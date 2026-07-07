@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>How It Works — RISIQ EV Solutions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How RISIQ measures EV battery health at the charging socket, computes State-of-Health to within ±3%, and issues a tamper-evident certificate — on any locked, imported EV.">
+<link rel="canonical" href="https://risiqevsolutions.com/how-it-works.html">
+<meta property="og:site_name" content="RISIQ EV Solutions">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://risiqevsolutions.com/how-it-works.html">
+<meta property="og:title" content="How It Works — RISIQ EV Solutions">
+<meta property="og:description" content="How RISIQ measures EV battery health at the charging socket, computes State-of-Health to within ±3%, and issues a tamper-evident certificate — on any locked, imported EV.">
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="14.5" fill="none" stroke="#2dd4c7" stroke-width="1.4"/>
+        <path d="M18 6 L9 18h5.5l-1.5 8L23 14h-5.5L18 6Z" fill="#e8871e"/>
+      </svg>
+      RISIQ <span class="brand-tag">EV Solutions</span>
+    </a>
+    <nav aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="how-it-works.html" aria-current="page">How It Works</a></li>
+        <li><a href="partners.html">For Partners</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav-cta">
+      <a href="contact.html" class="btn btn-primary btn-sm">Book the Pilot Briefing</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero" style="padding-bottom:20px;">
+    <div class="wrap">
+      <span class="eyebrow">How It Works</span>
+      <h1 style="margin-top:20px; max-width:16ch;">Fifteen minutes, at your site — and it works offline.</h1>
+      <p class="lede" style="margin-top:22px;">RISIQ measures the real electricity flowing into the battery at the charging socket — no OBD unlock, no manufacturer cooperation, no downtime.</p>
+      <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:32px;">
+        <span class="pill">Fast test ≈ 15 min</span>
+        <span class="pill">Reference accuracy ≤ 3%</span>
+        <span class="pill">Certificate verification &lt; 2 s</span>
+        <span class="pill">0% data loss on network drop</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOUR STEPS -->
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">The Process</span>
+        <h2>Four steps, one certificate.</h2>
+      </div>
+      <div class="grid grid-2 reveal">
+        <div class="card">
+          <span class="step-num mono">01 · Plug in</span>
+          <h3 style="margin-top:12px;">Connect the rig</h3>
+          <p style="margin-top:10px;">An operator connects the RISIQ rig at a workshop, importer yard or fleet depot — between the charge source and the vehicle's charging socket. Nothing to install on the car itself.</p>
+        </div>
+        <div class="card">
+          <span class="step-num mono">02 · Measure</span>
+          <h3 style="margin-top:12px;">Run a controlled charge</h3>
+          <p style="margin-top:10px;">A Class 0.5S revenue-grade energy meter samples voltage and current at 1 Hz on the charge path, while an opportunistic OBD logger reads whatever standard, unlocked PIDs the vehicle exposes — never required, never blocking.</p>
+        </div>
+        <div class="card">
+          <span class="step-num mono">03 · Compute</span>
+          <h3 style="margin-top:12px;">Integrate energy, apply physics</h3>
+          <p style="margin-top:10px;">The RISIQ cloud integrates delivered power over true elapsed time, corrects for charger conversion losses, and extrapolates full usable capacity from the measured State-of-Charge window.</p>
+        </div>
+        <div class="card">
+          <span class="step-num mono">04 · Certify</span>
+          <h3 style="margin-top:12px;">Sign &amp; issue</h3>
+          <p style="margin-top:10px;">Once the result clears every quality gate, a signed, QR-verified certificate is issued on the spot — usable capacity, range, grade and confidence band included.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY SOCKET MEASUREMENT -->
+  <section class="bg-raised">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Why Socket-Side, Not BMS-Reported</span>
+        <h2>Many locked imports report a number no one can check.</h2>
+        <p>A BMS-reported SoH is opaque, vendor-defined, and frequently optimistic or non-comparable across brands. Measuring real delivered energy at the connector gives an independent, physically grounded figure — the number a bank or insurer can actually underwrite.</p>
+      </div>
+      <div class="card reveal" style="max-width:640px;">
+        <h3 style="margin-bottom:16px;">The governing physics</h3>
+        <pre class="mono" style="white-space:pre-wrap; font-size:0.88rem; color:var(--text-muted); line-height:1.8; margin:0;">P_socket(t) = U_socket(t) × I_socket(t)
+E_socket = ∫ P_socket(t) dt                  (measured, socket meter)
+E_pack    = η × E_socket                     (η ≈ charge-path efficiency)
+C_actual  = E_pack / (SoC_end − SoC_start)
+SoH %     = 100 × C_actual / C_nominal</pre>
+        <p style="margin-top:16px; font-size:0.88rem;">Combined target uncertainty for a full-window reference test: <strong style="color:var(--teal-hi);">≤ 3%</strong>, root-sum-square of the independent error terms below.</p>
+      </div>
+      <div class="card reveal" style="margin-top:24px; overflow-x:auto;">
+        <table class="data-table">
+          <thead><tr><th>Error source</th><th>Typical magnitude</th><th>Mitigation</th></tr></thead>
+          <tbody>
+            <tr><td>Meter voltage/current accuracy</td><td>±0.5% (Class 0.5S)</td><td>Revenue-grade meter; annual calibration</td></tr>
+            <tr><td>SoC endpoint uncertainty</td><td>1–3% per endpoint</td><td>Prefer wide windows; anchor to rest-voltage</td></tr>
+            <tr><td>OBC efficiency variance</td><td>±2–4%</td><td>Characterise η per model &amp; temperature</td></tr>
+            <tr><td>Temperature effects on capacity</td><td>Model-dependent</td><td>Log pack/ambient temp; normalise in analytics</td></tr>
+            <tr><td>Timing / sample jitter</td><td>&lt; 0.1% at 1 Hz</td><td>Monotonic clock; integrate on true timestamps</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAST TEST / ML -->
+  <section>
+    <div class="wrap two-col">
+      <div class="reveal">
+        <span class="eyebrow">Fast Test</span>
+        <h2 style="margin-top:14px;">A 15-minute test, mapped to a full-window truth.</h2>
+        <p class="lede" style="margin-top:16px;">Once RISIQ's ground-truth dataset is large enough, a partial-charge fast test is mapped to full SoH by a model trained on our own physics-based reference tests — on the models and conditions that actually exist in Ethiopia.</p>
+        <p style="margin-top:18px; font-size:0.92rem;">Fast-test estimates are labelled as such on the certificate and carry a wider confidence band than full-window reference tests, until per-model accuracy is validated against a minimum sample count.</p>
+      </div>
+      <div class="card reveal">
+        <h3>Quality gates — must pass to certify</h3>
+        <ul style="list-style:none; padding:0; margin:20px 0 0; display:grid; gap:16px;">
+          <li style="display:flex; gap:12px;">
+            <svg style="flex:none; width:18px; height:18px; color:var(--teal-hi); margin-top:2px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font-size:0.92rem;">SoC window ≥ 10 percentage points for a reference test.</span>
+          </li>
+          <li style="display:flex; gap:12px;">
+            <svg style="flex:none; width:18px; height:18px; color:var(--teal-hi); margin-top:2px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font-size:0.92rem;">No unexplained gaps greater than 5 s in the integrated series.</span>
+          </li>
+          <li style="display:flex; gap:12px;">
+            <svg style="flex:none; width:18px; height:18px; color:var(--teal-hi); margin-top:2px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font-size:0.92rem;">Pack/ambient temperature within a defined valid band, or flagged.</span>
+          </li>
+          <li style="display:flex; gap:12px;">
+            <svg style="flex:none; width:18px; height:18px; color:var(--teal-hi); margin-top:2px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font-size:0.92rem;">Computed SoH within a plausible 40–105% range, else routed to manual review.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATE ANATOMY -->
+  <section class="bg-raised">
+    <div class="wrap two-col">
+      <div class="cert reveal">
+        <div class="cert-top">
+          <div>
+            <span class="pill">RISIQ Certified</span>
+            <h3 style="margin-top:14px;">Battery-Health Report</h3>
+          </div>
+          <span class="cert-grade">B</span>
+        </div>
+        <div class="cert-rows">
+          <div class="cert-row"><span>VIN / model / test date</span><span>on record</span></div>
+          <div class="cert-row"><span>Operator / test type</span><span>Reference</span></div>
+          <div class="cert-row"><span>State of health</span><span>87.4%</span></div>
+          <div class="cert-row"><span>Usable capacity / range</span><span>52.3 kWh / 310 km</span></div>
+          <div class="cert-row"><span>Anomaly flags</span><span>None</span></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:22px;">
+          <div class="cert-seal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z" stroke-linejoin="round"/><path d="M9.5 12l2 2 3.5-4"/></svg>
+            Signed &amp; verifiable
+          </div>
+          <div class="cert-qr" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <span class="eyebrow">Certificate Anatomy</span>
+        <h2 style="margin-top:14px;">Tamper-evident, and provable in seconds.</h2>
+        <p class="lede" style="margin-top:16px;">Each certificate is signed with a RISIQ private key. The QR resolves to a public endpoint that re-displays the signed record — anyone can scan and confirm it in under 2 seconds. Any edit to a downloaded PDF breaks signature verification.</p>
+        <p style="margin-top:18px; font-size:0.92rem;">SoH %, estimated usable capacity, estimated range and confidence band; anomaly flags for temperature, data gaps or plausibility; test type (reference or fast) clearly labelled.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUILT FOR ADDIS -->
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Built For Addis</span>
+        <h2>A dropped connection never invalidates a result.</h2>
+        <p>The rig buffers telemetry locally and forwards it once the link returns — full offline operation, with zero data loss, is a design requirement, not an afterthought.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section>
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <span class="eyebrow">Next Step</span>
+        <h2 style="margin-top:14px;">See it run on your fleet.</h2>
+        <p class="lede" style="margin:18px auto 0;">Book a briefing and we'll walk through a live test on a locked import from your own yard or depot.</p>
+        <div class="hero-cta">
+          <a href="contact.html" class="btn btn-primary">Book the Pilot Briefing</a>
+          <a href="partners.html" class="btn btn-ghost">See value by role</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <a href="index.html" class="brand" style="margin-bottom:16px;">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <circle cx="16" cy="16" r="14.5" fill="none" stroke="#2dd4c7" stroke-width="1.4"/>
+            <path d="M18 6 L9 18h5.5l-1.5 8L23 14h-5.5L18 6Z" fill="#e8871e"/>
+          </svg>
+          RISIQ
+        </a>
+        <p style="max-width:32ch;">Independent, physics-based EV battery-health certification for Ethiopia's electric fleet.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Site</h4>
+        <a href="index.html">Home</a>
+        <a href="how-it-works.html">How It Works</a>
+        <a href="partners.html">For Partners</a>
+        <a href="about.html">About</a>
+      </div>
+      <div class="footer-col">
+        <h4>Get Started</h4>
+        <a href="contact.html">Book a pilot briefing</a>
+        <a href="contact.html">Contact us</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <p>Addis Ababa, Ethiopia</p>
+        <a href="mailto:khalid@eniris.com">khalid@eniris.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year></span> RISIQ EV Solutions. Built on Eniris Engineering's certification platform.</span>
+      <span class="pill">Addis Ababa · Ethiopia</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
