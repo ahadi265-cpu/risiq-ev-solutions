@@ -159,7 +159,7 @@ p { margin: 0; color: var(--text-muted); }
   justify-content: space-between;
   gap: 20px;
   padding: 12px 18px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(14px) saturate(140%);
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -296,6 +296,12 @@ section { padding: 96px 0; position: relative; z-index: 1; }
   border-radius: var(--radius);
   padding: 28px;
   box-shadow: var(--shadow-card);
+  transition: transform 220ms var(--ease), box-shadow 220ms var(--ease), border-color 220ms var(--ease);
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 2px 4px rgba(15,27,45,0.05), 0 20px 44px rgba(15,27,45,0.13);
+  border-color: #a8d8d0;
 }
 .card-icon {
   width: 44px; height: 44px;
@@ -321,8 +327,25 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 @media (max-width: 900px) { .stat-band { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 540px) { .stat-band { grid-template-columns: 1fr; } }
 
-/* ---------- hero ---------- */
-.hero { padding: 76px 0 40px; overflow: hidden; }
+/* ---------- hero: deep-ink band for contrast ---------- */
+.hero {
+  padding: 170px 0 76px;
+  margin-top: -96px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 90% 70% at 80% -10%, rgba(232,135,30,0.14), transparent 60%),
+    linear-gradient(175deg, #0c1626 0%, #10233c 62%, #14304f 100%);
+  --ink: #ffffff;
+  --text: #e8eef6;
+  --text-muted: #b9c7d9;
+  --text-faint: #8496ad;
+  --amber-hi: #f5a949;
+  --line: #27405e;
+  --line-soft: #1d3350;
+}
+.hero .btn-ghost { color: #0f1b2d; }
+.hero .btn-ghost:hover { color: var(--teal-hi); }
+.hero .pill { background: rgba(255,255,255,0.08); color: #c9d6e6; border-color: #2c4666; }
 .hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 48px; align-items: center; }
 .hero h1 { margin-top: 20px; }
 .hero .lede { margin-top: 22px; font-size: 1.15rem; }
@@ -364,7 +387,8 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 
 /* ---------- steps ---------- */
 .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; counter-reset: step; }
-.step { position: relative; padding: 26px 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-card); box-shadow: var(--shadow-card); }
+.step { position: relative; padding: 26px 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-card); box-shadow: var(--shadow-card); transition: transform 220ms var(--ease), box-shadow 220ms var(--ease), border-color 220ms var(--ease); }
+.step:hover { transform: translateY(-5px); box-shadow: 0 2px 4px rgba(15,27,45,0.05), 0 20px 44px rgba(15,27,45,0.13); border-color: #a8d8d0; }
 .step .step-num { font-family: var(--font-mono); color: var(--amber-hi); font-size: 0.85rem; }
 .step h3 { margin-top: 14px; font-size: 1.1rem; }
 .step p { margin-top: 8px; font-size: 0.9rem; }
@@ -412,15 +436,23 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 .role-panel { display: none; }
 .role-panel.active { display: block; }
 
-/* ---------- CTA band ---------- */
+/* ---------- CTA band: Addis sunset ---------- */
 .cta-band {
   border-radius: 24px;
-  padding: 64px 48px;
-  background: linear-gradient(135deg, #ffffff, #eef4fb);
-  border: 1px solid var(--line);
+  padding: 72px 48px;
+  background:
+    linear-gradient(120deg, rgba(9,17,28,0.93) 0%, rgba(13,26,43,0.82) 55%, rgba(30,28,20,0.55) 100%),
+    url('../img/addis-sunset.jpg') center 62% / cover no-repeat;
+  border: 1px solid #22384f;
   box-shadow: var(--shadow-card);
   text-align: center;
+  --ink: #ffffff;
+  --text-muted: #c3cfdd;
+  --text-faint: #8ea0b5;
+  --amber-hi: #f5a949;
 }
+.cta-band .btn-ghost { color: #0f1b2d; }
+.cta-band .btn-ghost:hover { color: var(--teal-hi); }
 .cta-band h2 { max-width: 620px; margin: 0 auto; }
 .cta-band p { margin: 18px auto 0; }
 .cta-band .hero-cta { justify-content: center; margin-top: 30px; }
