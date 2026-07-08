@@ -102,26 +102,10 @@
         <h2>Many locked imports report a number no one can check.</h2>
         <p>A BMS-reported SoH is opaque, vendor-defined, and frequently optimistic or non-comparable across brands. Measuring real delivered energy at the connector gives an independent, physically grounded figure — the number a bank or insurer can actually underwrite.</p>
       </div>
-      <div class="card reveal" style="max-width:640px;">
-        <h3 style="margin-bottom:16px;">The governing physics</h3>
-        <pre class="mono" style="white-space:pre-wrap; font-size:0.88rem; color:var(--text-muted); line-height:1.8; margin:0;">P_socket(t) = U_socket(t) × I_socket(t)
-E_socket = ∫ P_socket(t) dt                  (measured, socket meter)
-E_pack    = η × E_socket                     (η ≈ charge-path efficiency)
-C_actual  = E_pack / (SoC_end − SoC_start)
-SoH %     = 100 × C_actual / C_nominal</pre>
-        <p style="margin-top:16px; font-size:0.88rem;">Combined target uncertainty for a full-window reference test: <strong style="color:var(--teal-hi);">≤ 3%</strong>, root-sum-square of the independent error terms below.</p>
-      </div>
-      <div class="card reveal" style="margin-top:24px; overflow-x:auto;">
-        <table class="data-table">
-          <thead><tr><th>Error source</th><th>Typical magnitude</th><th>Mitigation</th></tr></thead>
-          <tbody>
-            <tr><td>Meter voltage/current accuracy</td><td>±0.5% (Class 0.5S)</td><td>Revenue-grade meter; annual calibration</td></tr>
-            <tr><td>SoC endpoint uncertainty</td><td>1–3% per endpoint</td><td>Prefer wide windows; anchor to rest-voltage</td></tr>
-            <tr><td>OBC efficiency variance</td><td>±2–4%</td><td>Characterise η per model &amp; temperature</td></tr>
-            <tr><td>Temperature effects on capacity</td><td>Model-dependent</td><td>Log pack/ambient temp; normalise in analytics</td></tr>
-            <tr><td>Timing / sample jitter</td><td>&lt; 0.1% at 1 Hz</td><td>Monotonic clock; integrate on true timestamps</td></tr>
-          </tbody>
-        </table>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;" class="reveal">
+        <span class="pill">Revenue-grade, calibrated metering</span>
+        <span class="pill">Reference tests target &le; 3% accuracy</span>
+        <span class="pill">Every result passes quality gates before it certifies</span>
       </div>
     </div>
   </section>
