@@ -461,6 +461,25 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 .form-field textarea { min-height: 120px; resize: vertical; }
 .form-field input:focus, .form-field select:focus, .form-field textarea:focus { outline: 2px solid var(--teal-hi); outline-offset: 1px; border-color: var(--teal-hi); }
 
+/* ---------- hero figure & certificate figure ---------- */
+.hero-figure { margin-top: 52px; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); }
+.hero-figure img { width: 100%; display: block; }
+.cert-figure { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-card); background: #fff; }
+.cert-figure img { width: 100%; display: block; }
+
+/* ---------- product cards ---------- */
+.product-tag { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal-hi); background: #f0fbf9; border: 1px solid #a7e3da; padding: 4px 12px; border-radius: 999px; display: inline-block; margin-bottom: 16px; }
+.product-tag.amber { color: var(--amber-hi); background: #fdf3e7; border-color: #f3d3ad; }
+
+/* ---------- FAQ ---------- */
+.faq { display: grid; gap: 14px; max-width: 860px; }
+.faq details { background: var(--bg-card); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-card); }
+.faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 24px; font-weight: 600; color: var(--ink); }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-family: var(--font-mono); color: var(--amber-hi); font-size: 1.25rem; flex: none; transition: transform 200ms var(--ease); }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq .faq-body { padding: 0 24px 20px; color: var(--text-muted); font-size: 0.95rem; }
+
 /* ---------- misc ---------- */
 .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: var(--bg-card); border: 1px solid var(--line); font-size: 0.8rem; color: var(--text-muted); }
 .divider { height: 1px; background: var(--line-soft); margin: 56px 0; }
