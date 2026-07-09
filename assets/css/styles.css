@@ -469,6 +469,51 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 }
 .quote cite { display: block; font-style: normal; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-faint); margin-top: 14px; }
 
+/* ---------- hero two-column + floating certificate ---------- */
+.hero-grid2 { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 56px; align-items: center; }
+@media (max-width: 900px) { .hero-grid2 { grid-template-columns: 1fr; } }
+.cert-float {
+  max-width: 420px; width: 100%; height: auto; margin: 0 auto; display: block;
+  border-radius: 16px;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+  transform: rotate(2.5deg);
+  cursor: zoom-in;
+  animation: certFloat 7s ease-in-out infinite;
+}
+@keyframes certFloat {
+  0%, 100% { transform: rotate(2.5deg) translateY(0); }
+  50% { transform: rotate(2.5deg) translateY(-12px); }
+}
+@media (prefers-reduced-motion: reduce) { .cert-float { animation: none; } }
+
+/* ---------- nav scrolled state ---------- */
+.site-nav.scrolled .nav-inner { background: #ffffff; box-shadow: 0 8px 28px rgba(15,27,45,0.14); }
+
+/* ---------- back to top ---------- */
+.to-top {
+  position: fixed; right: 22px; bottom: 22px; z-index: 50;
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 1px solid var(--line); background: #ffffff; color: var(--ink);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: var(--shadow-card);
+  opacity: 0; pointer-events: none; transform: translateY(8px);
+  transition: opacity 200ms var(--ease), transform 200ms var(--ease), border-color 200ms var(--ease);
+}
+.to-top.show { opacity: 1; pointer-events: auto; transform: none; }
+.to-top:hover { border-color: var(--teal-hi); color: var(--teal-hi); }
+
+/* ---------- lightbox ---------- */
+.lightbox {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(8,13,20,0.88);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; cursor: zoom-out;
+  transition: opacity 220ms var(--ease);
+}
+.lightbox.open { opacity: 1; pointer-events: auto; }
+.lightbox img { max-width: min(92vw, 880px); max-height: 92vh; border-radius: 14px; box-shadow: 0 40px 90px rgba(0,0,0,0.6); }
+.cert-figure img { cursor: zoom-in; height: auto; }
+
 /* ---------- reveal animation ---------- */
 .reveal { opacity: 0; transform: translateY(16px); transition: opacity 600ms var(--ease), transform 600ms var(--ease); }
 .reveal.in { opacity: 1; transform: translateY(0); }
