@@ -149,4 +149,145 @@
     overlay.addEventListener('click', closeLb);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLb(); });
   }
+
+  /* Live QR codes for certificate verification (elements with data-qr-cert="ID") */
+  var qrTargets = document.querySelectorAll('[data-qr-cert]');
+  if (qrTargets.length && typeof qrcode === 'function') {
+    qrTargets.forEach(function (el) {
+      var id = el.getAttribute('data-qr-cert');
+      var url = window.location.origin + '/verify.html?id=' + encodeURIComponent(id);
+      var qr = qrcode(0, 'M');
+      qr.addData(url);
+      qr.make();
+      el.innerHTML = qr.createSvgTag({ scalable: true });
+      var svg = el.querySelector('svg');
+      if (svg) {
+        svg.setAttribute('role', 'img');
+        svg.setAttribute('aria-label', 'QR code to verify certificate ' + id);
+        svg.style.width = '100%';
+        svg.style.height = '100%';
+      }
+    });
+  }
+
+  /* Contact form: submit to /api/contact instead of mailto */
+  var contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    var contactStatus = document.getElementById('contact-status');
+    contactForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var submitBtn = contactForm.querySelector('button[type="submit"]');
+      var formData = new FormData(contactForm);
+      var payload = {
+        name: formData.get('name'),
+        org: formData.get('org'),
+        email: formData.get('email'),
+        role: formData.get('role'),
+        message: formData.get('message'),
+        company: formData.get('company')
+      };
+      submitBtn.disabled = true;
+      contactStatus.style.color = 'var(--text-faint)';
+      contactStatus.textContent = 'Sending...';
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+        .then(function (result) {
+          if (result.ok) {
+            contactForm.reset();
+            contactStatus.style.color = 'var(--teal-hi)';
+            contactStatus.textContent = 'Thanks — we\'ll be in touch shortly.';
+          } else {
+            contactStatus.style.color = 'var(--red)';
+            contactStatus.textContent = result.data.error || 'Something went wrong. Please email us directly.';
+          }
+        })
+        .catch(function () {
+          contactStatus.style.color = 'var(--red)';
+          contactStatus.textContent = 'Network error — please email us directly at Khalid@risiqbs.com.';
+        })
+        .finally(function () { submitBtn.disabled = false; });
+    });
+  }
+
+  /* Verify page: manual lookup form + auto-lookup from ?id= (e.g. from a scanned QR) */
+  var verifyForm = document.getElementById('verify-form');
+  var verifyResultSection = document.getElementById('verify-result-section');
+  var verifyResult = document.getElementById('verify-result');
+  if (verifyForm && verifyResult && verifyResultSection) {
+    var verifyInput = document.getElementById('verify-id');
+
+    var renderCert = function (id, cert) {
+      verifyResultSection.style.display = '';
+      verifyResult.innerHTML =
+        '<div class="cert" style="max-width:640px;">' +
+          '<div class="cert-top">' +
+            '<div><span class="pill">RISIQ Certified · Valid</span><h3 style="margin-top:14px;">' + cert.vehicle + '</h3></div>' +
+            '<span class="cert-grade">' + cert.grade + '</span>' +
+          '</div>' +
+          '<div class="cert-rows">' +
+            '<div class="cert-row"><span>Certificate ID</span><span>' + id + '</span></div>' +
+            '<div class="cert-row"><span>Test type / date</span><span>' + cert.testType + ' · ' + cert.testDate + '</span></div>' +
+            '<div class="cert-row"><span>State of health</span><span>' + cert.stateOfHealth + '%</span></div>' +
+            '<div class="cert-row"><span>Usable capacity / range</span><span>' + cert.usableCapacityKwh + ' kWh / ' + cert.estimatedRangeKm + ' km</span></div>' +
+            '<div class="cert-row"><span>Test location</span><span>' + cert.location + '</span></div>' +
+          '</div>' +
+          '<div class="cert-seal" style="margin-top:22px;">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z" stroke-linejoin="round"/><path d="M9.5 12l2 2 3.5-4"/></svg>' +
+            'Signed &amp; verified against the RISIQ registry' +
+          '</div>' +
+        '</div>';
+    };
+
+    var renderNotFound = function (id) {
+      verifyResultSection.style.display = '';
+      verifyResult.innerHTML =
+        '<div class="compare-card bad" style="max-width:640px;">' +
+          '<h3>No certificate found for "' + id + '"</h3>' +
+          '<p style="margin-top:10px;">Double-check the ID printed under the QR code on the certificate, or scan its QR code directly.</p>' +
+        '</div>';
+    };
+
+    var renderError = function () {
+      verifyResultSection.style.display = '';
+      verifyResult.innerHTML = '<p style="color:var(--red);">Something went wrong checking that certificate. Please try again.</p>';
+    };
+
+    var escapeHtml = function (str) {
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    };
+
+    var lookup = function (rawId) {
+      var id = escapeHtml(rawId.trim());
+      if (!id) return;
+      verifyResultSection.style.display = '';
+      verifyResult.innerHTML = '<p style="color:var(--text-faint);">Checking…</p>';
+      fetch('/api/verify?id=' + encodeURIComponent(rawId.trim()))
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.found) renderCert(id, data.certificate);
+          else renderNotFound(id);
+        })
+        .catch(renderError);
+    };
+
+    verifyForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var id = verifyInput.value.trim();
+      if (!id) return;
+      history.replaceState(null, '', '?id=' + encodeURIComponent(id));
+      lookup(id);
+    });
+
+    var presetId = new URLSearchParams(window.location.search).get('id');
+    if (presetId) {
+      verifyInput.value = presetId;
+      lookup(presetId);
+    }
+  }
 })();

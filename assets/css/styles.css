@@ -412,9 +412,12 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 .cert-row span:last-child { font-family: var(--font-mono); color: var(--text); }
 .cert-qr {
   width: 74px; height: 74px; border: 1px solid var(--line); border-radius: 8px;
-  background: repeating-linear-gradient(45deg, #c6d2e2 0 4px, transparent 4px 8px);
+  background: #ffffff;
   flex: none;
+  padding: 4px;
+  cursor: pointer;
 }
+.cert-qr svg { display: block; }
 .cert-seal { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--green); margin-top: 18px; }
 .cert-seal svg { width: 16px; height: 16px; }
 
@@ -551,6 +554,14 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 .hero-figure img { width: 100%; display: block; }
 .cert-figure { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-card); background: #fff; }
 .cert-figure img { width: 100%; display: block; }
+.qr-demo-strip {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 20px; border-top: 1px solid var(--line);
+  font-size: 0.9rem; color: var(--text-muted);
+}
+.qr-demo-strip .cert-qr { width: 56px; height: 56px; }
+.link-inline { color: var(--teal-hi); font-weight: 600; }
+.link-inline:hover { text-decoration: underline; }
 
 /* ---------- product cards ---------- */
 .product-tag { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal-hi); background: #f0fbf9; border: 1px solid #a7e3da; padding: 4px 12px; border-radius: 999px; display: inline-block; margin-bottom: 16px; }

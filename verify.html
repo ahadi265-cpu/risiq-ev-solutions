@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Verify a Certificate — RISIQ EV Solutions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Verify a RISIQ EV battery-health certificate by ID or QR code — confirm State-of-Health, grade and test details against RISIQ's signed record in seconds.">
+<link rel="canonical" href="https://risiqevsolutions.com/verify.html">
+<meta property="og:site_name" content="RISIQ EV Solutions">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://risiqevsolutions.com/verify.html">
+<meta property="og:title" content="Verify a Certificate — RISIQ EV Solutions">
+<meta property="og:description" content="Verify a RISIQ EV battery-health certificate by ID or QR code — confirm State-of-Health, grade and test details against RISIQ's signed record in seconds.">
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="14.5" fill="none" stroke="#0d9488" stroke-width="1.4"/>
+        <path d="M18 6 L9 18h5.5l-1.5 8L23 14h-5.5L18 6Z" fill="#e8871e"/>
+      </svg>
+      RISIQ <span class="brand-tag">EV Solutions</span>
+    </a>
+    <nav aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="how-it-works.html">How It Works</a></li>
+        <li><a href="verify.html" aria-current="page">Verify Certificate</a></li>
+        <li><a href="partners.html">For Partners</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav-cta">
+      <a href="contact.html" class="btn btn-primary btn-sm">Book the Pilot Briefing</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero" style="padding-bottom:20px;">
+    <div class="wrap">
+      <span class="eyebrow">Verify a Certificate</span>
+      <h1 style="margin-top:20px; max-width:18ch;">Scan it, or type the ID. Confirmed in seconds.</h1>
+      <p class="lede" style="margin-top:22px;">Every RISIQ certificate carries a unique ID and QR code that resolves here, straight from RISIQ's signed record — not from the PDF someone hands you.</p>
+    </div>
+  </section>
+
+  <!-- LOOKUP -->
+  <section class="section-tight">
+    <div class="wrap two-col">
+      <div class="card reveal">
+        <h3>Look up a certificate</h3>
+        <p style="margin-top:8px; font-size:0.92rem;">Enter the ID printed under the QR code on any RISIQ certificate.</p>
+        <form id="verify-form" style="margin-top:20px;">
+          <div class="form-field">
+            <label for="verify-id">Certificate ID</label>
+            <input type="text" id="verify-id" name="id" placeholder="e.g. RISIQ-0001" autocomplete="off" autocapitalize="characters">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Verify</button>
+        </form>
+      </div>
+
+      <div class="card reveal">
+        <h3>Try the live demo</h3>
+        <p style="margin-top:8px; font-size:0.92rem;">This QR code points at a sample certificate in RISIQ's live verification system — scan it with your phone camera, or tap it here.</p>
+        <a href="verify.html?id=RISIQ-0001" style="display:flex; align-items:center; gap:16px; margin-top:20px; cursor:pointer;">
+          <div class="cert-qr" data-qr-cert="RISIQ-0001" style="width:96px; height:96px;"></div>
+          <span style="font-size:0.92rem; color:var(--teal-hi); font-weight:600;">Verify certificate RISIQ-0001 →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="section-tight" id="verify-result-section" style="display:none;">
+    <div class="wrap">
+      <div id="verify-result" class="reveal in"></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section>
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <span class="eyebrow">Issuing Certificates</span>
+        <h2 style="margin-top:14px;">Want your own fleet certified?</h2>
+        <p class="lede" style="margin:18px auto 0;">Book a pilot briefing and we'll walk through a live test — and a live verification — on a vehicle from your own yard or depot.</p>
+        <div class="hero-cta">
+          <a href="contact.html" class="btn btn-primary">Book the Pilot Briefing</a>
+          <a href="how-it-works.html" class="btn btn-ghost">See how it works</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <a href="index.html" class="brand" style="margin-bottom:16px;">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <circle cx="16" cy="16" r="14.5" fill="none" stroke="#0d9488" stroke-width="1.4"/>
+            <path d="M18 6 L9 18h5.5l-1.5 8L23 14h-5.5L18 6Z" fill="#e8871e"/>
+          </svg>
+          RISIQ
+        </a>
+        <p style="max-width:32ch;">Independent, engineering-grade EV battery-health certification for Ethiopia's electric fleet.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Site</h4>
+        <a href="index.html">Home</a>
+        <a href="how-it-works.html">How It Works</a>
+        <a href="verify.html">Verify Certificate</a>
+        <a href="partners.html">For Partners</a>
+        <a href="about.html">About</a>
+      </div>
+      <div class="footer-col">
+        <h4>Get Started</h4>
+        <a href="contact.html">Book a pilot briefing</a>
+        <a href="contact.html">Contact us</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <p>Addis Ababa, Ethiopia</p>
+        <a href="mailto:Khalid@risiqbs.com">Khalid@risiqbs.com</a>
+        <a href="tel:+251911223848">+251 911 223 848</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year></span> RISIQ EV Solutions. Built on Eniris Engineering's certification platform.</span>
+      <span style="font-size:0.76rem;">Photos: H. Berberich · DFID · J. Rebiffé (CC BY)</span>
+      <span class="pill">Addis Ababa · Ethiopia</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/vendor/qrcode.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

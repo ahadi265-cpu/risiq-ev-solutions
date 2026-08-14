@@ -1,0 +1,9 @@
+{
+  "name": "risiq-ev-solutions",
+  "private": true,
+  "version": "1.0.0",
+  "description": "RISIQ EV Solutions marketing site with certificate verification and pilot-request backend on Vercel.",
+  "dependencies": {
+    "@vercel/kv": "^2.0.0"
+  }
+}

@@ -32,6 +32,7 @@
       <ul class="nav-links">
         <li><a href="index.html" aria-current="page">Home</a></li>
         <li><a href="how-it-works.html">How It Works</a></li>
+        <li><a href="verify.html">Verify Certificate</a></li>
         <li><a href="partners.html">For Partners</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="contact.html">Contact</a></li>
@@ -249,6 +250,12 @@
       </div>
       <figure class="cert-figure reveal" style="margin:0;">
         <img src="assets/img/certificate-risiq.png" data-lightbox alt="Sample RISIQ Battery Health Certificate — 94% State of Health, Grade A, with QR verification" width="2000" height="2540">
+        <figcaption class="qr-demo-strip">
+          <a href="verify.html?id=RISIQ-0001" aria-label="Scan or tap to verify this sample certificate">
+            <div class="cert-qr" data-qr-cert="RISIQ-0001"></div>
+          </a>
+          <span>See the verification system live. <a href="verify.html?id=RISIQ-0001" class="link-inline">Scan or tap to check this demo certificate →</a></span>
+        </figcaption>
       </figure>
     </div>
   </section>
@@ -451,6 +458,7 @@
         <h4>Site</h4>
         <a href="index.html">Home</a>
         <a href="how-it-works.html">How It Works</a>
+        <a href="verify.html">Verify Certificate</a>
         <a href="partners.html">For Partners</a>
         <a href="about.html">About</a>
       </div>
@@ -474,6 +482,7 @@
   </div>
 </footer>
 
+<script src="assets/js/vendor/qrcode.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>

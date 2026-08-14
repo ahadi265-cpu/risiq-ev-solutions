@@ -31,6 +31,7 @@
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="how-it-works.html">How It Works</a></li>
+        <li><a href="verify.html">Verify Certificate</a></li>
         <li><a href="partners.html">For Partners</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="contact.html" aria-current="page">Contact</a></li>
@@ -107,23 +108,23 @@
         <p style="margin-top:30px; font-size:0.86rem; color:var(--text-faint);">Abdulfetah Khalid · Founder &amp; CEO · RISIQ EV Solutions, built on Eniris Engineering's certification platform.</p>
       </div>
 
-      <form class="card reveal" action="mailto:Khalid@risiqbs.com" method="post" enctype="text/plain">
+      <form class="card reveal" id="contact-form">
         <h3 style="margin-bottom:22px;">Request the pilot briefing</h3>
         <div class="form-field">
           <label for="name">Full name</label>
-          <input type="text" id="name" name="Name" required>
+          <input type="text" id="name" name="name" required>
         </div>
         <div class="form-field">
           <label for="org">Organisation</label>
-          <input type="text" id="org" name="Organisation" required>
+          <input type="text" id="org" name="org" required>
         </div>
         <div class="form-field">
           <label for="email">Email</label>
-          <input type="email" id="email" name="Email" required>
+          <input type="email" id="email" name="email" required>
         </div>
         <div class="form-field">
           <label for="role">I am a...</label>
-          <select id="role" name="Role">
+          <select id="role" name="role">
             <option>Insurer</option>
             <option>Bank / MFI</option>
             <option>Importer / Dealer</option>
@@ -133,10 +134,14 @@
         </div>
         <div class="form-field">
           <label for="message">What would you like to certify or discuss?</label>
-          <textarea id="message" name="Message" required></textarea>
+          <textarea id="message" name="message" required></textarea>
+        </div>
+        <div style="position:absolute; left:-9999px;" aria-hidden="true">
+          <label for="company">Leave this field blank</label>
+          <input type="text" id="company" name="company" tabindex="-1" autocomplete="off">
         </div>
         <button type="submit" class="btn btn-primary btn-block">Send request</button>
-        <p style="margin-top:14px; font-size:0.8rem; color:var(--text-faint);">Opens your email client with these details pre-filled, addressed to Khalid@risiqbs.com.</p>
+        <p id="contact-status" role="status" style="margin-top:14px; font-size:0.85rem;"></p>
       </form>
     </div>
   </section>
@@ -160,6 +165,7 @@
         <h4>Site</h4>
         <a href="index.html">Home</a>
         <a href="how-it-works.html">How It Works</a>
+        <a href="verify.html">Verify Certificate</a>
         <a href="partners.html">For Partners</a>
         <a href="about.html">About</a>
       </div>
