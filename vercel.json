@@ -4,5 +4,8 @@
     "api/*.js": {
       "runtime": "nodejs20.x"
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/v/:id", "destination": "/verify.html?id=:id" }
+  ]
 }

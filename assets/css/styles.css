@@ -29,7 +29,7 @@
   --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
 
-  --max: 1160px;
+  --max: 1320px;
   --radius: 14px;
   --radius-sm: 8px;
 
@@ -549,9 +549,7 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 .form-field textarea { min-height: 120px; resize: vertical; }
 .form-field input:focus, .form-field select:focus, .form-field textarea:focus { outline: 2px solid var(--teal-hi); outline-offset: 1px; border-color: var(--teal-hi); }
 
-/* ---------- hero figure & certificate figure ---------- */
-.hero-figure { margin-top: 52px; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); }
-.hero-figure img { width: 100%; display: block; }
+/* ---------- certificate figure ---------- */
 .cert-figure { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-card); background: #fff; }
 .cert-figure img { width: 100%; display: block; }
 .qr-demo-strip {

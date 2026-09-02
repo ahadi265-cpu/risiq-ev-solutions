@@ -84,18 +84,28 @@
   /* Role tab switcher (For Partners page) */
   var tabs = document.querySelectorAll('.role-tab');
   if (tabs.length) {
+    var activateRole = function (role) {
+      var match = false;
+      tabs.forEach(function (t) {
+        var isMatch = t.getAttribute('data-role') === role;
+        if (isMatch) match = true;
+        t.classList.toggle('active', isMatch);
+        t.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+      });
+      if (!match) return false;
+      document.querySelectorAll('.role-panel').forEach(function (panel) {
+        panel.classList.toggle('active', panel.getAttribute('data-role') === role);
+      });
+      return true;
+    };
     tabs.forEach(function (tab) {
       tab.addEventListener('click', function () {
-        var target = tab.getAttribute('data-role');
-        tabs.forEach(function (t) {
-          t.classList.toggle('active', t === tab);
-          t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
-        });
-        document.querySelectorAll('.role-panel').forEach(function (panel) {
-          panel.classList.toggle('active', panel.getAttribute('data-role') === target);
-        });
+        activateRole(tab.getAttribute('data-role'));
       });
     });
+    /* Deep link support: partners.html?role=banks preselects a tab */
+    var presetRole = new URLSearchParams(window.location.search).get('role');
+    if (presetRole) activateRole(presetRole);
   }
 
   /* Current year in footer */
@@ -112,16 +122,11 @@
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
   });
 
-  /* Nav shadow + back-to-top visibility + hero parallax */
+  /* Nav shadow + back-to-top visibility */
   var navEl = document.querySelector('.site-nav');
-  var heroImg = document.querySelector('.hero-figure img');
   function onScroll() {
     if (navEl) navEl.classList.toggle('scrolled', window.scrollY > 24);
     toTop.classList.toggle('show', window.scrollY > 600);
-    if (!reduceMotion && heroImg) {
-      var y = Math.min(window.scrollY * 0.06, 60);
-      heroImg.style.transform = 'translateY(' + y + 'px)';
-    }
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
@@ -155,7 +160,7 @@
   if (qrTargets.length && typeof qrcode === 'function') {
     qrTargets.forEach(function (el) {
       var id = el.getAttribute('data-qr-cert');
-      var url = window.location.origin + '/verify.html?id=' + encodeURIComponent(id);
+      var url = window.location.origin + '/v/' + encodeURIComponent(id);
       var qr = qrcode(0, 'M');
       qr.addData(url);
       qr.make();
