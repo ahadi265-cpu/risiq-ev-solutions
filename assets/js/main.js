@@ -218,6 +218,227 @@
     });
   }
 
+  /* ------------------------------------------------------------------
+     Test bench — plays back a worked certification run.
+     Renders complete at rest; the button replays it from t = 0.
+     ------------------------------------------------------------------ */
+  var bench = document.querySelector('[data-bench]');
+  if (bench) {
+    var X0 = 62, XW = 634;                    /* chart plot area, in viewBox units */
+    var ysoc = function (soc) { return 228 - soc * 2.04; };
+    var capx = function (kwh) { return 8 + kwh * 10.472; };
+    var SVGNS = 'http://www.w3.org/2000/svg';
+
+    var RUNS = {
+      reference: {
+        name: 'Reference Test', tmax: 241,
+        socStart: 32.0, socEnd: 78.0,
+        socketKwh: 28.9, packKwh: 26.6,
+        usable: 57.8, nominal: 61.5, soh: 94.0, grade: 'A', range: 402,
+        band: '±3.0% · reference accuracy',
+        pwrMax: '10', pwrNote: '7.20 kW steady',
+        foot: 'Full-window reference test · Class 0.5S revenue-grade meter · 1 Hz sampling',
+        gap: '1.0 s', temp: '28 °C',
+        ticks: [[62, '0'], [219.8, '60'], [377.7, '120'], [535.5, '180'], [696, '241']],
+        soc: '62,162.7 114.6,154.8 167.2,147.4 219.8,139.3 272.5,131.7 325.1,123.6 377.7,116 430.3,108 482.9,100.3 535.5,92.7 588.1,84.8 640.8,76.8 696,68.9',
+        pwr: '62,350 62,296.7 114.6,296.2 167.2,297.1 219.8,296.4 272.5,296.9 325.1,296.3 377.7,297 430.3,296.5 482.9,296.8 535.5,296.6 588.1,297.2 640.8,297.9 696,298.9 696,350',
+        alt: 'Charge session: state of charge rises from 32 to 78 percent over 241 minutes at a steady 7.2 kilowatts, giving a 46 percentage-point measured window.'
+      },
+      rapid: {
+        name: 'Rapid Check', tmax: 15,
+        socStart: 38.0, socEnd: 62.7,
+        socketKwh: 15.0, packKwh: 14.3,
+        usable: 57.9, nominal: 61.5, soh: 94.1, grade: 'A', range: 403,
+        band: '±6.0% · model-mapped, provisional',
+        pwrMax: '70', pwrNote: '63 → 56 kW taper',
+        foot: 'Partial-window Rapid Check · DC 60 kW · mapped to full SoH by model',
+        gap: '0.0 s', temp: '31 °C',
+        ticks: [[62, '0'], [188.8, '3'], [315.6, '6'], [442.4, '9'], [569.2, '12'], [696, '15']],
+        soc: '62,150.5 125.4,145.2 188.8,140.1 252.2,134.8 315.6,129.7 379,124.6 442.4,119.5 505.8,114.4 569.2,109.5 632.6,104.6 696,100.1',
+        pwr: '62,350 62,283.4 188.8,283.9 315.6,285.5 442.4,287.1 569.2,289.2 696,290.8 696,350',
+        alt: 'Charge session: state of charge rises from 38 to 62.7 percent in 15 minutes on a 60 kilowatt DC charger, giving a 24.7 percentage-point measured window.'
+      }
+    };
+
+    var el = function (sel) { return bench.querySelector(sel); };
+    var ro = function (k) { return bench.querySelector('[data-ro="' + k + '"]'); };
+    var gateEls = Array.prototype.slice.call(bench.querySelectorAll('[data-gates] li'));
+    var railEls = Array.prototype.slice.call(bench.querySelectorAll('[data-rail] li'));
+    var playBtn = el('[data-play]');
+    var chart = el('[data-chart]');
+
+    var run = RUNS.reference;
+    var socPts = [];
+    var frame = null;
+
+    /* y on the drawn SoC curve at a given playhead x — keeps dot and readouts in step */
+    var parsePts = function (str) {
+      return str.trim().split(/\s+/).map(function (pair) {
+        var xy = pair.split(',');
+        return [parseFloat(xy[0]), parseFloat(xy[1])];
+      });
+    };
+    var yAt = function (x) {
+      for (var i = 1; i < socPts.length; i++) {
+        if (x <= socPts[i][0]) {
+          var a = socPts[i - 1], b = socPts[i];
+          var f = (x - a[0]) / (b[0] - a[0] || 1);
+          return a[1] + (b[1] - a[1]) * f;
+        }
+      }
+      return socPts[socPts.length - 1][1];
+    };
+
+    var clock = function (tMin) {
+      var s = Math.round(tMin * 60);
+      var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+      var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+      return pad(h) + ':' + pad(m) + ':' + pad(s % 60);
+    };
+    var mins = function (t) { return run.tmax >= 60 ? Math.round(t) + ' min' : t.toFixed(1) + ' min'; };
+
+    /* paint the static parts that only change when the test type changes */
+    var applyRun = function () {
+      socPts = parsePts(run.soc);
+      el('#chSoc').setAttribute('points', run.soc);
+      el('#chPwr').setAttribute('points', run.pwr);
+      el('#chPwrMax').textContent = run.pwrMax;
+      el('#chPwrNote').textContent = run.pwrNote;
+      el('#chFoot').textContent = run.foot;
+      el('#chBandBot').setAttribute('y1', ysoc(run.socStart));
+      el('#chBandBot').setAttribute('y2', ysoc(run.socStart));
+      el('#chStartLab').setAttribute('y', ysoc(run.socStart) + 13);
+      el('#chStartLab').textContent = 'start ' + run.socStart.toFixed(1) + '%';
+      chart.setAttribute('aria-label', run.alt);
+
+      var ticks = el('#chTicks');
+      while (ticks.firstChild) ticks.removeChild(ticks.firstChild);
+      run.ticks.forEach(function (t) {
+        var n = document.createElementNS(SVGNS, 'text');
+        n.setAttribute('x', t[0]);
+        n.setAttribute('y', 246);
+        n.textContent = t[1];
+        ticks.appendChild(n);
+      });
+
+      var pp = (run.socEnd - run.socStart).toFixed(1);
+      bench.querySelector('[data-gate="win"]').textContent = 'SoC window ' + pp + ' pp — needs ≥ 10 pp';
+      bench.querySelector('[data-gate="gap"]').textContent = 'Longest data gap ' + run.gap + ' — needs ≤ 5 s';
+      bench.querySelector('[data-gate="temp"]').textContent = 'Pack temperature ' + run.temp + ' — inside valid band';
+      bench.querySelector('[data-gate="soh"]').textContent = 'SoH ' + run.soh.toFixed(1) + '% — inside plausible 40–105%';
+    };
+
+    /* q = 0 .. 1 across the whole run: measure -> gate -> compute -> certify */
+    var draw = function (q) {
+      var MEASURE = 0.62, COMPUTE = 0.78, CERTIFY = 0.92;
+      var p = Math.min(q / MEASURE, 1);
+      var x = X0 + XW * p;
+      var y = yAt(x);
+      var soc = (228 - y) / 2.04;
+      var pack = (soc - run.socStart) / 100 * run.usable;
+      var socket = pack * (run.socketKwh / run.packKwh);
+      var pp = soc - run.socStart;
+
+      el('#chClipR').setAttribute('width', XW * p);
+      el('#chBand').setAttribute('y', y);
+      el('#chBand').setAttribute('height', Math.max(0, ysoc(run.socStart) - y));
+      el('#chBandTop').setAttribute('y1', y);
+      el('#chBandTop').setAttribute('y2', y);
+      el('#chPlay').setAttribute('opacity', q >= 1 ? 0 : 1);
+      el('#chPlay').setAttribute('x1', x);
+      el('#chPlay').setAttribute('x2', x);
+      el('#chDot').setAttribute('cx', x);
+      el('#chDot').setAttribute('cy', y);
+      el('#chEndLab').setAttribute('y', y - 6);
+      el('#chEndLab').textContent = 'now ' + soc.toFixed(1) + '%';
+      el('#chWinLab').textContent = 'measured window · ' + pp.toFixed(1) + ' pp';
+
+      ro('elapsed').textContent = mins(run.tmax * p);
+      ro('soc').textContent = soc.toFixed(1) + '%';
+      ro('socket').textContent = socket.toFixed(1) + ' kWh';
+      ro('pack').textContent = pack.toFixed(1) + ' kWh';
+      ro('clock').textContent = clock(run.tmax * p);
+
+      /* extrapolation from the measured slice out to the full window */
+      var r = q < COMPUTE ? 0 : Math.min((q - COMPUTE) / (CERTIFY - COMPUTE), 1);
+      var shown = pack + (run.usable - pack) * r;
+      el('#capLab').textContent = 'MEASURED ' + pack.toFixed(1) + ' kWh · ' + pp.toFixed(1) + ' pp';
+      el('#capFill').setAttribute('width', Math.max(0, capx(pack) - 8));
+      el('#capExt').setAttribute('x', capx(pack));
+      el('#capExt').setAttribute('width', Math.max(0, capx(shown) - capx(pack)));
+      el('#capLost').setAttribute('x', capx(shown));
+      el('#capLost').setAttribute('width', r > 0 ? Math.max(0, capx(run.nominal) - capx(shown)) : 0);
+      el('#capMark').setAttribute('x1', capx(shown));
+      el('#capMark').setAttribute('x2', capx(shown));
+      el('#capUsable').setAttribute('x', capx(shown));
+      el('#capUsable').textContent = r > 0 ? shown.toFixed(1) + ' kWh usable today' : '';
+
+      gateEls.forEach(function (g, i) {
+        var at = [MEASURE, MEASURE + 0.05, MEASURE + 0.10, CERTIFY - 0.02][i];
+        g.classList.toggle('is-pass', q >= at);
+      });
+      railEls.forEach(function (s, i) {
+        s.classList.toggle('is-on', q >= [0, 0.02, MEASURE, COMPUTE, CERTIFY][i]);
+      });
+
+      ro('grade').textContent = q >= CERTIFY ? run.grade : '—';
+      ro('soh').textContent = q >= COMPUTE ? (shown / run.nominal * 100).toFixed(1) + '%' : '—';
+      ro('detail').textContent = q >= CERTIFY
+        ? run.usable.toFixed(1) + ' kWh usable · ' + run.range + ' km estimated range'
+        : q >= COMPUTE ? 'extrapolating the full charge window…'
+        : 'no result until every gate passes';
+      ro('band').textContent = q >= CERTIFY ? run.band : '';
+      ro('state').textContent = q >= 1 ? 'Complete'
+        : q >= CERTIFY ? 'Signing'
+        : q >= COMPUTE ? 'Computing'
+        : q >= MEASURE ? 'Checking' : 'Measuring';
+    };
+
+    var play = function () {
+      if (frame) cancelAnimationFrame(frame);
+      if (reduceMotion) { draw(1); return; }
+      bench.setAttribute('data-state', 'running');
+      playBtn.disabled = true;
+      ro('playlabel').textContent = 'Running…';
+      var t0 = null, DUR = 7600;
+      var step = function (ts) {
+        if (t0 === null) t0 = ts;
+        var q = Math.min((ts - t0) / DUR, 1);
+        draw(q);
+        if (q < 1) { frame = requestAnimationFrame(step); }
+        else {
+          frame = null;
+          bench.setAttribute('data-state', 'done');
+          playBtn.disabled = false;
+          ro('playlabel').textContent = 'Replay the run';
+        }
+      };
+      frame = requestAnimationFrame(step);
+    };
+
+    applyRun();
+    draw(1);
+
+    playBtn.addEventListener('click', play);
+    bench.querySelectorAll('.bench-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        if (frame) { cancelAnimationFrame(frame); frame = null; }
+        bench.setAttribute('data-state', 'done');
+        playBtn.disabled = false;
+        ro('playlabel').textContent = 'Replay the run';
+        bench.querySelectorAll('.bench-tab').forEach(function (t) {
+          var on = t === tab;
+          t.classList.toggle('is-on', on);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        run = RUNS[tab.getAttribute('data-test')];
+        applyRun();
+        draw(1);
+      });
+    });
+  }
+
+
   /* Verify page: manual lookup form + auto-lookup from ?id= (e.g. from a scanned QR) */
   var verifyForm = document.getElementById('verify-form');
   var verifyResultSection = document.getElementById('verify-result-section');

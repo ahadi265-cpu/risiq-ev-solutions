@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <title>How It Works — RISIQ EV Solutions</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="How RISIQ measures EV battery health at the charging socket, computes State-of-Health to within ±3%, and issues a tamper-evident certificate — on any locked, imported EV.">
+<meta name="description" content="How RISIQ measures EV battery health at the charging socket, computes State-of-Health to within ±3%, and issues a tamper-evident certificate — on any locked, imported EV. Watch a full certification run played back end to end.">
 <link rel="canonical" href="https://risiqevsolutions.com/how-it-works.html">
 <meta property="og:site_name" content="RISIQ EV Solutions">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://risiqevsolutions.com/how-it-works.html">
 <meta property="og:title" content="How It Works — RISIQ EV Solutions">
-<meta property="og:description" content="How RISIQ measures EV battery health at the charging socket, computes State-of-Health to within ±3%, and issues a tamper-evident certificate — on any locked, imported EV.">
+<meta property="og:description" content="How RISIQ measures EV battery health at the charging socket, computes State-of-Health to within ±3%, and issues a tamper-evident certificate — on any locked, imported EV. Watch a full certification run played back end to end.">
 <meta property="og:image" content="https://risiqevsolutions.com/assets/img/certificate-risiq.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
@@ -97,6 +97,96 @@
     </div>
   </section>
 
+  <!-- SIGNAL PATH DIAGRAM -->
+  <section class="bg-raised">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">The Signal Path</span>
+        <h2>Where the rig sits, and what actually moves through it.</h2>
+        <p>The rig goes in line on the charge path — so the current that reaches the battery is the same current it measures. Everything downstream is arithmetic on that one honest number.</p>
+      </div>
+      <figure class="figure reveal">
+        <div class="figure-scroll">
+          <svg viewBox="0 0 960 448" role="img" aria-label="The RISIQ rig sits in line between the charge source and the vehicle's charging socket, meters the energy reaching the battery at 1 Hz, buffers it locally, and forwards it to the RISIQ cloud, which issues a signed certificate.">
+            <defs>
+              <marker id="hwAh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" class="dg-head"/>
+              </marker>
+              <marker id="hwAhK" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" class="dg-head-k"/>
+              </marker>
+            </defs>
+
+            <!-- physical charge path -->
+            <rect x="20" y="48" width="160" height="62" rx="8" class="dg-box"/>
+            <text x="100" y="74" text-anchor="middle" class="dg-t">Charge source</text>
+            <text x="100" y="93" text-anchor="middle" class="dg-s">AC box or DC charger</text>
+
+            <rect x="270" y="32" width="200" height="94" rx="10" class="dg-box-k"/>
+            <text x="370" y="58" text-anchor="middle" class="dg-t">RISIQ rig</text>
+            <text x="370" y="78" text-anchor="middle" class="dg-s">Class 0.5S meter</text>
+            <text x="370" y="94" text-anchor="middle" class="dg-s">edge compute + buffer</text>
+            <text x="370" y="110" text-anchor="middle" class="dg-s">charge control</text>
+
+            <rect x="560" y="48" width="160" height="62" rx="8" class="dg-box"/>
+            <text x="640" y="74" text-anchor="middle" class="dg-t">Charging socket</text>
+            <text x="640" y="93" text-anchor="middle" class="dg-s">no OEM unlock</text>
+
+            <rect x="800" y="48" width="140" height="62" rx="8" class="dg-box"/>
+            <text x="870" y="74" text-anchor="middle" class="dg-t">Battery pack</text>
+            <text x="870" y="93" text-anchor="middle" class="dg-s">locked · any brand</text>
+
+            <line x1="180" y1="79" x2="262" y2="79" class="dg-line" marker-end="url(#hwAh)"/>
+            <text x="221" y="134" text-anchor="middle" class="dg-lbl">AC 230 V</text>
+            <text x="221" y="148" text-anchor="middle" class="dg-lbl">7.2 kW</text>
+
+            <line x1="470" y1="79" x2="552" y2="79" class="dg-line-k" marker-end="url(#hwAhK)"/>
+            <text x="511" y="134" text-anchor="middle" class="dg-lbl-k">same current,</text>
+            <text x="511" y="148" text-anchor="middle" class="dg-lbl-k">now measured</text>
+
+            <line x1="720" y1="79" x2="792" y2="79" class="dg-line" marker-end="url(#hwAh)"/>
+            <text x="756" y="134" text-anchor="middle" class="dg-lbl">charges</text>
+            <text x="756" y="148" text-anchor="middle" class="dg-lbl">the pack</text>
+
+            <!-- optional OBD side channel -->
+            <rect x="20" y="178" width="200" height="54" rx="8" class="dg-box-o"/>
+            <text x="120" y="200" text-anchor="middle" class="dg-t">OBD-II port</text>
+            <text x="120" y="219" text-anchor="middle" class="dg-s">whatever it exposes</text>
+            <polyline points="220,205 310,205 310,134" class="dg-line-o" marker-end="url(#hwAh)"/>
+            <text x="20" y="256" class="dg-lbl">standard, unlocked PIDs only —</text>
+            <text x="20" y="270" class="dg-lbl">opportunistic, never blocks a test</text>
+
+            <!-- telemetry down to the platform -->
+            <line x1="370" y1="126" x2="370" y2="332" class="dg-line-k dg-flow" marker-end="url(#hwAhK)"/>
+            <text x="384" y="222" class="dg-lbl-k">1 Hz V·I samples</text>
+            <text x="384" y="236" class="dg-lbl-k">written to local storage first</text>
+
+            <rect x="270" y="340" width="190" height="62" rx="8" class="dg-box"/>
+            <text x="365" y="366" text-anchor="middle" class="dg-t">Local buffer</text>
+            <text x="365" y="385" text-anchor="middle" class="dg-s">survives link loss</text>
+
+            <rect x="530" y="340" width="190" height="62" rx="8" class="dg-box"/>
+            <text x="625" y="366" text-anchor="middle" class="dg-t">RISIQ cloud</text>
+            <text x="625" y="385" text-anchor="middle" class="dg-s">integrate → extrapolate</text>
+
+            <rect x="790" y="340" width="150" height="62" rx="8" class="dg-box-k"/>
+            <text x="865" y="366" text-anchor="middle" class="dg-t">Certificate</text>
+            <text x="865" y="385" text-anchor="middle" class="dg-s">SoH · grade · QR</text>
+
+            <line x1="460" y1="371" x2="522" y2="371" class="dg-line" marker-end="url(#hwAh)"/>
+            <text x="491" y="330" text-anchor="middle" class="dg-lbl">on reconnect · 0% loss</text>
+
+            <line x1="720" y1="371" x2="782" y2="371" class="dg-line-k" marker-end="url(#hwAhK)"/>
+            <text x="751" y="330" text-anchor="middle" class="dg-lbl-k">signed &amp; published</text>
+
+            <text x="940" y="428" text-anchor="end" class="dg-lbl">public /v/ endpoint · verified in &lt; 2 s</text>
+          </svg>
+        </div>
+        <figcaption>The rig is the only component in the loop that has to be trusted — and it sits on the physical charge path, not on the vehicle's own reporting. The OBD channel (dashed) is read when a car happens to expose standard PIDs; a locked import that exposes nothing still certifies.</figcaption>
+      </figure>
+    </div>
+  </section>
+
   <!-- WHY SOCKET MEASUREMENT -->
   <section class="bg-raised">
     <div class="wrap">
@@ -110,6 +200,169 @@
         <span class="pill">Reference tests target &le; 3% accuracy</span>
         <span class="pill">Every result passes quality gates before it certifies</span>
       </div>
+    </div>
+  </section>
+
+  <!-- LIVE TEST BENCH -->
+  <section id="bench">
+    <div class="wrap">
+      <div class="section-head reveal" style="max-width:720px;">
+        <span class="eyebrow">Watch A Test Run</span>
+        <h2>A real certification run, end to end.</h2>
+        <p>This is the arithmetic behind a RISIQ certificate, played back on a worked example: a locked 61.5&nbsp;kWh import measured at an Addis importer yard. Switch between the two test types to see exactly what the 15-minute Rapid Check trades away.</p>
+      </div>
+
+      <div class="bench reveal" data-bench data-state="done">
+        <div class="bench-bar">
+          <div class="bench-tabs" role="tablist" aria-label="Test type">
+            <button class="bench-tab is-on" data-test="reference" role="tab" aria-selected="true" type="button">Reference Test</button>
+            <button class="bench-tab" data-test="rapid" role="tab" aria-selected="false" type="button">Rapid Check</button>
+          </div>
+          <div class="bench-live">
+            <span class="bench-led" aria-hidden="true"></span>
+            <span class="bench-state mono" data-ro="state">Complete</span>
+            <span class="bench-clock mono" data-ro="clock">04:01:00</span>
+            <button class="bench-play" data-play type="button">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              <span data-ro="playlabel">Replay the run</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bench-body">
+          <div class="bench-left">
+          <figure class="bench-chart">
+            <div class="chart-scroll">
+              <svg viewBox="0 0 730 400" role="img" data-chart
+                   aria-label="Charge session: state of charge rises from 32 to 78 percent over 241 minutes at a steady 7.2 kilowatts, giving a 46 percentage-point measured window.">
+                <defs>
+                  <clipPath id="chClip"><rect id="chClipR" x="62" y="0" width="634" height="400"/></clipPath>
+                </defs>
+
+                <!-- SoC plot -->
+                <text x="62" y="16" class="ch-cap">STATE OF CHARGE · %</text>
+                <g class="ch-grid">
+                  <line x1="62" y1="24" x2="696" y2="24"/>
+                  <line x1="62" y1="75" x2="696" y2="75"/>
+                  <line x1="62" y1="126" x2="696" y2="126"/>
+                  <line x1="62" y1="177" x2="696" y2="177"/>
+                </g>
+                <g class="ch-lab" text-anchor="end">
+                  <text x="54" y="27.5">100</text>
+                  <text x="54" y="78.5">75</text>
+                  <text x="54" y="129.5">50</text>
+                  <text x="54" y="180.5">25</text>
+                  <text x="54" y="231.5">0</text>
+                </g>
+
+                <g clip-path="url(#chClip)">
+                  <rect id="chBand" x="62" y="68.9" width="634" height="93.8" class="ch-band"/>
+                  <line id="chBandTop" x1="62" y1="68.9" x2="696" y2="68.9" class="ch-bandl"/>
+                  <line id="chBandBot" x1="62" y1="162.7" x2="696" y2="162.7" class="ch-bandl"/>
+                  <polyline id="chSoc" class="ch-soc"
+                    points="62,162.7 114.6,154.8 167.2,147.4 219.8,139.3 272.5,131.7 325.1,123.6 377.7,116 430.3,108 482.9,100.3 535.5,92.7 588.1,84.8 640.8,76.8 696,68.9"/>
+                  <polygon id="chPwr" class="ch-pwr"
+                    points="62,350 62,296.7 114.6,296.2 167.2,297.1 219.8,296.4 272.5,296.9 325.1,296.3 377.7,297 430.3,296.5 482.9,296.8 535.5,296.6 588.1,297.2 640.8,297.9 696,298.9 696,350"/>
+                </g>
+
+                <text id="chWinLab" x="70" y="118" class="ch-note">measured window · 46.0 pp</text>
+                <text id="chStartLab" x="690" y="176" text-anchor="end" class="ch-note">start 32.0%</text>
+                <text id="chEndLab" x="690" y="63" text-anchor="end" class="ch-note">now 78.0%</text>
+
+                <line x1="62" y1="24" x2="62" y2="228" class="ch-axis"/>
+                <line x1="62" y1="228" x2="696" y2="228" class="ch-axis"/>
+                <g id="chTicks" class="ch-lab" text-anchor="middle">
+                  <text x="62" y="246">0</text>
+                  <text x="219.8" y="246">60</text>
+                  <text x="377.7" y="246">120</text>
+                  <text x="535.5" y="246">180</text>
+                  <text x="696" y="246">241</text>
+                </g>
+                <text x="379" y="266" text-anchor="middle" class="ch-cap">ELAPSED · MIN</text>
+
+                <!-- power strip -->
+                <text x="62" y="268" class="ch-cap">POWER AT THE SOCKET · kW</text>
+                <g class="ch-lab" text-anchor="end">
+                  <text id="chPwrMax" x="54" y="280">10</text>
+                  <text x="54" y="353">0</text>
+                </g>
+                <line x1="62" y1="350" x2="696" y2="350" class="ch-axis"/>
+                <text id="chPwrNote" x="70" y="344" class="ch-lab">7.20 kW steady</text>
+
+                <!-- playhead -->
+                <line id="chPlay" x1="696" y1="24" x2="696" y2="350" class="ch-play"/>
+                <circle id="chDot" cx="696" cy="68.9" r="5" class="ch-dot"/>
+
+                <text id="chFoot" x="62" y="378" class="ch-lab">Full-window reference test · Class 0.5S revenue-grade meter · 1 Hz sampling</text>
+              </svg>
+            </div>
+            <figcaption>State of charge over the session (teal) against the power actually drawn at the socket (amber). The shaded band is the only thing the certificate rests on: the span of charge RISIQ watched go in.</figcaption>
+          </figure>
+          <div class="cap-bar">
+            <span class="bench-h">Measured → extrapolated</span>
+            <svg viewBox="0 0 660 76" role="img" data-cap
+                 aria-label="Capacity bar: 26.6 kilowatt-hours measured across the window, extrapolated to 57.8 kilowatt-hours usable today, against 61.5 kilowatt-hours when new.">
+              <defs>
+                <pattern id="capHatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                  <rect width="7" height="7" fill="rgba(20,184,166,0.14)"/>
+                  <line x1="0" y1="0" x2="0" y2="7" stroke="#14b8a6" stroke-width="2.4"/>
+                </pattern>
+              </defs>
+              <text id="capLab" x="8" y="14" class="cap-lab-k">MEASURED 26.6 kWh · 46.0 pp</text>
+              <text x="652" y="14" text-anchor="end" class="cap-lab">61.5 kWh nominal when new</text>
+              <rect x="8" y="22" width="644" height="26" rx="4" class="cap-track"/>
+              <rect id="capLost" x="613.3" y="22" width="38.7" height="26" class="cap-lost"/>
+              <rect id="capExt" x="286.6" y="22" width="326.7" height="26" class="cap-ext"/>
+              <rect id="capFill" x="8" y="22" width="278.6" height="26" class="cap-fill"/>
+              <line id="capMark" x1="613.3" y1="16" x2="613.3" y2="56" class="cap-mark"/>
+              <text id="capUsable" x="613.3" y="70" text-anchor="end" class="cap-lab">57.8 kWh usable today</text>
+            </svg>
+            <p style="font-size:0.79rem; color:var(--text-faint); margin-top:10px;">Solid = energy RISIQ actually watched go in. Hatched = the rest of the window, extrapolated from it. Amber = capacity the pack has lost.</p>
+          </div>
+          </div>
+
+          <div class="bench-side">
+            <div>
+              <span class="bench-h">Live readout</span>
+              <div class="readouts">
+                <div class="ro"><span>Elapsed</span><b data-ro="elapsed">241 min</b></div>
+                <div class="ro"><span>State of charge</span><b data-ro="soc">78.0%</b></div>
+                <div class="ro"><span>Energy at socket</span><b data-ro="socket">28.9 kWh</b></div>
+                <div class="ro k"><span>Into the pack</span><b data-ro="pack">26.6 kWh</b></div>
+              </div>
+            </div>
+
+            <div>
+              <span class="bench-h">Quality gates</span>
+              <ul class="gates" data-gates>
+                <li class="is-pass"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-gate="win">SoC window 46.0 pp — needs ≥ 10 pp</span></li>
+                <li class="is-pass"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-gate="gap">Longest data gap 1.0 s — needs ≤ 5 s</span></li>
+                <li class="is-pass"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-gate="temp">Pack temperature 28 °C — inside valid band</span></li>
+                <li class="is-pass"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-gate="soh">SoH 94.0% — inside plausible 40–105%</span></li>
+              </ul>
+            </div>
+
+            <div class="verdict">
+              <span class="verdict-grade" data-ro="grade">A</span>
+              <div>
+                <span class="verdict-soh" data-ro="soh">94.0%</span>
+                <small data-ro="detail">57.8 kWh usable · 402 km estimated range</small>
+                <span class="verdict-band" data-ro="band">±3.0% · reference accuracy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ol class="bench-rail" data-rail>
+          <li class="is-on"><b>Connect</b><p>Rig goes in line between the charge source and the socket.</p></li>
+          <li class="is-on"><b>Measure</b><p>Voltage and current on the charge path, once a second.</p></li>
+          <li class="is-on"><b>Gate</b><p>Four checks the run has to pass before anything is issued.</p></li>
+          <li class="is-on"><b>Compute</b><p>Integrate, correct for charger losses, extrapolate the full window.</p></li>
+          <li class="is-on"><b>Certify</b><p>Sign the record and publish it to the public registry.</p></li>
+        </ol>
+      </div>
+
+      <p style="margin-top:26px; font-size:0.88rem; color:var(--text-faint); max-width:70ch;">Worked example on a representative 61.5&nbsp;kWh pack, using RISIQ's published method and accuracy targets. Figures illustrate the calculation — they are not a measurement of any specific customer vehicle.</p>
     </div>
   </section>
 

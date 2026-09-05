@@ -86,10 +86,16 @@
         <p style="margin-top:16px;">We do it in technology partnership with <strong style="color:var(--text);">Eniris</strong>, one of Europe's leading energy-management-system (EMS) providers. Eniris is an international company headquartered in Belgium, with operations across the Netherlands, Switzerland, Sweden and Germany — its SmartgridOne platform manages energy assets across more than 150,000 installations through 500+ vendor-independent hardware integrations.</p>
         <p style="margin-top:16px;">RISIQ's founder held an executive position at Eniris before returning to Addis Ababa to build RISIQ, and that relationship continues today as an active, contractual technology partnership — giving RISIQ direct access to European-grade energy engineering from day one.</p>
       </div>
-      <div class="card reveal">
-        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2L4 14h7l-1 8 10-14h-7l1-6z" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
-        <h3>Why the Eniris partnership matters</h3>
-        <p>Precision energy measurement and management is a solved engineering problem in Europe. RISIQ doesn't reinvent it — it brings that proven engineering discipline to a market no European EMS company has built for: Ethiopia's locked, imported EV fleet.</p>
+      <div class="reveal" style="display:grid; gap:24px; justify-items:center;">
+        <div class="plaque">
+          <img src="assets/img/partnership-plaque.svg" alt="RISIQ Tech signage: Partnering for Innovation — Empowered by Eniris" width="640" height="500">
+        </div>
+        <div class="card">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2L4 14h7l-1 8 10-14h-7l1-6z" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+          <h3>Why the Eniris partnership matters</h3>
+          <p>Precision energy measurement and management is a solved engineering problem in Europe. RISIQ doesn't reinvent it — it brings that proven engineering discipline to a market no European EMS company has built for: Ethiopia's locked, imported EV fleet.</p>
+          <a href="partners.html#eniris" class="btn btn-ghost btn-sm" style="margin-top:18px;">See who builds what →</a>
+        </div>
       </div>
     </div>
   </section>
@@ -116,6 +122,57 @@
           "This is a market that rewards people who can build hard things locally. That is exactly the job I have done before."
         </blockquote>
       </div>
+    </div>
+  </section>
+
+  <!-- ENGINEERING TEAM -->
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Engineering Team</span>
+        <h2>Three engineers, three layers, one certificate.</h2>
+        <p>A certificate is only as good as the rig that measured it, the service that computed it and the endpoint that still answers when someone scans the QR code two years later. Each of those layers has an owner.</p>
+      </div>
+      <div class="grid grid-3 reveal">
+
+        <div class="card">
+          <div class="team-card">
+            <div class="avatar teal">NA</div>
+            <div>
+              <h3>Natnael Abu</h3>
+              <p class="team-role">Embedded Engineer</p>
+              <p class="team-edu">Electrical Engineering · Debre Markos University</p>
+            </div>
+          </div>
+          <p class="team-owns"><strong>Owns the rig.</strong> Meter integration and calibration, the 1&nbsp;Hz sampling firmware on the charge path, charge control, and the local buffer that keeps a test valid when the network drops mid-session.</p>
+        </div>
+
+        <div class="card">
+          <div class="team-card">
+            <div class="avatar amber">IA</div>
+            <div>
+              <h3>Ikram Awol</h3>
+              <p class="team-role">Backend Engineer</p>
+              <p class="team-edu">Software Engineering · Addis Ababa University</p>
+            </div>
+          </div>
+          <p class="team-owns"><strong>Owns the certification platform.</strong> Telemetry ingestion, the State-of-Health computation service and its quality gates, certificate signing, and the registry every issued certificate is checked against.</p>
+        </div>
+
+        <div class="card">
+          <div class="team-card">
+            <div class="avatar ink">AA</div>
+            <div>
+              <h3>Anteneh Addisu</h3>
+              <p class="team-role">DevOps &amp; Infrastructure Engineer</p>
+              <p class="team-edu">Software Engineering · Addis Ababa University</p>
+            </div>
+          </div>
+          <p class="team-owns"><strong>Owns the infrastructure.</strong> Deployment, monitoring and the uptime of the public verification endpoint — the address every scanned QR code resolves to, which has to answer for the life of the certificate.</p>
+        </div>
+
+      </div>
+      <p class="lede" style="margin-top:34px; max-width:62ch;">The team is Ethiopian, based in Addis, and building for Ethiopian conditions — intermittent connectivity, locked imports, and institutions that need a document rather than a dashboard.</p>
     </div>
   </section>
 

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 500" role="img"
+     aria-label="RISIQ Tech signage plaque reading: Partnering for Innovation — Empowered by Eniris">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0%"  stop-color="#f5f1ec"/>
+      <stop offset="55%" stop-color="#efeae3"/>
+      <stop offset="100%" stop-color="#e4ddd4"/>
+    </linearGradient>
+    <radialGradient id="wash" cx="0.28" cy="0.12" r="0.95">
+      <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="raise" x="-25%" y="-25%" width="160%" height="170%">
+      <feDropShadow dx="2.5" dy="4" stdDeviation="3" flood-color="#2a231c" flood-opacity="0.34"/>
+    </filter>
+    <filter id="raiseSoft" x="-30%" y="-40%" width="170%" height="200%">
+      <feDropShadow dx="1.6" dy="2.6" stdDeviation="2" flood-color="#2a231c" flood-opacity="0.30"/>
+    </filter>
+  </defs>
+
+  <!-- brushed plaster wall -->
+  <rect width="640" height="500" fill="url(#wall)"/>
+  <rect width="640" height="500" fill="url(#wash)"/>
+
+  <!-- RISIQ mark -->
+  <g filter="url(#raise)">
+    <rect x="40" y="24" width="340" height="130" fill="#c8202a"/>
+    <rect x="52" y="34" width="110" height="110" fill="none" stroke="#ffffff" stroke-width="7"/>
+    <text x="107" y="126" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+          font-size="106" fill="#ffffff">R</text>
+    <text x="170" y="126" font-family="Georgia, 'Times New Roman', serif"
+          font-size="88" letter-spacing="1" fill="#ffffff">ISIQ</text>
+  </g>
+  <text x="392" y="50" font-family="Georgia, 'Times New Roman', serif" font-size="30"
+        fill="#c8202a" filter="url(#raiseSoft)">&#174;</text>
+
+  <!-- TECH rule row -->
+  <g filter="url(#raiseSoft)">
+    <line x1="44" y1="188" x2="118" y2="188" stroke="#23201e" stroke-width="6"/>
+    <text x="132" y="204" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="46"
+          font-weight="700" letter-spacing="10" fill="#23201e">TECH</text>
+    <line x1="322" y1="188" x2="360" y2="188" stroke="#23201e" stroke-width="6"/>
+  </g>
+
+  <!-- divider, as on the original sign -->
+  <rect x="429.5" y="26" width="5" height="126" fill="#23201e" filter="url(#raiseSoft)"/>
+
+  <!-- tagline -->
+  <g filter="url(#raiseSoft)">
+    <line x1="48" y1="284" x2="106" y2="284" stroke="#23201e" stroke-width="3"/>
+    <text x="336" y="291" text-anchor="middle" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif"
+          font-size="21" font-weight="500" letter-spacing="3.6" fill="#23201e">PARTNERING FOR INNOVATION</text>
+    <line x1="566" y1="284" x2="624" y2="284" stroke="#23201e" stroke-width="3"/>
+  </g>
+
+  <!-- Eniris lockup -->
+  <text x="336" y="374" text-anchor="middle" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif"
+        font-size="20" fill="#3a3735" filter="url(#raiseSoft)">Empowered by</text>
+
+  <g filter="url(#raise)">
+    <g stroke="#c8202a" stroke-width="4" stroke-linecap="round">
+      <line x1="194" y1="412" x2="232" y2="412"/>
+      <line x1="182" y1="420" x2="232" y2="420"/>
+      <line x1="182" y1="436" x2="232" y2="436"/>
+      <line x1="194" y1="444" x2="232" y2="444"/>
+    </g>
+    <path d="M252 401 A27 27 0 0 0 252 455 Z" fill="#23201e"/>
+    <path d="M252 401 A27 27 0 0 1 252 455 Z" fill="#c8202a"/>
+    <path d="M254.3 404.7 L234.5 430.3 L249.7 430.3 L247.3 451.3 L268.3 423.3 L253.2 423.3 Z" fill="#efeae3"/>
+    <text x="284" y="444" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="42"
+          font-weight="600" letter-spacing="6" fill="#23201e">ENIRIS</text>
+  </g>
+</svg>
