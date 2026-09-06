@@ -1175,11 +1175,11 @@ section { padding: 96px 0; position: relative; z-index: 1; }
   border-color: #a8d8d0;
 }
 .aud-media { position: relative; aspect-ratio: 3 / 2; overflow: hidden; background: var(--bg-raised); }
-.aud-media img {
+.aud-media > img {
   width: 100%; height: 100%; object-fit: cover; display: block;
   transition: transform 620ms var(--ease);
 }
-.aud-card:hover .aud-media img, .aud-card:focus-within .aud-media img { transform: scale(1.05); }
+.aud-card:hover .aud-media > img, .aud-card:focus-within .aud-media > img { transform: scale(1.05); }
 .aud-tag {
   position: absolute; left: 14px; top: 14px;
   font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
@@ -1218,3 +1218,57 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 /* invite cards adopt the audience-card media treatment without losing their padding */
 .invite-card.aud-card { padding: 28px; }
 .invite-card .aud-media { aspect-ratio: 16 / 9; }
+
+/* ==========================================================================
+   Institution logos — plates on the audience cards + a marquee strip
+   ========================================================================== */
+.logo-plate {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 22px; padding: 26px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(20,184,166,0.06), transparent 62%),
+    linear-gradient(#eef3f9 1px, transparent 1px) 0 0 / 100% 44px,
+    linear-gradient(90deg, #eef3f9 1px, transparent 1px) 0 0 / 44px 100%,
+    #ffffff;
+}
+.logo-plate img {
+  width: auto; max-width: 82%;
+  transition: transform 480ms var(--ease);
+}
+.lg-wide { height: 42px; }
+.lg-mid  { height: 58px; }
+.lg-mark { height: 74px; }
+.aud-card:hover .logo-plate img:first-of-type,
+.aud-card:focus-within .logo-plate img:first-of-type { transform: scale(1.07); }
+.aud-card:hover .logo-plate img + img,
+.aud-card:focus-within .logo-plate img + img { transform: scale(1.07); transition-delay: 70ms; }
+.logo-plate .lg-name {
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-muted); margin-top: -8px;
+}
+@media (max-width: 420px) { .lg-wide { height: 32px; } .lg-mid { height: 44px; } .lg-mark { height: 56px; } }
+
+/* logo marquee — greyscale at rest, colour as it passes under the pointer */
+.logo-marquee { padding: 26px 0; background: var(--bg-card); }
+.logo-marquee .marquee-track { gap: 72px; animation-duration: 30s; align-items: center; }
+.logo-item {
+  display: flex; align-items: center; gap: 14px; flex: none;
+  filter: grayscale(1) opacity(0.62);
+  transition: filter 260ms var(--ease), transform 260ms var(--ease);
+}
+.logo-item:hover { filter: none; transform: translateY(-2px); }
+.logo-item img { width: auto; }
+.logo-item .lm-wide { height: 30px; }
+.logo-item .lm-mark { height: 44px; }
+.logo-item span {
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-faint); white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) { .logo-item { filter: none; } }
+
+/* pointer-tracking tilt on the audience cards (desktop, fine pointers only) */
+@media (hover: hover) and (pointer: fine) {
+  .aud-card[data-tilt] { transform-style: preserve-3d; will-change: transform; }
+}

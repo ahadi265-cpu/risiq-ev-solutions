@@ -122,6 +122,29 @@
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
   });
 
+  /* Pointer-tracking tilt on the institution cards — desktop, fine pointers only */
+  if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.querySelectorAll('.aud-card').forEach(function (card) {
+      card.setAttribute('data-tilt', '');
+      var raf = null;
+      card.addEventListener('mousemove', function (e) {
+        if (raf) return;
+        raf = requestAnimationFrame(function () {
+          raf = null;
+          var r = card.getBoundingClientRect();
+          var rx = ((e.clientY - r.top) / r.height - 0.5) * -5;
+          var ry = ((e.clientX - r.left) / r.width - 0.5) * 5;
+          card.style.transform =
+            'perspective(900px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateY(-6px)';
+        });
+      });
+      card.addEventListener('mouseleave', function () {
+        if (raf) { cancelAnimationFrame(raf); raf = null; }
+        card.style.transform = '';
+      });
+    });
+  }
+
   /* Scroll progress rail — one quiet indicator of how far through a long page you are */
   var rail = null;
   if (!reduceMotion) {
