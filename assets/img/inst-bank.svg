@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="An Ethiopian commercial bank: a glass tower beside a colonnaded branch entrance.">
+  <defs>
+    <linearGradient id="bkSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dcecf6"/><stop offset="62%" stop-color="#eef4f8"/><stop offset="100%" stop-color="#f7f4ee"/>
+    </linearGradient>
+    <linearGradient id="bkGlass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f766e"/><stop offset="55%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+    <linearGradient id="bkSun" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45"/><stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#bkSky)"/>
+  <circle cx="628" cy="118" r="54" fill="#f8d9a8" opacity="0.55"/>
+
+  <!-- distant skyline -->
+  <g fill="#c9d8e4" opacity="0.5">
+    <rect x="24" y="286" width="58" height="180"/><rect x="92" y="322" width="44" height="144"/>
+    <rect x="700" y="300" width="52" height="166"/><rect x="758" y="338" width="34" height="128"/>
+  </g>
+
+  <!-- glass tower -->
+  <rect x="470" y="128" width="196" height="338" fill="url(#bkGlass)"/>
+  <rect x="470" y="128" width="196" height="338" fill="url(#bkSun)"/>
+  <g fill="#0b1524" opacity="0.16">
+    <rect x="486" y="150" width="164" height="4"/><rect x="486" y="192" width="164" height="4"/>
+    <rect x="486" y="234" width="164" height="4"/><rect x="486" y="276" width="164" height="4"/>
+    <rect x="486" y="318" width="164" height="4"/><rect x="486" y="360" width="164" height="4"/>
+    <rect x="486" y="402" width="164" height="4"/>
+  </g>
+  <g fill="#0b1524" opacity="0.1">
+    <rect x="536" y="140" width="4" height="316"/><rect x="596" y="140" width="4" height="316"/>
+  </g>
+  <rect x="470" y="112" width="196" height="18" fill="#0b1524" opacity="0.85"/>
+  <rect x="556" y="58" width="6" height="56" fill="#8496ad"/>
+  <path d="M562 62 L610 74 L562 86 Z" fill="#e8871e"/>
+
+  <!-- branch: colonnade -->
+  <rect x="120" y="238" width="332" height="20" fill="#0b1524" opacity="0.88"/>
+  <path d="M112 238 L286 186 L460 238 Z" fill="#152a42"/>
+  <rect x="132" y="258" width="308" height="188" fill="#ffffff"/>
+  <rect x="132" y="258" width="308" height="188" fill="#0b1524" opacity="0.04"/>
+  <g fill="#e4ebf2">
+    <rect x="150" y="270" width="30" height="176"/><rect x="216" y="270" width="30" height="176"/>
+    <rect x="282" y="270" width="30" height="176"/><rect x="348" y="270" width="30" height="176"/>
+  </g>
+  <g fill="#c6d3de">
+    <rect x="146" y="264" width="38" height="10"/><rect x="212" y="264" width="38" height="10"/>
+    <rect x="278" y="264" width="38" height="10"/><rect x="344" y="264" width="38" height="10"/>
+  </g>
+  <!-- signage band -->
+  <rect x="132" y="206" width="308" height="30" fill="#e8871e"/>
+  <g fill="#ffffff" opacity="0.9">
+    <rect x="152" y="217" width="86" height="8" rx="4"/><rect x="248" y="217" width="52" height="8" rx="4"/>
+    <rect x="310" y="217" width="34" height="8" rx="4"/>
+  </g>
+  <!-- doorway -->
+  <rect x="256" y="358" width="64" height="88" fill="#0f766e"/>
+  <rect x="286" y="358" width="4" height="88" fill="#ffffff" opacity="0.5"/>
+
+  <!-- steps + ground -->
+  <rect x="0" y="466" width="800" height="134" fill="#e8e2d6"/>
+  <rect x="0" y="466" width="800" height="8" fill="#d6cfc0"/>
+  <rect x="112" y="446" width="348" height="10" fill="#d9d2c4"/>
+  <rect x="98" y="456" width="376" height="10" fill="#cfc7b8"/>
+
+  <!-- people -->
+  <g fill="#2b3a4d">
+    <circle cx="352" cy="410" r="9"/><path d="M341 466v-32a11 11 0 0 1 22 0v32z"/>
+    <circle cx="392" cy="416" r="8"/><path d="M382 466v-28a10 10 0 0 1 20 0v28z"/>
+  </g>
+  <g fill="#46556b">
+    <circle cx="196" cy="414" r="9"/><path d="M185 466v-30a11 11 0 0 1 22 0v30z"/>
+  </g>
+  <ellipse cx="352" cy="470" rx="20" ry="4" fill="#0b1524" opacity="0.12"/>
+  <ellipse cx="392" cy="470" rx="17" ry="4" fill="#0b1524" opacity="0.12"/>
+  <ellipse cx="196" cy="470" rx="19" ry="4" fill="#0b1524" opacity="0.12"/>
+</svg>

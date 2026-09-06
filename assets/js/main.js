@@ -15,7 +15,7 @@
   }
 
   /* Stagger: expand group reveals into per-child reveals */
-  document.querySelectorAll('.grid.reveal, .steps.reveal, .compare.reveal').forEach(function (group) {
+  document.querySelectorAll('.grid.reveal, .steps.reveal, .compare.reveal, .aud-grid.reveal, .invite.reveal, .kpi-row.reveal, .chart-grid.reveal, .split.reveal').forEach(function (group) {
     var kids = Array.prototype.filter.call(group.children, function (c) { return c.nodeType === 1; });
     if (kids.length < 2) return;
     group.classList.remove('reveal');
@@ -122,11 +122,26 @@
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
   });
 
+  /* Scroll progress rail — one quiet indicator of how far through a long page you are */
+  var rail = null;
+  if (!reduceMotion) {
+    rail = document.createElement('div');
+    rail.className = 'scroll-rail';
+    rail.setAttribute('aria-hidden', 'true');
+    rail.innerHTML = '<i></i>';
+    document.body.appendChild(rail);
+  }
+  var railFill = rail ? rail.querySelector('i') : null;
+
   /* Nav shadow + back-to-top visibility */
   var navEl = document.querySelector('.site-nav');
   function onScroll() {
     if (navEl) navEl.classList.toggle('scrolled', window.scrollY > 24);
     toTop.classList.toggle('show', window.scrollY > 600);
+    if (railFill) {
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      railFill.style.width = (max > 0 ? Math.min(window.scrollY / max, 1) * 100 : 0) + '%';
+    }
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
@@ -175,47 +190,62 @@
     });
   }
 
-  /* Contact form: submit to /api/contact instead of mailto */
+  /* Pilot registration — posts to an email relay, because GitHub Pages cannot
+     run a serverless function. Without JS the form posts natively to the same
+     endpoint, so registration still works with scripting off. */
   var contactForm = document.getElementById('contact-form');
   if (contactForm) {
     var contactStatus = document.getElementById('contact-status');
+    var setStatus = function (msg, color) {
+      contactStatus.style.color = color;
+      contactStatus.textContent = msg;
+    };
+
     contactForm.addEventListener('submit', function (e) {
+      /* let the browser show its own message for empty required fields */
+      if (!contactForm.reportValidity()) return;
       e.preventDefault();
+
       var submitBtn = contactForm.querySelector('button[type="submit"]');
-      var formData = new FormData(contactForm);
-      var payload = {
-        name: formData.get('name'),
-        org: formData.get('org'),
-        email: formData.get('email'),
-        role: formData.get('role'),
-        message: formData.get('message'),
-        company: formData.get('company')
-      };
+      var data = new FormData(contactForm);
+      var payload = {};
+      data.forEach(function (v, k) { payload[k] = v; });
+
+      if (payload._honey) { setStatus('Thanks — we\'ll be in touch shortly.', 'var(--teal-hi)'); return; }
+      delete payload._next;
+
+      payload._subject = 'RISIQ pilot registration — ' + (payload.org || payload.name || 'new enquiry');
+
       submitBtn.disabled = true;
-      contactStatus.style.color = 'var(--text-faint)';
-      contactStatus.textContent = 'Sending...';
-      fetch('/api/contact', {
+      setStatus('Sending…', 'var(--text-faint)');
+
+      fetch(contactForm.action.replace('formsubmit.co/', 'formsubmit.co/ajax/'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(payload)
       })
-        .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+        .then(function (res) { return res.json().catch(function () { return {}; }); })
         .then(function (result) {
-          if (result.ok) {
+          if (result && String(result.success) === 'true') {
             contactForm.reset();
-            contactStatus.style.color = 'var(--teal-hi)';
-            contactStatus.textContent = 'Thanks — we\'ll be in touch shortly.';
+            setStatus('Registered — thank you. We will confirm your pilot place by email.', 'var(--teal-hi)');
           } else {
-            contactStatus.style.color = 'var(--red)';
-            contactStatus.textContent = result.data.error || 'Something went wrong. Please email us directly.';
+            setStatus(
+              (result && result.message) ||
+              'We could not send that. Please email Khalid@risiqbs.com directly.',
+              'var(--red)');
           }
         })
         .catch(function () {
-          contactStatus.style.color = 'var(--red)';
-          contactStatus.textContent = 'Network error — please email us directly at Khalid@risiqbs.com.';
+          setStatus('Network error — please email us directly at Khalid@risiqbs.com.', 'var(--red)');
         })
         .finally(function () { submitBtn.disabled = false; });
     });
+
+    /* returning from the no-JS native POST */
+    if (new URLSearchParams(window.location.search).get('sent') === '1') {
+      setStatus('Registered — thank you. We will confirm your pilot place by email.', 'var(--teal-hi)');
+    }
   }
 
   /* ------------------------------------------------------------------
@@ -493,10 +523,13 @@
       if (!id) return;
       verifyResultSection.style.display = '';
       verifyResult.innerHTML = '<p style="color:var(--text-faint);">Checking…</p>';
-      fetch('/api/verify?id=' + encodeURIComponent(rawId.trim()))
+      /* Static registry: the certificate store is a JSON file, so verification
+         works on static hosting with no backend to go down. */
+      fetch('assets/data/certificates.json', { cache: 'no-cache' })
         .then(function (res) { return res.json(); })
-        .then(function (data) {
-          if (data.found) renderCert(id, data.certificate);
+        .then(function (registry) {
+          var cert = registry[rawId.trim().toUpperCase()];
+          if (cert) renderCert(id, cert);
           else renderNotFound(id);
         })
         .catch(renderError);

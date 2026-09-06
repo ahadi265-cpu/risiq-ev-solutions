@@ -113,7 +113,15 @@
         <p style="margin-top:30px; font-size:0.86rem; color:var(--text-faint);">Abdulfetah Khalid · Founder &amp; CEO · RISIQ EV Solutions, part of RISIQ Group, in technology partnership with Eniris.</p>
       </div>
 
-      <form class="card reveal" id="contact-form">
+      <form class="card reveal" id="contact-form"
+            action="https://formsubmit.co/Khalid@risiqbs.com" method="POST">
+        <!-- FormSubmit config: the site is on GitHub Pages, which cannot run a
+             serverless function, so the form posts straight to an email relay.
+             Without JS the browser posts natively; with JS it goes over AJAX. -->
+        <input type="hidden" name="_subject" value="RISIQ pilot registration">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_next" value="https://risiqevsolutions.com/contact.html?sent=1">
         <h3 style="margin-bottom:6px;">Register for the pilot</h3>
         <p style="font-size:0.88rem; color:var(--text-faint); margin-bottom:22px;">Stakeholders — insurers, banks, importers and government agencies — can register here to join when the pilot goes live in late October 2026.</p>
         <div class="form-field">
@@ -146,9 +154,9 @@
         </div>
         <div style="position:absolute; left:-9999px;" aria-hidden="true">
           <label for="company">Leave this field blank</label>
-          <input type="text" id="company" name="company" tabindex="-1" autocomplete="off">
+          <input type="text" id="company" name="_honey" tabindex="-1" autocomplete="off">
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Send request</button>
+        <button type="submit" class="btn btn-primary btn-block">Register for the pilot</button>
         <p id="contact-status" role="status" style="margin-top:14px; font-size:0.85rem;"></p>
       </form>
     </div>

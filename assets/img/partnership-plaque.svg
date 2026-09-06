@@ -2,24 +2,39 @@
      aria-label="RISIQ Tech signage plaque reading: Partnering for Innovation — Empowered by Eniris">
   <defs>
     <linearGradient id="wall" x1="0" y1="0" x2="0.6" y2="1">
-      <stop offset="0%"  stop-color="#f5f1ec"/>
-      <stop offset="55%" stop-color="#efeae3"/>
-      <stop offset="100%" stop-color="#e4ddd4"/>
+      <stop offset="0%"  stop-color="#f7f4f0"/>
+      <stop offset="45%" stop-color="#efeae3"/>
+      <stop offset="100%" stop-color="#ded6cb"/>
     </linearGradient>
-    <radialGradient id="wash" cx="0.28" cy="0.12" r="0.95">
-      <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.55"/>
+    <radialGradient id="wash" cx="0.26" cy="0.10" r="0.98">
+      <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.62"/>
+      <stop offset="55%"  stop-color="#ffffff" stop-opacity="0.16"/>
       <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
-    <filter id="raise" x="-25%" y="-25%" width="160%" height="170%">
-      <feDropShadow dx="2.5" dy="4" stdDeviation="3" flood-color="#2a231c" flood-opacity="0.34"/>
+    <radialGradient id="vig" cx="0.5" cy="0.46" r="0.78">
+      <stop offset="60%"  stop-color="#2a231c" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#2a231c" stop-opacity="0.16"/>
+    </radialGradient>
+    <!-- brushed plaster grain, so the ground reads as a wall rather than flat fill -->
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" seed="11" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.085" intercept="0"/></feComponentTransfer>
     </filter>
-    <filter id="raiseSoft" x="-30%" y="-40%" width="170%" height="200%">
-      <feDropShadow dx="1.6" dy="2.6" stdDeviation="2" flood-color="#2a231c" flood-opacity="0.30"/>
+    <!-- raised lettering: a light edge up-left, a cast shadow down-right -->
+    <filter id="raise" x="-30%" y="-30%" width="175%" height="185%">
+      <feDropShadow dx="-1.6" dy="-2" stdDeviation="0.7" flood-color="#ffffff" flood-opacity="0.9"/>
+      <feDropShadow dx="3" dy="4.5" stdDeviation="3.2" flood-color="#2a231c" flood-opacity="0.36"/>
+    </filter>
+    <filter id="raiseSoft" x="-35%" y="-45%" width="185%" height="210%">
+      <feDropShadow dx="-1.1" dy="-1.4" stdDeviation="0.5" flood-color="#ffffff" flood-opacity="0.85"/>
+      <feDropShadow dx="2" dy="3" stdDeviation="2.2" flood-color="#2a231c" flood-opacity="0.32"/>
     </filter>
   </defs>
 
   <!-- brushed plaster wall -->
   <rect width="640" height="500" fill="url(#wall)"/>
+  <rect width="640" height="500" fill="#8a7d6b" filter="url(#grain)" opacity="0.55"/>
   <rect width="640" height="500" fill="url(#wash)"/>
 
   <!-- RISIQ mark -->
@@ -70,4 +85,5 @@
     <text x="284" y="444" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="42"
           font-weight="600" letter-spacing="6" fill="#23201e">ENIRIS</text>
   </g>
+  <rect width="640" height="500" fill="url(#vig)"/>
 </svg>
