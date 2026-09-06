@@ -6,8 +6,8 @@
 :root {
   /* Color: clean white ground, amber "meter needle" accent, deep teal "measured data" accent */
   --ink:        #0b1524;
-  --bg:         #f7f9fc;
-  --bg-raised:  #eef3f9;
+  --bg:         #fdfdfe;
+  --bg-raised:  #f3f6fa;
   --bg-card:    #ffffff;
   --line:       #dbe3ee;
   --line-soft:  #e7edf5;
@@ -25,6 +25,11 @@
 
   --green:      #15803d;
   --red:        #dc2626;
+
+  /* RISIQ brand red — logo keeps the true colour, UI uses the text-safe tone */
+  --brand:      #ed1c24;
+  --brand-ui:   #d8121b;   /* 5.2:1 with white text */
+  --brand-deep: #b30f17;
 
   --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
@@ -71,10 +76,10 @@ body::before {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(#e3eaf4 1px, transparent 1px),
-    linear-gradient(90deg, #e3eaf4 1px, transparent 1px);
+    linear-gradient(#e9eef6 1px, transparent 1px),
+    linear-gradient(90deg, #e9eef6 1px, transparent 1px);
   background-size: 64px 64px;
-  opacity: 0.6;
+  opacity: 0.45;
   pointer-events: none;
   z-index: 0;
   mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 70%);
@@ -153,11 +158,23 @@ p { margin: 0; color: var(--text-muted); text-wrap: pretty; }
   white-space: nowrap;
 }
 .btn-primary {
-  background: var(--amber);
-  color: var(--amber-ink);
-  box-shadow: 0 2px 8px rgba(232,135,30,0.35);
+  background: var(--brand-ui);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(216,18,27,0.32);
+  position: relative;
+  overflow: hidden;
 }
-.btn-primary:hover { background: #f59b38; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232,135,30,0.4); }
+.btn-primary:hover { background: var(--brand-deep); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(216,18,27,0.38); }
+/* light sweep across the primary action on hover */
+.btn-primary::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: -70%; width: 42%;
+  background: linear-gradient(105deg, transparent, rgba(255,255,255,0.38), transparent);
+  transform: skewX(-18deg);
+  transition: left 640ms var(--ease);
+  pointer-events: none;
+}
+.btn-primary:hover::after { left: 130%; }
+@media (prefers-reduced-motion: reduce) { .btn-primary::after { display: none; } }
 .btn-ghost {
   background: var(--bg-card);
   color: var(--text);
@@ -202,6 +219,8 @@ p { margin: 0; color: var(--text-muted); text-wrap: pretty; }
   width: 48px; height: 48px;
   flex: none;
 }
+.brand-logo { height: 54px; width: auto; flex: none; }
+.site-footer .brand-logo { height: 44px; }
 .brand-tag {
   font-family: var(--font-mono);
   font-size: 0.66rem;
@@ -217,6 +236,7 @@ p { margin: 0; color: var(--text-muted); text-wrap: pretty; }
 @media (max-width: 640px) {
   .brand { font-size: 1.35rem; gap: 10px; }
   .brand-mark { width: 38px; height: 38px; }
+  .brand-logo { height: 40px; }
   .brand-tag { display: none; }
 }
 .nav-links {
@@ -231,7 +251,16 @@ p { margin: 0; color: var(--text-muted); text-wrap: pretty; }
   color: var(--text-muted);
   transition: color 160ms;
   cursor: pointer;
+  position: relative;
+  padding-bottom: 3px;
 }
+.nav-links a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: var(--brand-ui); border-radius: 2px;
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 240ms var(--ease);
+}
+.nav-links a:hover::after, .nav-links a[aria-current="page"]::after { transform: scaleX(1); }
 .nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--ink); }
 .nav-cta { display: flex; align-items: center; gap: 14px; }
 .nav-toggle {
@@ -458,7 +487,7 @@ section { padding: 96px 0; position: relative; z-index: 1; }
   transition: all 160ms var(--ease);
 }
 .role-tab:hover { border-color: var(--teal-hi); color: var(--ink); }
-.role-tab.active { background: var(--amber); color: var(--amber-ink); border-color: var(--amber); }
+.role-tab.active { background: var(--brand-ui); color: #ffffff; border-color: var(--brand-ui); }
 .role-panel { display: none; }
 .role-panel.active { display: block; }
 
@@ -1211,7 +1240,7 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 }
 .scroll-rail i {
   display: block; height: 100%; width: 0%;
-  background: linear-gradient(90deg, var(--teal), var(--amber));
+  background: linear-gradient(90deg, var(--brand-ui), var(--amber));
   transition: width 90ms linear;
 }
 @media (prefers-reduced-motion: reduce) { .scroll-rail { display: none; } }
@@ -1237,9 +1266,9 @@ section { padding: 96px 0; position: relative; z-index: 1; }
   width: auto; max-width: 82%;
   transition: transform 480ms var(--ease);
 }
-.lg-wide { height: 42px; }
-.lg-mid  { height: 58px; }
-.lg-mark { height: 74px; }
+.lg-wide { height: 48px; }
+.lg-mid  { height: 66px; }
+.lg-mark { height: 86px; }
 .aud-card:hover .logo-plate img:first-of-type,
 .aud-card:focus-within .logo-plate img:first-of-type { transform: scale(1.07); }
 .aud-card:hover .logo-plate img + img,
@@ -1255,20 +1284,33 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 .logo-marquee .marquee-track { gap: 72px; animation-duration: 30s; align-items: center; }
 .logo-item {
   display: flex; align-items: center; gap: 14px; flex: none;
-  filter: grayscale(1) opacity(0.62);
-  transition: filter 260ms var(--ease), transform 260ms var(--ease);
+  transition: transform 260ms var(--ease);
 }
-.logo-item:hover { filter: none; transform: translateY(-2px); }
+.logo-item:hover { transform: translateY(-3px) scale(1.04); }
 .logo-item img { width: auto; }
-.logo-item .lm-wide { height: 30px; }
-.logo-item .lm-mark { height: 44px; }
+.logo-item .lm-wide { height: 36px; }
+.logo-item .lm-mark { height: 56px; }
 .logo-item span {
   font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--text-faint); white-space: nowrap;
 }
-@media (prefers-reduced-motion: reduce) { .logo-item { filter: none; } }
+
 
 /* pointer-tracking tilt on the audience cards (desktop, fine pointers only) */
 @media (hover: hover) and (pointer: fine) {
   .aud-card[data-tilt] { transform-style: preserve-3d; will-change: transform; }
+}
+
+
+/* ---------- hero entrance — one orchestrated moment on load ---------- */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(20px); }
+}
+.hero .eyebrow      { animation: riseIn 560ms var(--ease) both; }
+.hero h1            { animation: riseIn 640ms 90ms var(--ease) both; }
+.hero .lede         { animation: riseIn 640ms 190ms var(--ease) both; }
+.hero .hero-cta     { animation: riseIn 640ms 300ms var(--ease) both; }
+.hero .hero-note    { animation: riseIn 640ms 380ms var(--ease) both; }
+@media (prefers-reduced-motion: reduce) {
+  .hero .eyebrow, .hero h1, .hero .lede, .hero .hero-cta, .hero .hero-note { animation: none; }
 }
