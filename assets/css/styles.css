@@ -1,7 +1,7 @@
 /* ==========================================================================
    RISIQ EV Solutions — design tokens & base (bright theme)
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* Fonts are linked from each page <head> — an @import here blocks render and loads serially. */
 
 :root {
   /* Color: clean white ground, amber "meter needle" accent, deep teal "measured data" accent */
@@ -29,6 +29,14 @@
   --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
 
+  /* type scale — 1.25 ratio at the top end, tuned per step so nothing collides mid-viewport */
+  --t-h1:   clamp(2.5rem, 1.30rem + 3.9vw, 4.25rem);
+  --t-h2:   clamp(1.95rem, 1.28rem + 2.2vw, 2.75rem);
+  --t-h3:   clamp(1.22rem, 1.10rem + 0.42vw, 1.4rem);
+  --t-h4:   0.95rem;
+  --t-lede: clamp(1.1rem, 1.01rem + 0.30vw, 1.28rem);
+  --lh-tight: 1.14;
+
   --max: 1320px;
   --radius: 14px;
   --radius-sm: 8px;
@@ -52,6 +60,9 @@ body {
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis-weight: none;
+  text-size-adjust: 100%;
 }
 
 body::before {
@@ -72,14 +83,26 @@ body::before {
 img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
 
-h1, h2, h3, h4 { font-weight: 600; line-height: 1.15; margin: 0; letter-spacing: -0.01em; color: var(--ink); }
-h1 { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 700; }
-h2 { font-size: clamp(1.9rem, 3.4vw, 2.6rem); }
-h3 { font-size: 1.3rem; }
-p { margin: 0; color: var(--text-muted); }
-.lede { font-size: 1.2rem; color: var(--text-muted); max-width: 46ch; }
+h1, h2, h3, h4 {
+  font-weight: 600; margin: 0; color: var(--ink);
+  line-height: var(--lh-tight);
+  text-wrap: balance;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+}
+/* optical tracking: the larger the type, the tighter it wants to be set */
+h1 { font-size: var(--t-h1); font-weight: 700; letter-spacing: -0.022em; line-height: 1.06; }
+h2 { font-size: var(--t-h2); letter-spacing: -0.018em; line-height: 1.1; }
+h3 { font-size: var(--t-h3); letter-spacing: -0.011em; line-height: 1.22; }
+h4 { font-size: var(--t-h4); letter-spacing: -0.006em; }
+p { margin: 0; color: var(--text-muted); text-wrap: pretty; }
+.lede { font-size: var(--t-lede); line-height: 1.5; color: var(--text-muted); max-width: 46ch; letter-spacing: -0.006em; }
 
-.mono { font-family: var(--font-mono); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+/* every measured figure on this site lines up in a column */
+.mono, .num, .cert-row span:last-child, .step-num, .data-table td, .ro b {
+  font-variant-numeric: tabular-nums lining-nums;
+}
 
 :focus-visible {
   outline: 2px solid var(--teal-hi);
@@ -901,3 +924,225 @@ section { padding: 96px 0; position: relative; z-index: 1; }
   font-size: 0.9rem;
 }
 .team-owns strong { color: var(--text); font-weight: 600; }
+
+/* ==========================================================================
+   Pilot dashboard — KPI tiles, chart cards, grade badges
+   Chart palette (validated, light surface): teal #0d9488 · amber #b45309
+   ========================================================================== */
+:root {
+  --c-1:    #0d9488;   /* slot 1 — magnitude / primary marks */
+  --c-2:    #b45309;   /* slot 2 — second series */
+  --c-grid: #e2e8f0;   /* recessive gridlines */
+  --g-a:    #15803d;
+  --g-b:    #0f766e;
+  --g-c:    #b45309;
+  --g-d:    #b91c1c;
+}
+
+/* --- notice band: says plainly what the numbers are --- */
+.notice {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 18px 22px;
+  border: 1px solid #f3d3ad;
+  background: #fdf6ec;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  color: #6b4415;
+}
+.notice svg { width: 19px; height: 19px; flex: none; margin-top: 2px; color: var(--amber-hi); }
+.notice strong { color: #4a2f0d; }
+
+/* --- KPI row --- */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+@media (max-width: 900px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .kpi-row { grid-template-columns: 1fr; } }
+.kpi {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px 24px 24px;
+  box-shadow: var(--shadow-card);
+}
+.kpi-lab {
+  font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--text-faint);
+}
+.kpi-val {
+  display: block; margin-top: 12px;
+  font-family: var(--font-mono); font-weight: 600;
+  font-size: clamp(1.9rem, 1.3rem + 1.7vw, 2.5rem);
+  line-height: 1; letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.kpi-val .unit { font-size: 0.5em; color: var(--text-faint); letter-spacing: 0; margin-left: 3px; }
+.kpi-sub { display: block; margin-top: 12px; font-size: 0.84rem; color: var(--text-muted); }
+
+/* --- chart cards --- */
+.chart-grid { display: grid; gap: 24px; }
+.chart-grid.two { grid-template-columns: 1fr 1fr; }
+@media (max-width: 1000px) { .chart-grid.two { grid-template-columns: 1fr; } }
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px 26px 20px;
+  box-shadow: var(--shadow-card);
+  min-width: 0;
+}
+.chart-card h3 { font-size: 1.18rem; }
+.chart-card .chart-sub { margin-top: 8px; font-size: 0.9rem; color: var(--text-muted); max-width: 62ch; }
+.chart-canvas { width: 100%; height: 400px; margin-top: 20px; }
+.chart-canvas.tall { height: 460px; }
+@media (max-width: 640px) { .chart-canvas, .chart-canvas.tall { height: 340px; } }
+.chart-note {
+  margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-soft);
+  font-size: 0.84rem; color: var(--text-faint);
+}
+.chart-note strong { color: var(--text-muted); }
+/* placeholder shown until the chart library paints — never an empty box */
+.chart-canvas[data-empty]::after {
+  content: "Loading chart…";
+  display: flex; align-items: center; justify-content: center; height: 100%;
+  font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-faint);
+}
+
+/* --- grade badges (status colour + always a letter, never colour alone) --- */
+.grade {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600;
+  padding: 3px 10px; border-radius: 999px; border: 1px solid currentColor;
+  line-height: 1.5;
+}
+.grade::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+.grade.a { color: var(--g-a); background: #f0fdf4; }
+.grade.b { color: var(--g-b); background: #f0fbf9; }
+.grade.c { color: var(--g-c); background: #fdf6ec; }
+.grade.d { color: var(--g-d); background: #fef2f2; }
+
+/* --- data table view (the accessible counterpart to every chart) --- */
+.table-view { margin-top: 28px; }
+.table-view summary {
+  cursor: pointer; list-style: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.88rem; font-weight: 600; color: var(--teal-hi);
+  padding: 9px 16px; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--bg-card); min-height: 38px;
+}
+.table-view summary::-webkit-details-marker { display: none; }
+.table-view summary::after { content: "+"; font-family: var(--font-mono); font-size: 1.05rem; }
+.table-view[open] summary::after { content: "–"; }
+.table-view .table-wrap {
+  margin-top: 16px; overflow-x: auto;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-card);
+}
+.table-view table { min-width: 640px; margin: 0; }
+.table-view .data-table th, .table-view .data-table td { white-space: nowrap; }
+.table-view .data-table td.num { text-align: right; font-family: var(--font-mono); }
+
+/* --- fleet marquee: the models actually going through the pilot --- */
+.marquee {
+  overflow: hidden; position: relative;
+  border-block: 1px solid var(--line-soft);
+  padding: 18px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-track { display: flex; gap: 44px; width: max-content; animation: marq 34s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes marq { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+  .marquee { -webkit-mask-image: none; mask-image: none; overflow-x: auto; }
+}
+.marquee-item {
+  display: flex; align-items: baseline; gap: 10px; flex: none;
+  font-family: var(--font-mono); font-size: 0.86rem; color: var(--text-muted);
+}
+.marquee-item b { color: var(--ink); font-weight: 600; }
+.marquee-item span { color: var(--text-faint); font-size: 0.78rem; }
+
+/* --- invitation cards --- */
+.invite { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 940px) { .invite { grid-template-columns: 1fr; } }
+.invite-card {
+  background: var(--bg-card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow-card);
+  display: flex; flex-direction: column;
+}
+.invite-card .seats {
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--amber-hi);
+  background: #fdf3e7; border: 1px solid #f3d3ad;
+  padding: 4px 12px; border-radius: 999px; align-self: flex-start; margin-bottom: 16px;
+}
+.invite-list { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 11px; flex: 1; }
+.invite-list li { display: flex; gap: 11px; font-size: 0.92rem; color: var(--text-muted); }
+.invite-list svg { width: 17px; height: 17px; flex: none; color: var(--teal-hi); margin-top: 3px; }
+.invite-card .btn { margin-top: 24px; }
+
+/* --- pilot timeline --- */
+.timeline { display: grid; gap: 0; margin-top: 8px; }
+.tl-item {
+  display: grid; grid-template-columns: 132px 1fr; gap: 26px;
+  padding: 24px 0; border-top: 1px solid var(--line-soft);
+}
+.tl-item:last-child { border-bottom: 1px solid var(--line-soft); }
+@media (max-width: 640px) { .tl-item { grid-template-columns: 1fr; gap: 8px; } }
+.tl-when {
+  font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.04em;
+  color: var(--amber-hi); padding-top: 3px;
+}
+.tl-item.now .tl-when { color: var(--teal-hi); font-weight: 600; }
+.tl-what h4 { font-size: 1.05rem; margin-bottom: 7px; }
+.tl-what p { font-size: 0.93rem; }
+
+/* screen-reader-only text (table captions, chart descriptions) */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* --- hero cohort board (pilot page) --- */
+.cohort {
+  background: rgba(255,255,255,0.045);
+  border: 1px solid #2c4666;
+  border-radius: 18px;
+  padding: 26px 28px 22px;
+  backdrop-filter: blur(6px);
+  max-width: 400px;
+  margin-left: auto;
+}
+.cohort-h {
+  font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-faint);
+}
+.cohort-n {
+  display: block; margin-top: 10px;
+  font-family: var(--font-mono); font-size: 2.6rem; font-weight: 600;
+  line-height: 1; letter-spacing: -0.03em; color: #fff;
+}
+.cohort-n small { font-size: 0.34em; color: var(--text-faint); letter-spacing: 0.04em; margin-left: 8px; font-weight: 400; }
+.cohort-rows { margin-top: 22px; display: grid; gap: 1px; background: #24405f; border-radius: 10px; overflow: hidden; }
+.cohort-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  background: rgba(6,13,24,0.55); padding: 12px 15px;
+  font-size: 0.92rem; color: var(--text-muted);
+}
+.cohort-row b {
+  font-family: var(--font-mono); font-size: 0.82rem; font-weight: 500;
+  color: #2dd4bf; display: inline-flex; align-items: center; gap: 7px;
+}
+.cohort-row b::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.cohort-foot {
+  margin-top: 18px; padding-top: 16px; border-top: 1px solid #24405f;
+  display: grid; gap: 9px;
+}
+.cohort-foot div { display: flex; justify-content: space-between; gap: 14px; font-size: 0.85rem; color: var(--text-faint); }
+.cohort-foot span { font-family: var(--font-mono); color: var(--text); }
+@media (max-width: 420px) { .team-card { flex-wrap: wrap; } }
+/* chart library unreachable — the table view carries every value instead */
+.chart-canvas[data-empty="fallback"]::after {
+  content: "Chart unavailable — the full figures are in the data table below.";
+  padding: 0 24px; text-align: center;
+}

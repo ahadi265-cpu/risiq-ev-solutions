@@ -16,6 +16,7 @@
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -32,6 +33,7 @@
     <nav aria-label="Primary">
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
+        <li><a href="pilot.html">The Pilot</a></li>
         <li><a href="how-it-works.html">How It Works</a></li>
         <li><a href="verify.html">Verify Certificate</a></li>
         <li><a href="partners.html">For Partners</a></li>
@@ -186,8 +188,8 @@
       </div>
       <div class="grid grid-2 reveal">
         <div class="card">
-          <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;">
-            <div style="width:56px; height:56px; border-radius:50%; background:var(--teal); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:600; font-size:1.05rem; flex:none;">AA</div>
+          <div class="team-card">
+            <div class="avatar teal">AA</div>
             <div>
               <h3>Addis Alemayehou</h3>
               <p style="margin-top:4px; font-size:0.9rem; color:var(--teal-hi);">Founder, Kazana Fund &amp; 251 Communications</p>
@@ -196,8 +198,8 @@
           </div>
         </div>
         <div class="card">
-          <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;">
-            <div style="width:56px; height:56px; border-radius:50%; background:var(--amber); color:var(--amber-ink); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:600; font-size:1.05rem; flex:none;">MB</div>
+          <div class="team-card">
+            <div class="avatar amber">MB</div>
             <div>
               <h3>Mesfin Bezu</h3>
               <p style="margin-top:4px; font-size:0.9rem; color:var(--amber-hi);">Vice President, Dashen Bank</p>
@@ -206,6 +208,45 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- TECHNICAL ADVISORS -->
+  <section class="bg-raised">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Technical Advisors</span>
+        <h2>Engineering counsel from inside Eniris.</h2>
+        <p>The technology partnership is not only commercial. Two of Eniris's own engineering leaders advise RISIQ directly on platform architecture, measurement practice and the systems the certificate depends on.</p>
+      </div>
+      <div class="grid grid-2 reveal">
+
+        <div class="card">
+          <div class="team-card">
+            <div class="avatar ink">NT</div>
+            <div>
+              <h3>Niels Tiben</h3>
+              <p class="team-role">Chief Technology Officer, Eniris</p>
+              <p class="team-edu">Technical engineering advisor to RISIQ</p>
+            </div>
+          </div>
+          <p class="team-owns"><strong>Advises on architecture.</strong> How a measurement platform is built so it still answers years later — device management, telemetry ingestion and the operational design behind SmartgridOne's 150,000+ installations.</p>
+        </div>
+
+        <div class="card">
+          <div class="team-card">
+            <div class="avatar teal">C</div>
+            <div>
+              <h3>Cyprian</h3>
+              <p class="team-role">Senior Developer, Eniris</p>
+              <p class="team-edu">Technical engineering advisor to RISIQ</p>
+            </div>
+          </div>
+          <p class="team-owns"><strong>Advises on implementation.</strong> Day-to-day engineering review of RISIQ's ingestion and certification services, and the integration patterns Eniris has proven across 500+ vendor-independent hardware devices.</p>
+        </div>
+
+      </div>
+      <p style="margin-top:28px; font-size:0.92rem; max-width:66ch;">Both advise RISIQ in a technical capacity under the Eniris technology partnership. <a href="partners.html#eniris" class="link-inline">See how the partnership is structured →</a></p>
     </div>
   </section>
 
@@ -288,6 +329,7 @@
       <div class="footer-col">
         <h4>Site</h4>
         <a href="index.html">Home</a>
+        <a href="pilot.html">The Pilot</a>
         <a href="how-it-works.html">How It Works</a>
         <a href="verify.html">Verify Certificate</a>
         <a href="partners.html">For Partners</a>
