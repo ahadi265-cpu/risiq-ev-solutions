@@ -42,7 +42,7 @@
   --t-lede: clamp(1.1rem, 1.01rem + 0.30vw, 1.28rem);
   --lh-tight: 1.14;
 
-  --max: 1320px;
+  --max: 1440px;
   --radius: 14px;
   --radius-sm: 8px;
 
@@ -1315,34 +1315,113 @@ section { padding: 96px 0; position: relative; z-index: 1; }
   .hero .eyebrow, .hero h1, .hero .lede, .hero .hero-cta, .hero .hero-note { animation: none; }
 }
 
-/* ---------- founder education panel ---------- */
-.edu-split { display: grid; grid-template-columns: 1.55fr 1fr; gap: 38px; align-items: start; }
-@media (max-width: 880px) { .edu-split { grid-template-columns: 1fr; gap: 26px; } }
+/* ---------- founder education timeline ---------- */
+.edu-split { display: grid; grid-template-columns: minmax(0, 1.22fr) minmax(0, 1fr); gap: 52px; align-items: stretch; }
+@media (max-width: 980px) { .edu-split { grid-template-columns: 1fr; gap: 30px; } }
+.edu-bio { display: flex; flex-direction: column; }
+.edu-bio p { max-width: 60ch; }
 .edu-panel {
   border-left: 1px solid var(--line-soft);
-  padding-left: 34px;
-  display: grid; gap: 16px; align-content: start;
+  padding-left: 44px;
+  display: flex; flex-direction: column; gap: 14px;
 }
-@media (max-width: 880px) {
-  .edu-panel { border-left: none; padding-left: 0; border-top: 1px solid var(--line-soft); padding-top: 24px; }
+@media (max-width: 980px) {
+  .edu-panel { border-left: none; padding-left: 0; border-top: 1px solid var(--line-soft); padding-top: 28px; }
 }
 .edu-h {
   font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em;
   text-transform: uppercase; color: var(--text-faint);
+  display: flex; align-items: center; gap: 12px;
 }
+.edu-h::after { content: ""; flex: 1; height: 1px; background: var(--line-soft); }
+.edu-list { display: flex; flex-direction: column; gap: 12px; flex: 1; }
 .edu-item {
-  display: flex; align-items: center; gap: 18px;
-  padding: 18px 20px;
-  border: 1px solid var(--line); border-radius: 12px; background: #ffffff;
-  transition: transform 240ms var(--ease), box-shadow 240ms var(--ease), border-color 240ms var(--ease);
+  display: flex; align-items: center; gap: 20px;
+  padding: 16px 20px;
+  border: 1px solid var(--line); border-radius: 14px; background: #ffffff;
+  position: relative; overflow: hidden;
+  transition: transform 260ms var(--ease), box-shadow 260ms var(--ease), border-color 260ms var(--ease);
 }
-.edu-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); border-color: #c9d4e2; }
-.edu-item img { flex: none; width: auto; }
-.edu-item .lg-aalto { height: 58px; }
-.edu-item .lg-ams { height: 44px; }
-.edu-item b { display: block; color: var(--ink); font-size: 0.94rem; line-height: 1.3; }
-.edu-item small { display: block; margin-top: 4px; font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-faint); letter-spacing: 0.02em; }
+/* a brand rail wipes in from the left on hover */
+.edu-item::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--brand-ui); transform: scaleY(0); transform-origin: top;
+  transition: transform 300ms var(--ease);
+}
+.edu-item:hover { transform: translateX(4px); box-shadow: var(--shadow-card); border-color: #cfd9e6; }
+.edu-item:hover::before { transform: scaleY(1); }
+@media (prefers-reduced-motion: reduce) { .edu-item:hover { transform: none; } }
+/* one box for every mark, so four different aspect ratios read as one system */
+.edu-logo {
+  flex: none; width: 72px; height: 54px;
+  display: flex; align-items: center; justify-content: center;
+}
+.edu-logo img { max-width: 100%; max-height: 100%; width: auto; height: auto; }
+.edu-item b { display: block; color: var(--ink); font-size: 0.96rem; line-height: 1.3; }
+.edu-item small {
+  display: block; margin-top: 5px;
+  font-family: var(--font-mono); font-size: 0.73rem; color: var(--text-faint); letter-spacing: 0.01em;
+}
+.edu-yr {
+  margin-left: auto; flex: none;
+  font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-faint);
+  padding: 4px 10px; border: 1px solid var(--line-soft); border-radius: 999px;
+}
+@media (max-width: 520px) { .edu-yr { display: none; } }
 
 /* the partnership artwork is a white-ground poster now */
 .plaque { background: #ffffff; }
 .plaque img { cursor: zoom-in; }
+
+/* ==========================================================================
+   Hero capability strip — the four things the rig actually guarantees
+   ========================================================================== */
+.cap-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; margin-top: 54px;
+  background: rgba(255,255,255,0.09);
+  border: 1px solid rgba(255,255,255,0.11);
+  border-radius: 16px; overflow: hidden;
+}
+@media (max-width: 900px) { .cap-strip { grid-template-columns: repeat(2, 1fr); margin-top: 38px; } }
+@media (max-width: 460px) { .cap-strip { grid-template-columns: 1fr; } }
+.cap-cell {
+  display: flex; align-items: center; gap: 14px;
+  padding: 20px 22px;
+  background: rgba(10,20,34,0.55);
+  backdrop-filter: blur(6px);
+  transition: background 320ms var(--ease);
+}
+.cap-cell:hover { background: rgba(216,18,27,0.14); }
+.cap-ico {
+  flex: none; width: 40px; height: 40px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #7fe3d6;
+  transition: color 320ms var(--ease), border-color 320ms var(--ease), transform 320ms var(--ease);
+}
+.cap-cell:hover .cap-ico { color: #ff8a90; border-color: rgba(255,138,144,0.45); transform: translateY(-2px); }
+.cap-ico svg { width: 20px; height: 20px; }
+.cap-cell b { display: block; font-size: 0.94rem; font-weight: 600; color: #fff; line-height: 1.25; }
+.cap-cell small {
+  display: block; margin-top: 4px;
+  font-family: var(--font-mono); font-size: 0.72rem; color: #93a6bd; letter-spacing: 0.02em;
+}
+@media (prefers-reduced-motion: reduce) { .cap-cell:hover .cap-ico { transform: none; } }
+
+/* ambient aurora behind the hero — canvas-free, GPU-cheap */
+.hero { position: relative; isolation: isolate; }
+.hero::after {
+  content: ""; position: absolute; inset: -20% -10% auto -10%; height: 130%;
+  z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38% 44% at 18% 22%, rgba(216,18,27,0.20), transparent 70%),
+    radial-gradient(34% 40% at 82% 68%, rgba(20,184,166,0.16), transparent 70%);
+  animation: aurora 16s ease-in-out infinite alternate;
+}
+@keyframes aurora {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  100% { transform: translate3d(2%, 3%, 0) scale(1.09); }
+}
+@media (prefers-reduced-motion: reduce) { .hero::after { animation: none; } }
