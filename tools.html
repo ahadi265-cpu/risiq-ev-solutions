@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Verify a Certificate — RISIQ EV Solutions</title>
+<title>Battery Tools — RISIQ EV Solutions</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Verify a RISIQ EV battery-health certificate by ID or QR code — confirm State-of-Health, grade and test details against RISIQ's signed record in seconds.">
-<link rel="canonical" href="https://risiqevsolutions.com/verify.html">
+<meta name="description" content="Model EV battery degradation and collateral value against mileage, charge cycles and Ethiopian climate; compare the 15-minute Rapid Check with the full Reference Test; search vehicle coverage.">
+<link rel="canonical" href="https://risiqevsolutions.com/tools.html">
 <meta property="og:site_name" content="RISIQ EV Solutions">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://risiqevsolutions.com/verify.html">
-<meta property="og:title" content="Verify a Certificate — RISIQ EV Solutions">
-<meta property="og:description" content="Verify a RISIQ EV battery-health certificate by ID or QR code — confirm State-of-Health, grade and test details against RISIQ's signed record in seconds.">
+<meta property="og:url" content="https://risiqevsolutions.com/tools.html">
+<meta property="og:title" content="Battery Tools — RISIQ EV Solutions">
+<meta property="og:description" content="Model EV battery degradation and collateral value against mileage, charge cycles and Ethiopian climate.">
 <meta property="og:image" content="https://risiqevsolutions.com/assets/img/certificate-risiq.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
@@ -32,8 +32,8 @@
         <li><a href="index.html">Home</a></li>
         <li><a href="pilot.html">The Pilot</a></li>
         <li><a href="how-it-works.html">How It Works</a></li>
-        <li><a href="tools.html">Tools</a></li>
-        <li><a href="verify.html" aria-current="page">Verify Certificate</a></li>
+        <li><a href="tools.html" aria-current="page">Tools</a></li>
+        <li><a href="verify.html">Verify Certificate</a></li>
         <li><a href="partners.html">For Partners</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="contact.html">Contact</a></li>
@@ -47,59 +47,66 @@
     </div>
   </div>
 </header>
-
 <main>
 
-  <!-- HERO -->
-  <section class="hero" style="padding-bottom:20px;">
+  <section class="hero" style="padding-bottom:30px;">
     <div class="wrap">
-      <span class="eyebrow">Verify a Certificate</span>
-      <h1 style="margin-top:20px; max-width:18ch;">Scan it, or type the ID. Confirmed in seconds.</h1>
-      <p class="lede" style="margin-top:22px;">Every RISIQ certificate carries a unique ID and QR code that resolves here, straight from RISIQ's signed record — not from the PDF someone hands you.</p>
+      <span class="eyebrow">Battery Tools</span>
+      <h1 style="margin-top:20px; max-width:20ch;">Put a number on the battery before you lend against it.</h1>
+      <p class="lede" style="margin-top:22px; max-width:58ch;">Three working tools: model how a pack degrades under Ethiopian conditions, see what the 15-minute Rapid Check trades away against a full Reference Test, and check whether a vehicle is covered.</p>
+      <div class="hero-cta">
+        <a href="#calculator" class="btn btn-primary">Open the calculator</a>
+        <a href="verify.html" class="btn btn-ghost">Verify a certificate</a>
+      </div>
+      <p class="hero-note">Models are indicative. A RISIQ certificate replaces an estimate with a measurement.</p>
     </div>
   </section>
 
-  <!-- LIVE VERIFICATION DEMO -->
-  <section class="section-tight">
+  <!-- CALCULATOR -->
+  <section id="calculator">
     <div class="wrap">
-      <div class="section-head reveal" style="max-width:740px; margin-bottom:34px;">
-        <span class="eyebrow">Live Demo</span>
-        <h2>Verify a certificate now.</h2>
-        <p>Type a certificate ID or simulate a QR scan. The record is fetched from the public registry, its issuer signature checked, and the full certificate rendered — including the cell-level degradation map behind the headline number.</p>
+      <div class="section-head reveal" style="max-width:780px;">
+        <span class="eyebrow">Degradation &amp; Valuation</span>
+        <h2>What is the pack worth after five Addis years?</h2>
+        <p>Move the sliders. State of health follows a square-root calendar-fade law with an Arrhenius temperature term, plus linear cycle fade — the same method behind the certificate. The collateral figures show what a battery-blind valuation misses.</p>
       </div>
-      <div data-react="cert-demo" data-loading></div>
-      <p style="margin-top:26px; font-size:0.86rem; color:var(--text-faint); max-width:70ch;">To check a certificate is genuine, compare every field here against the paper or PDF copy in your hand — vehicle, VIN, state of health, grade, test date. If anything differs, treat the copy as invalid and contact RISIQ directly.</p>
+      <div data-react="calculator" data-loading></div>
     </div>
   </section>
 
-  <!-- SCAN IT -->
-  <section class="section-tight bg-raised">
-    <div class="wrap two-col">
-      <div class="reveal">
-        <span class="eyebrow">From The Certificate Itself</span>
-        <h2 style="margin-top:14px;">Every certificate carries its own address.</h2>
-        <p class="lede" style="margin-top:16px;">The QR code printed on a RISIQ certificate resolves to this page and pulls the signed record directly — so what you read comes from the registry, never from the document in someone's hand.</p>
-        <p style="margin-top:16px; font-size:0.92rem;">Scan the code with any phone camera, or tap it to open the record.</p>
+  <!-- RAPID VS REFERENCE -->
+  <section class="bg-raised">
+    <div class="wrap">
+      <div class="section-head reveal" style="max-width:760px;">
+        <span class="eyebrow">Test Comparison</span>
+        <h2>Fifteen minutes, or four hours?</h2>
+        <p>Both end in the same signed certificate. What differs is how much of the charge window RISIQ actually watched — and therefore how tight the confidence band can honestly be.</p>
       </div>
-      <div class="card reveal" style="justify-self:center; max-width:380px;">
-        <a href="/v/RISIQ-0001" style="display:flex; align-items:center; gap:18px; cursor:pointer;">
-          <div class="cert-qr" data-qr-cert="RISIQ-0001" style="width:110px; height:110px;"></div>
-          <span style="font-size:0.94rem; color:var(--teal-hi); font-weight:600;">Verify certificate RISIQ-0001 &rarr;</span>
-        </a>
-      </div>
+      <div data-react="test-timeline" data-loading></div>
     </div>
   </section>
 
-  <!-- CTA -->
-  <section>
+  <!-- COVERAGE -->
+  <section id="coverage">
+    <div class="wrap">
+      <div class="section-head reveal" style="max-width:760px;">
+        <span class="eyebrow">Vehicle Coverage</span>
+        <h2>Is the car you financed testable?</h2>
+        <p>Socket-side measurement needs no manufacturer permission, so coverage is broad by construction. Search the models already certified or supported — and book a briefing on any of them.</p>
+      </div>
+      <div data-react="coverage" data-loading></div>
+    </div>
+  </section>
+
+  <section class="bg-raised">
     <div class="wrap">
       <div class="cta-band reveal">
-        <span class="eyebrow">Issuing Certificates</span>
-        <h2 style="margin-top:14px;">Want your own fleet certified?</h2>
-        <p class="lede" style="margin:18px auto 0;">Book a pilot briefing and we'll walk through a live test — and a live verification — on a vehicle from your own yard or depot.</p>
+        <span class="eyebrow">From Estimate To Measurement</span>
+        <h2 style="margin-top:14px;">A model is a guess. A certificate is a record.</h2>
+        <p class="lede" style="margin:18px auto 0;">The pilot goes live in Addis Ababa in late October 2026, across ten BYD vehicles. Founding places are open to banks, micro-finance institutions and insurers.</p>
         <div class="hero-cta">
-          <a href="contact.html" class="btn btn-primary">Register for the Pilot</a>
-          <a href="how-it-works.html" class="btn btn-ghost">See how it works</a>
+          <a href="pilot.html" class="btn btn-primary">See the pilot</a>
+          <a href="contact.html" class="btn btn-ghost">Register your interest</a>
         </div>
       </div>
     </div>
@@ -119,9 +126,7 @@
       <div class="footer-col">
         <h4>Site</h4>
         <a href="index.html">Home</a>
-        <a href="pilot.html">The Pilot</a>
         <a href="how-it-works.html">How It Works</a>
-        <a href="tools.html">Battery Tools</a>
         <a href="verify.html">Verify Certificate</a>
         <a href="partners.html">For Partners</a>
         <a href="about.html">About</a>
@@ -146,7 +151,6 @@
   </div>
 </footer>
 
-<script src="assets/js/vendor/qrcode.js"></script>
 <script src="assets/js/main.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" crossorigin defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" crossorigin defer></script>
