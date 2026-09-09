@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RISIQ EV Solutions — EV Battery Certification for Ethiopia</title>
+    <meta name="description" content="Independent, engineering-grade EV battery-health certification built for Ethiopia's locked, imported fleet." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+    <script>
+      /* GitHub Pages has no server-side rewrites, so a deep link like /pilot
+         404s. public/404.html stashes the path in sessionStorage and bounces
+         here; this restores it before React Router mounts. */
+      (function () {
+        var redirect = sessionStorage.getItem('spa-redirect')
+        if (redirect) {
+          sessionStorage.removeItem('spa-redirect')
+          if (redirect !== location.pathname + location.search + location.hash) {
+            history.replaceState(null, '', redirect)
+          }
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

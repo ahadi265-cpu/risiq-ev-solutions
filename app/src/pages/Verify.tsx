@@ -1,0 +1,209 @@
+import { useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { QrCode, Search, ShieldCheck, Loader2, XCircle, Check } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Section, SectionHead } from '@/components/Layout'
+import { Reveal } from '@/components/Reveal'
+import { cn } from '@/lib/utils'
+import { CERTIFICATES, clamp, hashStr, mulberry32 } from '@/lib/data'
+
+/* one hue, light→dark; validated for monotone lightness and light-end contrast */
+const RAMP = ['#3cc4ae', '#1eab97', '#12897c', '#0d6b61', '#084f47']
+const COLS = 12, ROWS = 8, CELLS = COLS * ROWS
+
+const STEPS = [
+  'Locating certificate in the registry',
+  'Verifying issuer signature',
+  'Confirming quality gates passed at issue',
+  'Record verified',
+]
+
+/** Cells diverge as a pack ages, so spread widens as health falls. Values derive
+ *  from the id, so one certificate always draws the same map. */
+function cellMap(id: string, soh: number) {
+  const rnd = mulberry32(hashStr(id))
+  const spread = 1.1 + (100 - soh) * 0.13
+  return Array.from({ length: CELLS }, () =>
+    clamp(soh + (rnd() + rnd() + rnd() - 1.5) * spread, 35, 100))
+}
+
+export default function Verify() {
+  const [query, setQuery] = useState('')
+  const [phase, setPhase] = useState<'idle' | 'running' | 'done' | 'missing'>('idle')
+  const [step, setStep] = useState(-1)
+  const [cid, setCid] = useState('')
+  const timers = useRef<number[]>([])
+
+  const run = (raw: string) => {
+    const id = raw.trim().toUpperCase()
+    if (!id) return
+    timers.current.forEach(clearTimeout); timers.current = []
+    setCid(id); setStep(-1); setPhase('running')
+    STEPS.forEach((_, i) => timers.current.push(
+      window.setTimeout(() => setStep(i), 600 * (i + 1))))
+    timers.current.push(window.setTimeout(
+      () => setPhase(CERTIFICATES[id] ? 'done' : 'missing'), 600 * (STEPS.length + 0.4)))
+  }
+
+  const scan = () => {
+    const ids = Object.keys(CERTIFICATES)
+    const pick = ids[Math.floor(Math.random() * ids.length)]
+    setQuery(pick); run(pick)
+  }
+
+  const cert = phase === 'done' ? CERTIFICATES[cid] : null
+
+  return (
+    <Section className="pt-14">
+      <SectionHead eyebrow="Live Demo" title="Verify a certificate now.">
+        Type a certificate ID or simulate a QR scan. The record is fetched from the public registry, its issuer signature checked, and the full certificate rendered — including the cell-level degradation map behind the headline number.
+      </SectionHead>
+
+      <Reveal>
+        <Card>
+          <CardContent className="grid gap-3">
+            <Label htmlFor="cert-id">Certificate ID</Label>
+            <form className="flex flex-wrap gap-2.5" onSubmit={(e) => { e.preventDefault(); run(query) }}>
+              <Input id="cert-id" value={query} onChange={(e) => setQuery(e.target.value)}
+                placeholder="RISIQ-0001" autoComplete="off" spellCheck={false} className="flex-1 font-mono" />
+              <Button type="submit"><Search />Verify</Button>
+              <Button type="button" variant="outline" onClick={scan}><QrCode />Simulate QR scan</Button>
+            </form>
+            <p className="text-xs text-muted-foreground">
+              Try{' '}
+              {Object.keys(CERTIFICATES).map((id, i, arr) => (
+                <span key={id}>
+                  <button type="button" onClick={() => { setQuery(id); run(id) }}
+                    className="cursor-pointer font-semibold text-teal underline underline-offset-2">{id}</button>
+                  {i < arr.length - 2 ? ', ' : i === arr.length - 2 ? ' or ' : ''}
+                </span>
+              ))}
+              {' '}— or scan to pick one at random.
+            </p>
+          </CardContent>
+        </Card>
+      </Reveal>
+
+      {phase !== 'idle' && (
+        <ol className="mt-7 grid gap-2.5" aria-live="polite">
+          {STEPS.map((s, i) => {
+            const done = phase === 'done' || step > i
+            const now = step === i && phase === 'running'
+            const fail = phase === 'missing' && step === i
+            return (
+              <li key={s} className={cn('flex items-center gap-3 text-sm transition-colors',
+                done || now ? 'text-foreground' : 'text-muted-foreground')}>
+                <span className={cn('grid size-5 shrink-0 place-items-center rounded-full border-2',
+                  done && 'border-teal bg-teal text-white', fail && 'border-destructive bg-destructive text-white',
+                  !done && !fail && 'border-border')}>
+                  {done && <Check className="size-3" strokeWidth={3} />}
+                  {fail && <XCircle className="size-3" />}
+                  {now && <Loader2 className="size-3 animate-spin text-primary" />}
+                </span>
+                {s}
+              </li>
+            )
+          })}
+        </ol>
+      )}
+
+      <AnimatePresence mode="wait">
+        {phase === 'missing' && (
+          <motion.div key="missing" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="mt-7 rounded-xl border border-destructive/25 bg-destructive/5 p-6">
+            <b className="block">No certificate found for “{cid}”</b>
+            <p className="mt-1.5 text-sm text-muted-foreground">Check the ID printed under the QR code, or scan the code directly. Only certificates issued by RISIQ resolve here.</p>
+          </motion.div>
+        )}
+        {cert && <CertCard key={cid} id={cid} cert={cert} />}
+      </AnimatePresence>
+    </Section>
+  )
+}
+
+function CertCard({ id, cert }: { id: string; cert: typeof CERTIFICATES[string] }) {
+  const soh = cert.stateOfHealth
+  const cells = useMemo(() => cellMap(id, soh), [id, soh])
+  const lo = Math.min(...cells), hi = Math.max(...cells)
+  const weakest = cells.indexOf(lo)
+  const [sel, setSel] = useState<number | null>(null)
+  const idx = (v: number) => clamp(Math.floor(((v - lo) / (hi - lo || 1)) * RAMP.length), 0, RAMP.length - 1)
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 20, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="mt-7 grid gap-7 rounded-2xl border bg-gradient-to-br from-card to-muted/40 p-8 shadow-xl">
+      <div className="flex flex-wrap items-start justify-between gap-6 border-b border-dashed pb-6">
+        <div>
+          <span className="inline-flex items-center gap-2 rounded-full border border-grade-a/30 bg-grade-a/10 px-3 py-1 font-mono text-[0.68rem] tracking-wider text-grade-a uppercase">
+            <ShieldCheck className="size-3.5" />Signed &amp; verified
+          </span>
+          <h3 className="mt-3 text-2xl font-semibold">{cert.vehicle}</h3>
+          <span className="mt-1.5 block font-mono text-sm text-muted-foreground">{id}</span>
+        </div>
+        <div className="grid justify-items-center gap-2.5">
+          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+            className="font-mono text-4xl font-semibold tabular">{soh}%</motion.span>
+          <Badge variant={cert.grade.toLowerCase() as 'a'}>Grade {cert.grade}</Badge>
+        </div>
+      </div>
+
+      <dl className="grid gap-0">
+        {([['Test type', cert.testType], ['Test date', cert.testDate],
+           ['Usable capacity', `${cert.usableCapacityKwh} kWh`], ['Estimated range', `${cert.estimatedRangeKm} km`],
+           ['Test location', cert.location], ['Registry status', cert.status]] as const).map(([k, v]) => (
+          <div key={k} className="flex justify-between gap-4 border-b py-2.5 text-sm">
+            <dt className="text-muted-foreground">{k}</dt><dd className="font-mono">{v}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div className="grid gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">Cell-level degradation</span>
+          <span className="flex items-center gap-1">
+            <small className="font-mono text-xs text-muted-foreground">{lo.toFixed(0)}%</small>
+            {RAMP.map((c) => <i key={c} className="block h-2.5 w-5" style={{ background: c }} />)}
+            <small className="font-mono text-xs text-muted-foreground">{hi.toFixed(0)}%</small>
+          </span>
+        </div>
+        <div className="grid grid-cols-12 gap-1" role="img"
+          aria-label={`${CELLS} cells span ${lo.toFixed(1)}% to ${hi.toFixed(1)}% state of health.`}>
+          {cells.map((v, i) => (
+            <motion.button key={i} type="button" onClick={() => setSel(sel === i ? null : i)}
+              initial={{ opacity: 0, scale: 0.4 }} animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.006, duration: 0.3 }}
+              whileHover={{ scale: 1.22, zIndex: 1 }}
+              className={cn('aspect-square cursor-pointer rounded-[3px]',
+                i === weakest && 'ring-2 ring-amber', sel === i && 'ring-2 ring-foreground')}
+              style={{ background: RAMP[idx(v)] }}
+              aria-label={`Cell ${i + 1}, ${v.toFixed(1)} percent`} />
+          ))}
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {sel !== null
+            ? <><b className="text-foreground">Cell {sel + 1}</b> — {cells[sel].toFixed(1)}% of nominal, module {Math.floor(sel / COLS) + 1} of {ROWS}.</>
+            : <><b className="text-foreground">Weakest cell {weakest + 1}</b> at {lo.toFixed(1)}%, {(soh - lo).toFixed(1)} pp below pack average. Select any cell to inspect it.</>}
+        </p>
+      </div>
+
+      <div className="grid gap-3 rounded-xl border bg-muted/40 p-5">
+        <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">Cryptographic status</span>
+        <code className="font-mono text-xs break-all text-teal">
+          sha256:{(hashStr(id + soh).toString(16) + hashStr(cert.vehicle).toString(16)).slice(0, 40)}
+        </code>
+        <ul className="grid gap-1.5 text-sm text-muted-foreground">
+          {['Signature valid — issuer RISIQ EV Solutions',
+            `Record unchanged since ${cert.testDate}`,
+            'Any edit to a downloaded PDF breaks this signature'].map((l) => (
+            <li key={l} className="flex gap-2"><Check className="mt-0.5 size-3.5 shrink-0 text-grade-a" strokeWidth={3} />{l}</li>
+          ))}
+        </ul>
+      </div>
+    </motion.div>
+  )
+}

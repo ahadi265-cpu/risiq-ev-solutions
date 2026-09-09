@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>RISIQ EV Solutions</title>
+    <script>
+      /* Stash the requested deep link, then hand control back to the SPA. */
+      sessionStorage.setItem('spa-redirect', location.pathname + location.search + location.hash)
+      location.replace(document.querySelector('base')?.href || '/')
+    </script>
+  </head>
+  <body></body>
+</html>
