@@ -9,8 +9,12 @@ import { cn } from '@/lib/utils'
 const NAV = [
   { to: '/', label: 'Home', end: true },
   { to: '/pilot', label: 'The Pilot' },
+  { to: '/how-it-works', label: 'How It Works' },
   { to: '/tools', label: 'Tools' },
   { to: '/verify', label: 'Verify' },
+  { to: '/partners', label: 'Partners' },
+  { to: '/about', label: 'About' },
+  { to: '/contact', label: 'Contact' },
 ]
 
 export function Layout() {
@@ -24,11 +28,11 @@ export function Layout() {
             <img src="img/risiq-logo.png" alt="RISIQ" width={1600} height={614} className="h-9 w-auto" />
             <span className="hidden font-mono text-[0.6rem] font-medium tracking-[0.14em] text-muted-foreground uppercase sm:inline">EV Solutions</span>
           </Link>
-          <ul className="hidden items-center gap-1 md:flex">
+          <ul className="hidden items-center gap-0.5 lg:flex">
             {NAV.map((n) => (
               <li key={n.to}>
                 <NavLink to={n.to} end={n.end} className={({ isActive }) => cn(
-                  'relative rounded-full px-4 py-2 text-sm transition-colors',
+                  'relative rounded-full px-3 py-2 text-[0.87rem] transition-colors',
                   isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground')}>
                   {({ isActive }) => (<>
                     {n.label}
@@ -40,14 +44,14 @@ export function Layout() {
           </ul>
           <div className="flex items-center gap-2">
             <Button asChild size="sm" className="hidden sm:inline-flex"><Link to="/pilot">Register for the Pilot</Link></Button>
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu" aria-expanded={open}>
+            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu" aria-expanded={open}>
               {open ? <X /> : <Menu />}
             </Button>
           </div>
         </nav>
         {open && (
           <motion.ul initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-            className="mx-auto mt-2 max-w-[1440px] rounded-2xl border bg-card p-2 shadow-lg md:hidden">
+            className="mx-auto mt-2 max-w-[1440px] rounded-2xl border bg-card p-2 shadow-lg lg:hidden">
             {NAV.map((n) => (
               <li key={n.to}>
                 <NavLink to={n.to} end={n.end} onClick={() => setOpen(false)}
@@ -64,7 +68,12 @@ export function Layout() {
         <div className="mx-auto grid max-w-[1440px] gap-6 px-6 text-sm text-muted-foreground md:grid-cols-2">
           <div><img src="img/risiq-logo.png" alt="RISIQ" width={1600} height={614} className="mb-4 h-8 w-auto" />
             <p className="max-w-[42ch]">Independent, engineering-grade EV battery-health certification for Ethiopia's electric fleet. Part of RISIQ Group.</p></div>
-          <p className="md:text-right">
+          <nav className="flex flex-wrap gap-x-5 gap-y-2 md:justify-end" aria-label="Footer">
+            {NAV.slice(1).map((n) => (
+              <Link key={n.to} to={n.to} className="hover:text-primary hover:underline">{n.label}</Link>
+            ))}
+          </nav>
+          <p className="md:col-span-2 md:text-right">
             Addis Ababa, Ethiopia · <a className="text-primary hover:underline" href="mailto:Khalid@risiqbs.com">Khalid@risiqbs.com</a>
             <br className="hidden md:block" />
             <a className="text-primary hover:underline" href="tel:+251911223871">+251 911 223 871</a>{' '}
