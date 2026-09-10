@@ -1,7 +1,7 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useState } from 'react'
-import { Menu, X, Zap } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useGsapReveal } from '@/lib/useGsapReveal'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -20,9 +20,9 @@ export function Layout() {
     <div className="min-h-dvh flex flex-col">
       <header className="sticky top-3 z-40 mx-3">
         <nav className="mx-auto flex max-w-[1440px] items-center justify-between gap-5 rounded-full border bg-card/95 px-5 py-2.5 shadow-sm backdrop-blur-md">
-          <Link to="/" className="flex items-center gap-2.5 font-bold text-xl tracking-tight">
-            <span className="grid size-9 place-items-center rounded-lg bg-brand text-white"><Zap className="size-5" /></span>
-            RISIQ <span className="hidden font-mono text-[0.6rem] font-medium tracking-[0.14em] text-muted-foreground uppercase sm:inline">EV Solutions</span>
+          <Link to="/" className="flex items-center gap-3" aria-label="RISIQ EV Solutions — home">
+            <img src="img/risiq-logo.png" alt="RISIQ" width={1600} height={614} className="h-9 w-auto" />
+            <span className="hidden font-mono text-[0.6rem] font-medium tracking-[0.14em] text-muted-foreground uppercase sm:inline">EV Solutions</span>
           </Link>
           <ul className="hidden items-center gap-1 md:flex">
             {NAV.map((n) => (
@@ -62,12 +62,12 @@ export function Layout() {
 
       <footer className="mt-28 border-t bg-card py-12">
         <div className="mx-auto grid max-w-[1440px] gap-6 px-6 text-sm text-muted-foreground md:grid-cols-2">
-          <p className="max-w-[42ch]">Independent, engineering-grade EV battery-health certification for Ethiopia's electric fleet. Part of RISIQ Group.</p>
+          <div><img src="img/risiq-logo.png" alt="RISIQ" width={1600} height={614} className="mb-4 h-8 w-auto" />
+            <p className="max-w-[42ch]">Independent, engineering-grade EV battery-health certification for Ethiopia's electric fleet. Part of RISIQ Group.</p></div>
           <p className="md:text-right">
             Addis Ababa, Ethiopia · <a className="text-primary hover:underline" href="mailto:Khalid@risiqbs.com">Khalid@risiqbs.com</a>
             <br className="hidden md:block" />
-            <a className="text-primary hover:underline" href="tel:+251911223848">+251 911 223 848</a>{' '}
-            &middot; <a className="text-primary hover:underline" href="tel:+251911223871">+251 911 223 871</a>{' '}
+            <a className="text-primary hover:underline" href="tel:+251911223871">+251 911 223 871</a>{' '}
             &middot; <a className="text-primary hover:underline" href="tel:+32489976231">+32 489 97 62 31</a>
           </p>
         </div>
