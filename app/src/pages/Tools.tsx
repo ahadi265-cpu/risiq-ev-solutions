@@ -7,6 +7,7 @@ import { Slider } from '@/components/ui/slider'
 import { Label } from '@/components/ui/label'
 import { Section, SectionHead } from '@/components/Layout'
 import { Reveal } from '@/components/Reveal'
+import { TestVisualizer } from '@/components/TestVisualizer'
 import { cn } from '@/lib/utils'
 import {
   FLEET, CLIMATES, modelSoH, gradeOf, bookFactor, batteryFactor, fmt, etb, type Grade,
@@ -149,6 +150,13 @@ export default function Tools() {
           </div>
         </div>
       </Reveal>
+
+      <div className="mt-20">
+        <SectionHead eyebrow="Test Comparison" title="Fifteen minutes, or four hours?">
+          Both tests end in the same signed certificate. Play either run to see what the Rapid Check trades away.
+        </SectionHead>
+        <Reveal><TestVisualizer /></Reveal>
+      </div>
     </Section>
   )
 }

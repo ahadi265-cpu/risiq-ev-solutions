@@ -11,6 +11,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
 import { Section, SectionHead } from '@/components/Layout'
 import { Reveal, RevealGroup, revealItem } from '@/components/Reveal'
+import { CompareMatrix } from '@/components/CompareMatrix'
+import { BriefingModal } from '@/components/BriefingModal'
 import { PILOT, fmt, type Grade } from '@/lib/data'
 
 const TEAL = 'oklch(0.596 0.113 183.3)'
@@ -226,12 +228,19 @@ export default function Pilot() {
                   <Badge variant="outline" className="mt-5 border-amber/30 text-amber">{s}</Badge>
                   <h3 className="mt-3 text-xl font-semibold">{t}</h3>
                   <p className="mt-3 flex-1 text-sm text-muted-foreground">{d}</p>
-                  <Button className="mt-6 w-full" asChild><a href="mailto:Khalid@risiqbs.com?subject=RISIQ pilot founding place">Claim a place</a></Button>
+                  <div className="mt-6"><BriefingModal trigger={<Button className="w-full">Claim a place</Button>} /></div>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </RevealGroup>
+      </Section>
+
+      <Section>
+        <SectionHead eyebrow="The Landscape" title="Built for the market Ethiopia actually has.">
+          Toggle to just the rows where the approaches diverge.
+        </SectionHead>
+        <Reveal><CompareMatrix /></Reveal>
       </Section>
 
       <Section muted>

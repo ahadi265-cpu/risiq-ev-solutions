@@ -2,6 +2,7 @@ import { NavLink, Outlet, Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useState } from 'react'
 import { Menu, X, Zap } from 'lucide-react'
+import { useGsapReveal } from '@/lib/useGsapReveal'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -14,6 +15,7 @@ const NAV = [
 
 export function Layout() {
   const [open, setOpen] = useState(false)
+  useGsapReveal()
   return (
     <div className="min-h-dvh flex flex-col">
       <header className="sticky top-3 z-40 mx-3">
@@ -92,7 +94,7 @@ export function SectionHead({ eyebrow, title, children }: {
       <span className="flex items-center gap-2.5 font-mono text-xs tracking-[0.14em] text-amber uppercase">
         <span className="size-1.5 rounded-full bg-amber ring-3 ring-amber/20" />{eyebrow}
       </span>
-      <h2 className="mt-4 text-3xl font-semibold md:text-[2.6rem] md:leading-[1.1]">{title}</h2>
+      <h2 data-settle className="mt-4 text-3xl font-semibold md:text-[2.6rem] md:leading-[1.1]">{title}</h2>
       {children && <p className="mt-4 text-lg text-muted-foreground text-pretty">{children}</p>}
     </div>
   )
