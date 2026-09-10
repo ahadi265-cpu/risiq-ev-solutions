@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Page not found — RISIQ EV Solutions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="This page could not be found. Verify a RISIQ battery certificate, or return to the homepage.">
+<meta name="robots" content="noindex">
+<script>
+/* Certificate short links. Printed certificates and QR codes encode
+   risiqevsolutions.com/v/<ID>, but GitHub Pages has no server-side rewrites,
+   so that path 404s and lands here. Translate it back to the verify page
+   before anything renders. */
+(function () {
+  var m = location.pathname.match(/\/v\/([^/]+)\/?$/);
+  if (m && m[1]) {
+    location.replace('/verify.html?id=' + encodeURIComponent(decodeURIComponent(m[1])));
+  }
+})();
+</script>
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="nav-inner">
+    <a href="/index.html" class="brand">
+      <img class="brand-logo" src="/assets/img/risiq-logo.png" alt="RISIQ" width="1600" height="614">
+      <span class="brand-tag">EV Solutions</span>
+    </a>
+    <nav aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/pilot.html">The Pilot</a></li>
+        <li><a href="/how-it-works.html">How It Works</a></li>
+        <li><a href="/tools.html">Tools</a></li>
+        <li><a href="/verify.html" >Verify Certificate</a></li>
+        <li><a href="/partners.html">For Partners</a></li>
+        <li><a href="/about.html">About</a></li>
+        <li><a href="/contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav-cta">
+      <a href="/contact.html" class="btn btn-primary btn-sm">Register for the Pilot</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero" style="padding-bottom:40px;">
+    <div class="wrap">
+      <span class="eyebrow">Error 404</span>
+      <h1 style="margin-top:20px; max-width:16ch;">That page isn't here.</h1>
+      <p class="lede" style="margin-top:22px; max-width:52ch;">The link may be mistyped or out of date. If you were scanning a certificate QR code, verify it directly by entering the ID printed beneath the code.</p>
+      <div class="hero-cta">
+        <a href="/verify.html" class="btn btn-primary">Verify a certificate</a>
+        <a href="/" class="btn btn-ghost">Back to home</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="grid grid-3 reveal">
+        <a class="card" href="/pilot.html" style="display:block; cursor:pointer;">
+          <h2>The October Pilot</h2>
+          <p style="margin-top:10px;">Ten BYD vehicles, ninety days, in Addis Ababa — and founding places for banks, insurers and micro-finance.</p>
+          <span class="link-inline" style="display:inline-block; margin-top:14px; font-size:0.86rem;">See the pilot &rarr;</span>
+        </a>
+        <a class="card" href="/how-it-works.html" style="display:block; cursor:pointer;">
+          <h2>How It Works</h2>
+          <p style="margin-top:10px;">Socket-side measurement on any locked import, in fifteen minutes, ending in a signed certificate.</p>
+          <span class="link-inline" style="display:inline-block; margin-top:14px; font-size:0.86rem;">See the process &rarr;</span>
+        </a>
+        <a class="card" href="/contact.html" style="display:block; cursor:pointer;">
+          <h2>Talk to us</h2>
+          <p style="margin-top:10px;">Register for the pilot, or ask about certifying the vehicles already on your books.</p>
+          <span class="link-inline" style="display:inline-block; margin-top:14px; font-size:0.86rem;">Get in touch &rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <a href="/index.html" class="brand" style="margin-bottom:16px;">
+          <img class="brand-logo" src="/assets/img/risiq-logo.png" alt="RISIQ" width="1600" height="614">
+        </a>
+        <p style="max-width:32ch;">Independent, engineering-grade EV battery-health certification for Ethiopia's electric fleet.</p>
+      </div>
+      <div class="footer-col">
+        <h2>Site</h2>
+        <a href="/index.html">Home</a>
+        <a href="/pilot.html">The Pilot</a>
+        <a href="/how-it-works.html">How It Works</a>
+        <a href="/tools.html">Battery Tools</a>
+        <a href="/verify.html">Verify Certificate</a>
+        <a href="/partners.html">For Partners</a>
+        <a href="/about.html">About</a>
+      </div>
+      <div class="footer-col">
+        <h2>Get Started</h2>
+        <a href="/contact.html">Register for the Pilot</a>
+        <a href="/contact.html">Contact us</a>
+      </div>
+      <div class="footer-col">
+        <h2>Contact</h2>
+        <p>Addis Ababa, Ethiopia</p>
+        <a href="mailto:Khalid@risiqbs.com">Khalid@risiqbs.com</a>
+        <a href="tel:+251911223848">+251 911 223 848</a>
+        <a href="tel:+251911223871">+251 911 223 871</a>
+        <a href="tel:+32489976231">+32 489 97 62 31</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year></span> RISIQ EV Solutions — part of <a href="https://www.risiqbs.com/" target="_blank" rel="noopener" style="text-decoration:underline;">RISIQ Group</a>. Battery analytics built in partnership with Eniris.</span>
+      <span style="font-size:0.76rem;">Photos: H. Berberich · DFID · J. Rebiffé (CC BY)</span>
+      <span class="pill">Addis Ababa · Ethiopia</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

@@ -297,7 +297,7 @@ p { margin: 0; color: var(--text-muted); text-wrap: pretty; }
   gap: 32px;
   padding-bottom: 40px;
 }
-.footer-col h4 {
+.footer-col h2 {
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -733,7 +733,7 @@ section { padding: 96px 0; position: relative; z-index: 1; }
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 @media (max-width: 800px) { .split { grid-template-columns: 1fr; } }
 .split-col { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-card); padding: 26px; box-shadow: var(--shadow-card); }
-.split-col h4 {
+.split-col h3 {
   font-family: var(--font-mono);
   font-size: 0.76rem;
   letter-spacing: 0.12em;

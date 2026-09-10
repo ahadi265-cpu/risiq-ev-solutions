@@ -53,6 +53,19 @@
       return function () { timers.current.forEach(clearTimeout); };
     }, []);
 
+    /* A scanned QR code arrives as /v/<ID>, which 404.html rewrites to
+       ?id=<ID>. Prefill and verify automatically so a scan resolves without
+       the visitor retyping the ID they just scanned. */
+    var autoRan = useRef(false);
+    useEffect(function () {
+      if (!reg || autoRan.current) return;
+      var id = new URLSearchParams(window.location.search).get('id');
+      if (!id) return;
+      autoRan.current = true;
+      setQuery(id.trim().toUpperCase());
+      run(id);
+    }, [reg]);
+
     var run = function (rawId) {
       var id = String(rawId || '').trim().toUpperCase();
       if (!id) return;
