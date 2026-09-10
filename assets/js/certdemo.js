@@ -272,7 +272,7 @@
       e.preventDefault();
       if (!name.trim() || !org.trim() || !email.trim()) return;
       setSt('sending');
-      fetch('https://formsubmit.co/ajax/Khalid@risiqbs.com', {
+      fetch('https://formsubmit.co/ajax/ahadi265@gmail.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
