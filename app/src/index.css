@@ -1,24 +1,69 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant light (&:is(.light *));
 
-/* ==========================================================================
-   RISIQ design tokens. Brand red is split: --brand is the logo's true colour,
-   --primary the text-safe tone (5.2:1 with white) used on interactive surfaces.
-   Teal and amber stay for instrument and chart duty.
-   ========================================================================== */
 :root {
   --radius: 0.75rem;
 
+  /* deep slate ground — near-black with a blue bias, not pure grey */
+  --background: oklch(0.165 0.021 258);
+  --foreground: oklch(0.971 0.006 250);
+  --card: oklch(0.205 0.024 258);
+  --card-foreground: oklch(0.971 0.006 250);
+  --popover: oklch(0.205 0.024 258);
+  --popover-foreground: oklch(0.971 0.006 250);
+
+  /* emerald/teal is the action colour on dark ground */
+  --primary: oklch(0.766 0.137 172);
+  --primary-foreground: oklch(0.16 0.02 258);
+  --secondary: oklch(0.262 0.028 258);
+  --secondary-foreground: oklch(0.971 0.006 250);
+  --muted: oklch(0.245 0.026 258);
+  --muted-foreground: oklch(0.702 0.023 256);
+  --accent: oklch(0.262 0.028 258);
+  --accent-foreground: oklch(0.971 0.006 250);
+  --destructive: oklch(0.665 0.196 24);
+
+  --border: oklch(1 0 0 / 11%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.766 0.137 172);
+
+  --brand: oklch(0.62 0.222 27.5);          /* RISIQ red, kept for the mark */
+  --teal: oklch(0.783 0.13 176);
+  --amber: oklch(0.804 0.13 78);
+  --ink: oklch(0.971 0.006 250);
+
+  --grade-a: oklch(0.79 0.16 155);
+  --grade-b: oklch(0.783 0.13 176);
+  --grade-c: oklch(0.804 0.13 78);
+  --grade-d: oklch(0.68 0.19 24);
+
+  --chart-1: var(--teal);
+  --chart-2: var(--amber);
+  --chart-3: oklch(0.7 0.14 210);
+  --chart-4: oklch(0.68 0.13 290);
+  --chart-5: oklch(0.7 0.15 340);
+
+  --sidebar: oklch(0.205 0.024 258);
+  --sidebar-foreground: oklch(0.971 0.006 250);
+  --sidebar-primary: oklch(0.766 0.137 172);
+  --sidebar-primary-foreground: oklch(0.16 0.02 258);
+  --sidebar-accent: oklch(0.262 0.028 258);
+  --sidebar-accent-foreground: oklch(0.971 0.006 250);
+  --sidebar-border: oklch(1 0 0 / 11%);
+  --sidebar-ring: oklch(0.766 0.137 172);
+}
+
+/* opt-in light mode, for anyone who explicitly asks for it */
+.light {
   --background: oklch(0.994 0.001 250);
   --foreground: oklch(0.216 0.031 258);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.216 0.031 258);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.216 0.031 258);
-
-  --primary: oklch(0.532 0.213 26.5);          /* #d8121b */
+  --primary: oklch(0.532 0.213 26.5);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.968 0.006 250);
   --secondary-foreground: oklch(0.279 0.036 258);
@@ -26,63 +71,15 @@
   --muted-foreground: oklch(0.503 0.028 257);
   --accent: oklch(0.968 0.006 250);
   --accent-foreground: oklch(0.279 0.036 258);
-  --destructive: oklch(0.577 0.222 27.3);
-
   --border: oklch(0.916 0.011 251);
   --input: oklch(0.916 0.011 251);
   --ring: oklch(0.532 0.213 26.5);
-
-  --brand: oklch(0.577 0.229 27.9);            /* #ed1c24 — logo red */
-  --teal: oklch(0.596 0.113 183.3);            /* #0d9488 — measured data */
-  --amber: oklch(0.523 0.135 62.4);            /* #b45309 — claimed / rated */
+  --teal: oklch(0.596 0.113 183.3);
+  --amber: oklch(0.523 0.135 62.4);
   --ink: oklch(0.216 0.031 258);
-
-  --grade-a: oklch(0.517 0.146 149.1);
-  --grade-b: oklch(0.511 0.096 186.4);
-  --grade-c: oklch(0.523 0.135 62.4);
-  --grade-d: oklch(0.487 0.192 27.6);
-
-  --chart-1: var(--teal);
-  --chart-2: var(--amber);
-  --chart-3: oklch(0.646 0.15 200);
-  --chart-4: oklch(0.6 0.118 285);
-  --chart-5: oklch(0.55 0.14 340);
-
-  --sidebar: oklch(0.984 0.003 248);
-  --sidebar-foreground: oklch(0.216 0.031 258);
-  --sidebar-primary: oklch(0.532 0.213 26.5);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.968 0.006 250);
-  --sidebar-accent-foreground: oklch(0.279 0.036 258);
-  --sidebar-border: oklch(0.916 0.011 251);
-  --sidebar-ring: oklch(0.532 0.213 26.5);
 }
 
-.dark {
-  --background: oklch(0.181 0.026 259);
-  --foreground: oklch(0.968 0.006 250);
-  --card: oklch(0.226 0.031 259);
-  --card-foreground: oklch(0.968 0.006 250);
-  --popover: oklch(0.226 0.031 259);
-  --popover-foreground: oklch(0.968 0.006 250);
-  --primary: oklch(0.63 0.207 27.2);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.28 0.033 259);
-  --secondary-foreground: oklch(0.968 0.006 250);
-  --muted: oklch(0.28 0.033 259);
-  --muted-foreground: oklch(0.7 0.023 256);
-  --accent: oklch(0.28 0.033 259);
-  --accent-foreground: oklch(0.968 0.006 250);
-  --destructive: oklch(0.704 0.191 22.2);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.63 0.207 27.2);
-  --teal: oklch(0.77 0.129 181.9);
-  --amber: oklch(0.75 0.14 70);
-  --sidebar: oklch(0.226 0.031 259);
-  --sidebar-foreground: oklch(0.968 0.006 250);
-  --sidebar-border: oklch(1 0 0 / 12%);
-}
+
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -146,3 +143,32 @@
 @keyframes accordion-up { from { height: var(--radix-accordion-content-height) } to { height: 0 } }
 
 @keyframes marq { to { transform: translateX(-50%); } }
+
+@layer utilities {
+  /* headline gradient, teal -> cyan, used once per page at most */
+  .text-gradient {
+    background: linear-gradient(96deg, oklch(0.83 0.13 172), oklch(0.78 0.11 210));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  /* faint technical grid, the way instrument UIs ground a dark field */
+  .bg-grid {
+    background-image:
+      linear-gradient(oklch(1 0 0 / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(1 0 0 / 0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  .ring-glow { box-shadow: 0 0 0 1px oklch(0.766 0.137 172 / 0.25), 0 0 34px -8px oklch(0.766 0.137 172 / 0.45); }
+}
+
+@layer utilities {
+  /* Hero entrances run on CSS, not the JS animation loop. A CSS animation
+     always reaches its end state, so a stalled frame loop can never leave
+     above-the-fold content stuck at opacity 0. */
+  @keyframes rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+  @keyframes riseCert { from { opacity: 0; transform: translateY(30px) rotate(3deg); } to { opacity: 1; transform: rotate(2deg); } }
+  .animate-rise { animation: rise 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+  .animate-rise-cert { animation: riseCert 0.9s 0.15s cubic-bezier(0.22,1,0.36,1) both; }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-rise, .animate-rise-cert { animation: none; opacity: 1; transform: none; }
+  }
+}

@@ -21,6 +21,13 @@ const CAPS = [
   { icon: ShieldCheck, title: 'QR-verified certificate', note: 'public registry < 2 s' },
 ]
 
+const METRICS = [
+  { k: 'Test duration', v: '<15', u: 'min', d: 'Socket-level rapid check' },
+  { k: 'Reference accuracy', v: '±3', u: '%', d: 'Class 0.5S revenue-grade meter' },
+  { k: 'OEM access needed', v: '0', u: '', d: 'Bypasses locked OBD entirely' },
+  { k: 'Verification', v: '<2', u: 's', d: 'Public registry, QR-resolved' },
+]
+
 const STATS = [
   { v: '2024', l: 'World-first ban on petrol & diesel car imports' },
   { v: '115,000', l: 'EVs on the road today, up from under 10,000 in 2023' },
@@ -49,38 +56,34 @@ export default function Home() {
   return (
     <>
       {/* ---------------------------------------------------------- hero */}
-      <section className="relative isolate overflow-hidden bg-[oklch(0.22_0.04_255)] py-20 text-white md:py-28">
-        <div aria-hidden className="pointer-events-none absolute -inset-x-24 -top-1/3 h-[130%] -z-10 opacity-70
-          [background:radial-gradient(38%_44%_at_18%_22%,oklch(0.53_0.21_27/0.34),transparent_70%),radial-gradient(34%_40%_at_82%_68%,oklch(0.6_0.11_183/0.28),transparent_70%)]" />
+      <section className="bg-grid relative isolate overflow-hidden py-20 md:py-28">
+        <div aria-hidden className="pointer-events-none absolute -inset-x-24 -top-1/3 h-[130%] -z-10 opacity-80
+          [background:radial-gradient(40%_44%_at_20%_18%,oklch(0.766_0.137_172/0.20),transparent_68%),radial-gradient(34%_40%_at_84%_70%,oklch(0.7_0.14_210/0.16),transparent_70%)]" />
         <div className="mx-auto grid max-w-[1440px] items-center gap-14 px-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <motion.div initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}>
+          <div className="animate-rise">
             <span className="flex items-center gap-2.5 font-mono text-xs tracking-[0.14em] text-amber uppercase">
               <span className="size-1.5 rounded-full bg-amber ring-3 ring-amber/25" />EV Battery Intelligence &amp; Certification
             </span>
             <h1 className="mt-6 text-5xl font-bold tracking-tight md:text-[4.2rem] md:leading-[1.02]">
-              The battery truth behind Ethiopia's electric future.
+              Never buy or finance an EV<br className="hidden md:block" />
+              <span className="text-gradient">without true battery SoH.</span>
             </h1>
-            <p className="mt-6 max-w-[52ch] text-lg text-white/70">
-              Independent, engineering-grade EV battery-health certification — built for the locked, imported fleet now filling the streets of Addis Ababa.
+            <p className="mt-6 max-w-[54ch] text-lg text-muted-foreground">
+              The odometer is a dangerous proxy for EV value. RISIQ measures real delivered energy at the charging socket — past locked OBD ports and self-reported BMS numbers — and issues a certificate a bank can underwrite.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <BriefingModal trigger={<Button size="lg">Book a pilot briefing</Button>} />
-              <Button asChild size="lg" variant="outline" className="border-white/25 bg-white/5 text-white hover:bg-white hover:text-ink">
-                <Link to="/verify">Verify a certificate</Link>
+              <Button asChild size="lg" variant="outline">
+                <Link to="/verify"><ShieldCheck />Sample certificate demo</Link>
               </Button>
             </div>
-            <p className="mt-6 text-sm text-white/45">
+            <p className="mt-6 font-mono text-xs tracking-wide text-muted-foreground">
               Part of RISIQ Group · in technology partnership with Eniris
             </p>
-          </motion.div>
+          </div>
 
           {/* the product itself, not a stock photo */}
-          <motion.div
-            initial={reduce ? false : { opacity: 0, y: 30, rotate: 3 }}
-            animate={{ opacity: 1, y: 0, rotate: 2 }}
-            transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="relative mx-auto w-full max-w-[440px]">
+          <div className="animate-rise-cert relative mx-auto w-full max-w-[440px]">
             <div aria-hidden className="absolute -inset-8 -z-10 rounded-[2rem] bg-white/5 blur-2xl" />
             <motion.img
               src="img/certificate-risiq.png"
@@ -93,21 +96,20 @@ export default function Home() {
             <span className="absolute -bottom-3 -left-3 flex items-center gap-2 rounded-full border border-white/15 bg-[oklch(0.22_0.04_255)] px-4 py-2 font-mono text-xs text-teal shadow-lg">
               <QrCode className="size-3.5" />Scan to verify · &lt; 2 s
             </span>
-          </motion.div>
+          </div>
         </div>
 
         <div className="mx-auto max-w-[1440px] px-6">
-          <RevealGroup className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-white/12 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
-            {CAPS.map(({ icon: Icon, title, note }) => (
-              <motion.div key={title} variants={revealItem}
-                className="group flex items-center gap-4 bg-[oklch(0.2_0.035_255)]/80 p-5 transition-colors hover:bg-primary/15">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-white/12 bg-white/6 text-teal transition-colors group-hover:text-primary">
-                  <Icon className="size-5" />
-                </span>
-                <div>
-                  <b className="block text-sm font-semibold">{title}</b>
-                  <small className="mt-0.5 block font-mono text-xs text-white/45">{note}</small>
+          <RevealGroup className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {METRICS.map((m) => (
+              <motion.div key={m.k} variants={revealItem}
+                className="group rounded-2xl border bg-card/70 p-6 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:ring-glow">
+                <span className="font-mono text-[0.68rem] tracking-[0.14em] text-muted-foreground uppercase">{m.k}</span>
+                <div className="mt-3 flex items-baseline gap-1.5">
+                  <span className="font-mono text-3xl font-semibold text-gradient md:text-4xl">{m.v}</span>
+                  <span className="font-mono text-sm text-muted-foreground">{m.u}</span>
                 </div>
+                <span className="mt-2 block text-sm text-muted-foreground">{m.d}</span>
               </motion.div>
             ))}
           </RevealGroup>
@@ -188,6 +190,20 @@ export default function Home() {
                   <p className="mt-2 flex-1 text-sm text-muted-foreground">{d}</p>
                 </CardContent>
               </Card>
+            </motion.div>
+          ))}
+        </RevealGroup>
+        <RevealGroup className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {CAPS.map(({ icon: Icon, title, note }) => (
+            <motion.div key={title} variants={revealItem}
+              className="flex items-center gap-3 rounded-xl border bg-card/60 p-4">
+              <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-teal/10 text-teal">
+                <Icon className="size-4" />
+              </span>
+              <div>
+                <b className="block text-sm">{title}</b>
+                <small className="font-mono text-xs text-muted-foreground">{note}</small>
+              </div>
             </motion.div>
           ))}
         </RevealGroup>

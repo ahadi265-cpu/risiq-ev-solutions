@@ -1,12 +1,10 @@
 import { useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { QrCode, Search, ShieldCheck, Loader2, XCircle, Check } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Section, SectionHead } from '@/components/Layout'
+import { Section } from '@/components/Layout'
 import { Reveal } from '@/components/Reveal'
 import { cn } from '@/lib/utils'
 import { CERTIFICATES, clamp, hashStr, mulberry32 } from '@/lib/data'
@@ -59,33 +57,44 @@ export default function Verify() {
 
   return (
     <Section className="pt-14">
-      <SectionHead eyebrow="Live Demo" title="Verify a certificate now.">
-        Type a certificate ID or simulate a QR scan. The record is fetched from the public registry, its issuer signature checked, and the full certificate rendered — including the cell-level degradation map behind the headline number.
-      </SectionHead>
+      <div className="mb-12 text-center">
+        <span className="font-mono text-xs tracking-[0.16em] text-primary uppercase">Cryptographic transparency</span>
+        <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
+          Live certificate <span className="text-gradient">verification engine</span>
+        </h1>
+        <p className="mx-auto mt-4 max-w-[60ch] text-muted-foreground">
+          Verify a battery-health report instantly against the public registry — by certificate ID, or by simulating a scan of the QR code printed on it.
+        </p>
+      </div>
 
       <Reveal>
-        <Card>
-          <CardContent className="grid gap-3">
-            <Label htmlFor="cert-id">Certificate ID</Label>
-            <form className="flex flex-wrap gap-2.5" onSubmit={(e) => { e.preventDefault(); run(query) }}>
-              <Input id="cert-id" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder="RISIQ-0001" autoComplete="off" spellCheck={false} className="flex-1 font-mono" />
-              <Button type="submit"><Search />Verify</Button>
-              <Button type="button" variant="outline" onClick={scan}><QrCode />Simulate QR scan</Button>
-            </form>
-            <p className="text-xs text-muted-foreground">
-              Try{' '}
-              {Object.keys(CERTIFICATES).map((id, i, arr) => (
-                <span key={id}>
-                  <button type="button" onClick={() => { setQuery(id); run(id) }}
-                    className="cursor-pointer font-semibold text-teal underline underline-offset-2">{id}</button>
-                  {i < arr.length - 2 ? ', ' : i === arr.length - 2 ? ' or ' : ''}
-                </span>
-              ))}
-              {' '}— or scan to pick one at random.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="bg-grid rounded-3xl border p-6 md:p-10">
+          <form className="mx-auto flex max-w-2xl items-center gap-2 rounded-2xl border bg-card/80 p-2 backdrop-blur
+            focus-within:border-primary/50 focus-within:ring-glow"
+            onSubmit={(e) => { e.preventDefault(); run(query) }}>
+            <Search className="ml-3 size-4 shrink-0 text-muted-foreground" />
+            <label htmlFor="cert-id" className="sr-only">Certificate ID</label>
+            <Input id="cert-id" value={query} onChange={(e) => setQuery(e.target.value)}
+              placeholder="RISIQ-0001" autoComplete="off" spellCheck={false}
+              className="h-10 flex-1 border-0 bg-transparent font-mono focus-visible:ring-0" />
+            <Button type="button" variant="ghost" size="icon" onClick={scan} title="Simulate QR scan">
+              <QrCode /><span className="sr-only">Simulate QR scan</span>
+            </Button>
+            <Button type="submit">Verify now</Button>
+          </form>
+          <p className="mt-4 text-center font-mono text-xs text-muted-foreground">
+            Sample demos:{' '}
+            {Object.entries(CERTIFICATES).map(([id, c], i, arr) => (
+              <span key={id}>
+                <button type="button" onClick={() => { setQuery(id); run(id) }}
+                  className="cursor-pointer font-semibold text-primary underline-offset-4 hover:underline">
+                  Grade {c.grade} ({id})
+                </button>
+                {i < arr.length - 1 && <span className="mx-2 text-border">|</span>}
+              </span>
+            ))}
+          </p>
+        </div>
       </Reveal>
 
       {phase !== 'idle' && (
