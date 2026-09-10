@@ -61,7 +61,13 @@ export function Layout() {
       <footer className="mt-28 border-t bg-card py-12">
         <div className="mx-auto grid max-w-[1440px] gap-6 px-6 text-sm text-muted-foreground md:grid-cols-2">
           <p className="max-w-[42ch]">Independent, engineering-grade EV battery-health certification for Ethiopia's electric fleet. Part of RISIQ Group.</p>
-          <p className="md:text-right">Addis Ababa, Ethiopia · <a className="text-primary hover:underline" href="mailto:Khalid@risiqbs.com">Khalid@risiqbs.com</a></p>
+          <p className="md:text-right">
+            Addis Ababa, Ethiopia · <a className="text-primary hover:underline" href="mailto:Khalid@risiqbs.com">Khalid@risiqbs.com</a>
+            <br className="hidden md:block" />
+            <a className="text-primary hover:underline" href="tel:+251911223848">+251 911 223 848</a>{' '}
+            &middot; <a className="text-primary hover:underline" href="tel:+251911223871">+251 911 223 871</a>{' '}
+            &middot; <a className="text-primary hover:underline" href="tel:+32489976231">+32 489 97 62 31</a>
+          </p>
         </div>
       </footer>
     </div>
