@@ -8,32 +8,38 @@
    Red is split: --brand is the logo's true colour, --primary the text-safe
    tone (5.2:1 with white). Teal and amber stay for measurement and chart duty.
    ========================================================================== */
+/* ==========================================================================
+   RISIQ palette. Light is the default but sits on a soft paper tone rather
+   than pure white — large white fields read as glare at full-page scale.
+   Cards stay white so they lift off that ground. Dark is a real second
+   theme, not an inversion, and both are reachable from the header toggle.
+   ========================================================================== */
 :root {
   --radius: 0.75rem;
 
-  --background: oklch(0.995 0.001 250);
+  --background: oklch(0.968 0.004 255);        /* soft paper, not #fff */
   --foreground: oklch(0.205 0.029 258);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.205 0.029 258);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.205 0.029 258);
 
-  --primary: oklch(0.532 0.213 26.5);          /* #d8121b — text-safe brand red */
+  --primary: oklch(0.532 0.213 26.5);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.972 0.005 250);
+  --secondary: oklch(0.945 0.006 255);
   --secondary-foreground: oklch(0.279 0.036 258);
-  --muted: oklch(0.972 0.005 250);
-  --muted-foreground: oklch(0.505 0.028 257);
-  --accent: oklch(0.966 0.008 40);
+  --muted: oklch(0.945 0.006 255);
+  --muted-foreground: oklch(0.487 0.027 257);
+  --accent: oklch(0.955 0.012 30);
   --accent-foreground: oklch(0.279 0.036 258);
   --destructive: oklch(0.577 0.222 27.3);
 
-  --border: oklch(0.922 0.010 251);
-  --input: oklch(0.922 0.010 251);
+  --border: oklch(0.896 0.010 253);
+  --input: oklch(0.896 0.010 253);
   --ring: oklch(0.532 0.213 26.5);
 
-  --brand: oklch(0.577 0.229 27.9);            /* #ed1c24 — the logo red */
-  --brand-soft: oklch(0.955 0.022 27);         /* red wash for fills */
+  --brand: oklch(0.577 0.229 27.9);
+  --brand-soft: oklch(0.955 0.022 27);
   --teal: oklch(0.596 0.113 183.3);
   --amber: oklch(0.523 0.135 62.4);
   --ink: oklch(0.205 0.029 258);
@@ -49,14 +55,58 @@
   --chart-4: oklch(0.6 0.118 285);
   --chart-5: oklch(0.55 0.14 340);
 
+  --glass: oklch(1 0 0 / 0.72);
+  --glass-border: oklch(0.205 0.029 258 / 0.08);
+
   --sidebar: oklch(0.984 0.003 248);
   --sidebar-foreground: oklch(0.205 0.029 258);
   --sidebar-primary: oklch(0.532 0.213 26.5);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.972 0.005 250);
+  --sidebar-accent: oklch(0.945 0.006 255);
   --sidebar-accent-foreground: oklch(0.279 0.036 258);
-  --sidebar-border: oklch(0.922 0.010 251);
+  --sidebar-border: oklch(0.896 0.010 253);
   --sidebar-ring: oklch(0.532 0.213 26.5);
+}
+
+.dark {
+  --background: oklch(0.178 0.022 258);
+  --foreground: oklch(0.968 0.005 250);
+  --card: oklch(0.222 0.026 258);
+  --card-foreground: oklch(0.968 0.005 250);
+  --popover: oklch(0.222 0.026 258);
+  --popover-foreground: oklch(0.968 0.005 250);
+
+  --primary: oklch(0.63 0.215 27.2);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.275 0.028 258);
+  --secondary-foreground: oklch(0.968 0.005 250);
+  --muted: oklch(0.262 0.027 258);
+  --muted-foreground: oklch(0.712 0.022 256);
+  --accent: oklch(0.285 0.035 26);
+  --accent-foreground: oklch(0.968 0.005 250);
+  --destructive: oklch(0.665 0.196 24);
+
+  --border: oklch(1 0 0 / 0.11);
+  --input: oklch(1 0 0 / 0.15);
+  --ring: oklch(0.63 0.215 27.2);
+
+  --brand: oklch(0.64 0.222 27.9);
+  --brand-soft: oklch(0.30 0.06 27);
+  --teal: oklch(0.75 0.12 178);
+  --amber: oklch(0.79 0.13 74);
+  --ink: oklch(0.968 0.005 250);
+
+  --grade-a: oklch(0.75 0.15 152);
+  --grade-b: oklch(0.75 0.12 178);
+  --grade-c: oklch(0.79 0.13 74);
+  --grade-d: oklch(0.68 0.19 24);
+
+  --glass: oklch(0.222 0.026 258 / 0.62);
+  --glass-border: oklch(1 0 0 / 0.10);
+
+  --sidebar: oklch(0.222 0.026 258);
+  --sidebar-foreground: oklch(0.968 0.005 250);
+  --sidebar-border: oklch(1 0 0 / 0.11);
 }
 
 @theme inline {
@@ -83,6 +133,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
 
   --color-brand: var(--brand);
   --color-teal: var(--teal);
@@ -131,9 +183,16 @@
   /* faint technical grid, the way instrument UIs ground a dark field */
   .bg-grid {
     background-image:
-      linear-gradient(oklch(0.205 0.029 258 / 0.035) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(0.205 0.029 258 / 0.035) 1px, transparent 1px);
+      linear-gradient(var(--glass-border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
     background-size: 56px 56px;
+  }
+  /* glassmorphic surface — frosted panel that works on either ground */
+  .glass {
+    background: var(--glass);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    border: 1px solid var(--glass-border);
   }
   .ring-glow { box-shadow: 0 0 0 1px oklch(0.532 0.213 26.5 / 0.22), 0 10px 34px -10px oklch(0.532 0.213 26.5 / 0.30); }
 }

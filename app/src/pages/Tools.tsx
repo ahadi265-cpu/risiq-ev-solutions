@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'motion/react'
-import { RadialBarChart, RadialBar, PolarAngleAxis, ResponsiveContainer } from 'recharts'
+import {
+  RadialBarChart, RadialBar, PolarAngleAxis, ResponsiveContainer,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine,
+} from 'recharts'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
@@ -10,7 +13,7 @@ import { Reveal } from '@/components/Reveal'
 import { TestVisualizer } from '@/components/TestVisualizer'
 import { cn } from '@/lib/utils'
 import {
-  FLEET, CLIMATES, modelSoH, gradeOf, bookFactor, batteryFactor, fmt, etb, type Grade,
+  FLEET, CLIMATES, modelSoH, decayCurve, gradeOf, bookFactor, batteryFactor, fmt, etb, type Grade,
 } from '@/lib/data'
 
 const GRADE_FILL: Record<Grade, string> = {
@@ -34,10 +37,12 @@ export default function Tools() {
   const [km, setKm] = useState(72_000)
   const [cycles, setCycles] = useState(620)
   const [cli, setCli] = useState<string>('addis')
+  const [fast, setFast] = useState(30)
 
   const car = FLEET.find((f) => f.id === vid)!
   const climate = CLIMATES.find((c) => c.id === cli)!
-  const m = useMemo(() => modelSoH(years, cycles, climate.temp), [years, cycles, climate.temp])
+  const m = useMemo(() => modelSoH(years, cycles, climate.temp, fast / 100), [years, cycles, climate.temp, fast])
+  const curve = useMemo(() => decayCurve(years, cycles, climate.temp, fast / 100), [years, cycles, climate.temp, fast])
   const grade = gradeOf(m.soh)
 
   const book = car.price * bookFactor(years, km)
@@ -71,6 +76,7 @@ export default function Tools() {
               { label: 'Age', value: years, set: setYears, min: 0, max: 10, step: 0.5, disp: `${years} ${years === 1 ? 'year' : 'years'}`, hint: 'Calendar fade grows with the square root of time.' },
               { label: 'Odometer', value: km, set: setKm, min: 0, max: 200_000, step: 1000, disp: `${fmt(km)} km`, hint: 'Drives market depreciation — not battery health.' },
               { label: 'Charge cycles', value: cycles, set: setCycles, min: 0, max: 2000, step: 10, disp: `${fmt(cycles)} cycles`, hint: 'Equivalent full cycles. A commuter adds ~150/year; a taxi, ~600.' },
+              { label: 'Fast charging', value: fast, set: setFast, min: 0, max: 100, step: 5, disp: `${fast}% fast`, hint: 'Share of charging done on a DC fast charger rather than overnight.' },
             ].map((s) => (
               <div key={s.label} className="grid gap-2.5">
                 <div className="flex items-baseline justify-between gap-4">
@@ -141,6 +147,59 @@ export default function Tools() {
                 <span className="text-muted-foreground">Unpriced exposure</span>
                 <b className="font-mono text-lg text-primary tabular">{etb(gap)}</b>
               </div>
+            </div>
+
+            <div>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">
+                  Health over time
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  this car vs. a gently-used baseline
+                </span>
+              </div>
+              <div className="mt-3 h-[230px] w-full">
+                <ResponsiveContainer>
+                  <AreaChart data={curve} margin={{ top: 6, right: 8, bottom: 0, left: -18 }}>
+                    <defs>
+                      <linearGradient id="gActual" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.28} />
+                        <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid stroke="var(--border)" vertical={false} />
+                    <XAxis dataKey="year" tickLine={false} axisLine={{ stroke: 'var(--border)' }}
+                      tick={{ fill: 'var(--muted-foreground)', fontSize: 11, fontFamily: 'var(--font-mono)' }}
+                      tickFormatter={(v: number) => `${v}y`} />
+                    <YAxis domain={[60, 100]} tickLine={false} axisLine={false} width={42}
+                      tick={{ fill: 'var(--muted-foreground)', fontSize: 11, fontFamily: 'var(--font-mono)' }}
+                      tickFormatter={(v: number) => `${v}%`} />
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)',
+                        color: 'var(--card-foreground)', fontSize: 12,
+                      }}
+                      labelFormatter={(v) => `Year ${v}`}
+                      formatter={(v, n) => [`${v}%`, n === 'actual' ? 'This car' : 'Gentle use']} />
+                    <Legend verticalAlign="top" height={28} iconType="plainline"
+                      formatter={(v) => (
+                        <span style={{ color: 'var(--muted-foreground)', fontSize: 12 }}>
+                          {v === 'actual' ? 'This car' : 'Gentle-use baseline'}
+                        </span>
+                      )} />
+                    <ReferenceLine y={80} stroke="var(--border)" strokeDasharray="4 4"
+                      label={{ value: '80% — warranty floor', position: 'insideBottomRight',
+                               fill: 'var(--muted-foreground)', fontSize: 10.5 }} />
+                    <Area type="monotone" dataKey="standard" stroke="var(--muted-foreground)" strokeWidth={1.5}
+                      strokeDasharray="5 4" fill="none" dot={false} />
+                    <Area type="monotone" dataKey="actual" stroke="var(--primary)" strokeWidth={2.5}
+                      fill="url(#gActual)" dot={false} activeDot={{ r: 4 }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                The gap between the two lines is what heat, hard use and fast charging cost this particular car.
+              </p>
             </div>
 
             <p className="text-xs leading-relaxed text-muted-foreground">

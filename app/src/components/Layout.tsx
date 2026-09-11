@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { useGsapReveal } from '@/lib/useGsapReveal'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -23,7 +24,7 @@ export function Layout() {
   return (
     <div className="min-h-dvh flex flex-col">
       <header className="sticky top-3 z-40 mx-3">
-        <nav className="mx-auto flex max-w-[1440px] items-center justify-between gap-5 rounded-full border bg-card/95 px-5 py-2.5 shadow-sm backdrop-blur-md">
+        <nav className="glass mx-auto flex max-w-[1440px] items-center justify-between gap-5 rounded-full px-5 py-2.5 shadow-sm">
           <Link to="/" className="flex items-center gap-3" aria-label="RISIQ EV Solutions — home">
             <img src="img/risiq-logo.png" alt="RISIQ" width={1600} height={614} className="h-9 w-auto" />
             <span className="hidden font-mono text-[0.6rem] font-medium tracking-[0.14em] text-muted-foreground uppercase sm:inline">EV Solutions</span>
@@ -42,7 +43,8 @@ export function Layout() {
               </li>
             ))}
           </ul>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <ThemeToggle />
             <Button asChild size="sm" className="hidden sm:inline-flex"><Link to="/pilot">Register for the Pilot</Link></Button>
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu" aria-expanded={open}>
               {open ? <X /> : <Menu />}

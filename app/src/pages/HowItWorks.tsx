@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Section, SectionHead } from '@/components/Layout'
 import { Reveal, RevealGroup, revealItem } from '@/components/Reveal'
 import { TestVisualizer } from '@/components/TestVisualizer'
+import { ArchitectureVisualizer } from '@/components/ArchitectureVisualizer'
 import { cn } from '@/lib/utils'
 
 const STEPS = [
@@ -101,6 +102,13 @@ export default function HowItWorks() {
             </Card>
           </Reveal>
         </div>
+      </Section>
+
+      <Section>
+        <SectionHead eyebrow="The Three Pieces" title="What actually makes up the service.">
+          One portable unit, one analysis engine, and a code your customer can check. Switch between them to see how each part works.
+        </SectionHead>
+        <Reveal><ArchitectureVisualizer /></Reveal>
       </Section>
 
       <Section muted>

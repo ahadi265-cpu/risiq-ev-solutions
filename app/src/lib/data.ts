@@ -26,10 +26,24 @@ const T_REF = 25, K_CAL = 2.2, K_CYC = 0.0115
 export const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
 const arrhenius = (t: number) => Math.pow(2, (t - T_REF) / 10)
 
-export function modelSoH(years: number, cycles: number, temp: number) {
+/** fastShare 0..1 — DC fast charging is harder on a pack than overnight AC.
+ *  At 100% fast charging cycle wear runs ~45% higher than all-slow. */
+export function modelSoH(years: number, cycles: number, temp: number, fastShare = 0.3) {
   const calendar = K_CAL * Math.sqrt(Math.max(0, years)) * arrhenius(temp)
-  const cyclic = K_CYC * cycles
+  const cyclic = K_CYC * cycles * (1 + 0.45 * clamp(fastShare, 0, 1))
   return { soh: clamp(100 - calendar - cyclic, 40, 100), calendar, cyclic }
+}
+
+/** Year-by-year decay for the chart: the configured pack against a baseline
+ *  that assumes gentle use in a mild climate — the "standard wear" line. */
+export function decayCurve(years: number, cycles: number, temp: number, fastShare: number) {
+  const span = Math.max(8, Math.ceil(years) + 2)
+  const perYear = years > 0 ? cycles / years : 150
+  return Array.from({ length: span + 1 }, (_, y) => ({
+    year: y,
+    actual: +modelSoH(y, perYear * y, temp, fastShare).soh.toFixed(1),
+    standard: +modelSoH(y, 150 * y, 16, 0.15).soh.toFixed(1),
+  }))
 }
 
 export type Grade = 'A' | 'B' | 'C' | 'D'
