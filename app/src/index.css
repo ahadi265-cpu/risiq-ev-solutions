@@ -3,83 +3,61 @@
 
 @custom-variant light (&:is(.light *));
 
+/* ==========================================================================
+   RISIQ palette — bright white ground, brand red as the action colour.
+   Red is split: --brand is the logo's true colour, --primary the text-safe
+   tone (5.2:1 with white). Teal and amber stay for measurement and chart duty.
+   ========================================================================== */
 :root {
   --radius: 0.75rem;
 
-  /* deep slate ground — near-black with a blue bias, not pure grey */
-  --background: oklch(0.165 0.021 258);
-  --foreground: oklch(0.971 0.006 250);
-  --card: oklch(0.205 0.024 258);
-  --card-foreground: oklch(0.971 0.006 250);
-  --popover: oklch(0.205 0.024 258);
-  --popover-foreground: oklch(0.971 0.006 250);
+  --background: oklch(0.995 0.001 250);
+  --foreground: oklch(0.205 0.029 258);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.205 0.029 258);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.205 0.029 258);
 
-  /* emerald/teal is the action colour on dark ground */
-  --primary: oklch(0.766 0.137 172);
-  --primary-foreground: oklch(0.16 0.02 258);
-  --secondary: oklch(0.262 0.028 258);
-  --secondary-foreground: oklch(0.971 0.006 250);
-  --muted: oklch(0.245 0.026 258);
-  --muted-foreground: oklch(0.702 0.023 256);
-  --accent: oklch(0.262 0.028 258);
-  --accent-foreground: oklch(0.971 0.006 250);
-  --destructive: oklch(0.665 0.196 24);
+  --primary: oklch(0.532 0.213 26.5);          /* #d8121b — text-safe brand red */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.972 0.005 250);
+  --secondary-foreground: oklch(0.279 0.036 258);
+  --muted: oklch(0.972 0.005 250);
+  --muted-foreground: oklch(0.505 0.028 257);
+  --accent: oklch(0.966 0.008 40);
+  --accent-foreground: oklch(0.279 0.036 258);
+  --destructive: oklch(0.577 0.222 27.3);
 
-  --border: oklch(1 0 0 / 11%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.766 0.137 172);
+  --border: oklch(0.922 0.010 251);
+  --input: oklch(0.922 0.010 251);
+  --ring: oklch(0.532 0.213 26.5);
 
-  --brand: oklch(0.62 0.222 27.5);          /* RISIQ red, kept for the mark */
-  --teal: oklch(0.783 0.13 176);
-  --amber: oklch(0.804 0.13 78);
-  --ink: oklch(0.971 0.006 250);
+  --brand: oklch(0.577 0.229 27.9);            /* #ed1c24 — the logo red */
+  --brand-soft: oklch(0.955 0.022 27);         /* red wash for fills */
+  --teal: oklch(0.596 0.113 183.3);
+  --amber: oklch(0.523 0.135 62.4);
+  --ink: oklch(0.205 0.029 258);
 
-  --grade-a: oklch(0.79 0.16 155);
-  --grade-b: oklch(0.783 0.13 176);
-  --grade-c: oklch(0.804 0.13 78);
-  --grade-d: oklch(0.68 0.19 24);
+  --grade-a: oklch(0.517 0.146 149.1);
+  --grade-b: oklch(0.511 0.096 186.4);
+  --grade-c: oklch(0.523 0.135 62.4);
+  --grade-d: oklch(0.487 0.192 27.6);
 
   --chart-1: var(--teal);
   --chart-2: var(--amber);
-  --chart-3: oklch(0.7 0.14 210);
-  --chart-4: oklch(0.68 0.13 290);
-  --chart-5: oklch(0.7 0.15 340);
+  --chart-3: oklch(0.646 0.15 200);
+  --chart-4: oklch(0.6 0.118 285);
+  --chart-5: oklch(0.55 0.14 340);
 
-  --sidebar: oklch(0.205 0.024 258);
-  --sidebar-foreground: oklch(0.971 0.006 250);
-  --sidebar-primary: oklch(0.766 0.137 172);
-  --sidebar-primary-foreground: oklch(0.16 0.02 258);
-  --sidebar-accent: oklch(0.262 0.028 258);
-  --sidebar-accent-foreground: oklch(0.971 0.006 250);
-  --sidebar-border: oklch(1 0 0 / 11%);
-  --sidebar-ring: oklch(0.766 0.137 172);
+  --sidebar: oklch(0.984 0.003 248);
+  --sidebar-foreground: oklch(0.205 0.029 258);
+  --sidebar-primary: oklch(0.532 0.213 26.5);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.972 0.005 250);
+  --sidebar-accent-foreground: oklch(0.279 0.036 258);
+  --sidebar-border: oklch(0.922 0.010 251);
+  --sidebar-ring: oklch(0.532 0.213 26.5);
 }
-
-/* opt-in light mode, for anyone who explicitly asks for it */
-.light {
-  --background: oklch(0.994 0.001 250);
-  --foreground: oklch(0.216 0.031 258);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.216 0.031 258);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.216 0.031 258);
-  --primary: oklch(0.532 0.213 26.5);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.968 0.006 250);
-  --secondary-foreground: oklch(0.279 0.036 258);
-  --muted: oklch(0.968 0.006 250);
-  --muted-foreground: oklch(0.503 0.028 257);
-  --accent: oklch(0.968 0.006 250);
-  --accent-foreground: oklch(0.279 0.036 258);
-  --border: oklch(0.916 0.011 251);
-  --input: oklch(0.916 0.011 251);
-  --ring: oklch(0.532 0.213 26.5);
-  --teal: oklch(0.596 0.113 183.3);
-  --amber: oklch(0.523 0.135 62.4);
-  --ink: oklch(0.216 0.031 258);
-}
-
-
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -147,17 +125,17 @@
 @layer utilities {
   /* headline gradient, teal -> cyan, used once per page at most */
   .text-gradient {
-    background: linear-gradient(96deg, oklch(0.83 0.13 172), oklch(0.78 0.11 210));
+    background: linear-gradient(96deg, oklch(0.577 0.229 27.9), oklch(0.50 0.20 15));
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   /* faint technical grid, the way instrument UIs ground a dark field */
   .bg-grid {
     background-image:
-      linear-gradient(oklch(1 0 0 / 0.035) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(1 0 0 / 0.035) 1px, transparent 1px);
+      linear-gradient(oklch(0.205 0.029 258 / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(0.205 0.029 258 / 0.035) 1px, transparent 1px);
     background-size: 56px 56px;
   }
-  .ring-glow { box-shadow: 0 0 0 1px oklch(0.766 0.137 172 / 0.25), 0 0 34px -8px oklch(0.766 0.137 172 / 0.45); }
+  .ring-glow { box-shadow: 0 0 0 1px oklch(0.532 0.213 26.5 / 0.22), 0 10px 34px -10px oklch(0.532 0.213 26.5 / 0.30); }
 }
 
 @layer utilities {

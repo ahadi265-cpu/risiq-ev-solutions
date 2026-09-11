@@ -35,13 +35,6 @@ const ADVISORS = [
     d: 'A senior executive at one of Ethiopia’s largest private banks, bringing a practitioner’s view of Ethiopian lending, collateral and risk — the perspective a bank-grade certificate needs.' },
 ]
 
-const ROADMAP = [
-  { p: 'Phase 1 · Months 1–4', t: 'Rig & first measurements', d: 'Certification rig assembled — precision meter, edge compute, charge control — with controlled charge data flowing from a first Addis site.' },
-  { p: 'Phase 2 · Months 3–8', t: 'Ground-truth SoH', d: 'Measured capacity and state of health from full-window reference tests, with quality gates. The accuracy benchmark everything else is validated against.' },
-  { p: 'Phase 3 · Months 6–12', t: 'The 15-minute fast test', d: 'Partial-window fast testing and a per-model catalogue of the vehicles actually on Ethiopian roads.' },
-  { p: 'Phase 4 · Months 9–18', t: 'AI on the Ethiopian dataset', d: 'Models trained on our own reference tests, with per-model accuracy validated before certificates tighten their confidence bands.' },
-  { p: 'Phase 5 · Months 6–24+', t: 'Scale & moat', d: 'Deployment to local workshops and importer yards, a bank-grade certificate in circulation, and a dataset competitors cannot replicate.' },
-]
 
 export default function About() {
   return (
@@ -181,22 +174,6 @@ export default function About() {
         </RevealGroup>
       </Section>
 
-      <Section muted>
-        <SectionHead eyebrow="Where We Are" title="Prototype-stage — with a clear road to a national standard." />
-        <Reveal>
-          <ol className="grid gap-0">
-            {ROADMAP.map((r, i) => (
-              <li key={r.t} className={`grid gap-6 py-6 md:grid-cols-[190px_1fr] ${i > 0 ? 'border-t' : ''}`}>
-                <span className="pt-1 font-mono text-sm text-amber">{r.p}</span>
-                <div>
-                  <h3 className="font-semibold">{r.t}</h3>
-                  <p className="mt-1.5 max-w-[70ch] text-sm text-muted-foreground">{r.d}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </Reveal>
-      </Section>
     </>
   )
 }

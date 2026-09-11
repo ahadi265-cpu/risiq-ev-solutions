@@ -13,6 +13,7 @@ import { Reveal, RevealGroup, revealItem } from '@/components/Reveal'
 import { LogoMarquee } from '@/components/LogoMarquee'
 import { OdometerProof } from '@/components/OdometerProof'
 import { BriefingModal } from '@/components/BriefingModal'
+import { CountUp } from '@/components/CountUp'
 
 const CAPS = [
   { icon: Plug, title: 'Socket-side measurement', note: 'no OEM unlock needed' },
@@ -22,17 +23,18 @@ const CAPS = [
 ]
 
 const METRICS = [
-  { k: 'Test duration', v: '<15', u: 'min', d: 'Socket-level rapid check' },
-  { k: 'Reference accuracy', v: '±3', u: '%', d: 'Class 0.5S revenue-grade meter' },
-  { k: 'OEM access needed', v: '0', u: '', d: 'Bypasses locked OBD entirely' },
-  { k: 'Verification', v: '<2', u: 's', d: 'Public registry, QR-resolved' },
+  { k: 'Time per car', v: '15', u: 'min', d: 'At your yard, with no downtime' },
+  { k: 'Accuracy', v: '±3', u: '%', d: 'Measured, never self-reported' },
+  { k: 'Cars we can test', v: 'Any', u: 'EV', d: 'Including locked imports' },
+  { k: 'To verify one', v: '2', u: 'sec', d: 'Scan the code, see the record' },
 ]
 
-const STATS = [
-  { v: '2024', l: 'World-first ban on petrol & diesel car imports' },
-  { v: '115,000', l: 'EVs on the road today, up from under 10,000 in 2023' },
-  { v: '500,000', l: 'EV import target by 2030 under the National E-Mobility Strategy' },
-  { v: '$6B/yr', l: 'Fuel-import bill the switch is designed to end' },
+type Stat = { v: string; l: string; n?: number; prefix?: string; suffix?: string }
+const STATS: Stat[] = [
+  { v: '2024', n: 2024, l: 'The year Ethiopia became the first country to ban petrol and diesel car imports' },
+  { v: '115,000', n: 115000, l: 'Electric cars on Ethiopian roads today, up from under 10,000 in 2023' },
+  { v: '500,000', n: 500000, l: 'The national target for electric vehicles by 2030' },
+  { v: '$6B', n: 6, prefix: '$', suffix: 'B', l: 'Annual fuel import bill the switch is designed to end' },
 ]
 
 const AUDIENCE = [
@@ -45,10 +47,10 @@ const AUDIENCE = [
 ]
 
 const STEPS = [
-  { icon: Plug, n: '01', t: 'Plug in', d: 'The rig goes in line between the charge source and the car’s own socket. Nothing is installed on the vehicle.' },
-  { icon: ScanLine, n: '02', t: 'Measure', d: 'A Class 0.5S revenue-grade meter samples voltage and current at 1 Hz across a controlled charge.' },
-  { icon: Cpu, n: '03', t: 'Compute', d: 'Energy is integrated over true elapsed time, corrected for charger losses, and extrapolated to the full window.' },
-  { icon: FileCheck2, n: '04', t: 'Certify', d: 'Once every quality gate passes, a signed, QR-verifiable certificate is issued on the spot.' },
+  { icon: Plug, n: '01', t: 'Plug in', d: 'We connect our equipment to the car’s normal charging socket. Nothing is fitted to the vehicle itself.' },
+  { icon: ScanLine, n: '02', t: 'Measure', d: 'We charge the car under controlled conditions and measure exactly how much energy the battery actually accepts.' },
+  { icon: Cpu, n: '03', t: 'Compute', d: 'That measurement tells us how much capacity the battery has left, compared with when it was new.' },
+  { icon: FileCheck2, n: '04', t: 'Certify', d: 'You get the certificate on the spot, with a code anyone can scan to confirm it is genuine.' },
 ]
 
 export default function Home() {
@@ -65,11 +67,11 @@ export default function Home() {
               <span className="size-1.5 rounded-full bg-amber ring-3 ring-amber/25" />EV Battery Intelligence &amp; Certification
             </span>
             <h1 className="mt-6 text-5xl font-bold tracking-tight md:text-[4.2rem] md:leading-[1.02]">
-              Never buy or finance an EV<br className="hidden md:block" />
-              <span className="text-gradient">without true battery SoH.</span>
+              Know what the car is<br className="hidden md:block" />
+              <span className="text-gradient">really worth.</span>
             </h1>
             <p className="mt-6 max-w-[54ch] text-lg text-muted-foreground">
-              The odometer is a dangerous proxy for EV value. RISIQ measures real delivered energy at the charging socket — past locked OBD ports and self-reported BMS numbers — and issues a certificate a bank can underwrite.
+              On an electric car, the battery is half the value — and the odometer tells you nothing about it. RISIQ gives you an independent, verifiable battery report in fifteen minutes, so you can buy, lend and insure with confidence.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <BriefingModal trigger={<Button size="lg">Book a pilot briefing</Button>} />
@@ -84,7 +86,7 @@ export default function Home() {
 
           {/* the product itself, not a stock photo */}
           <div className="animate-rise-cert relative mx-auto w-full max-w-[440px]">
-            <div aria-hidden className="absolute -inset-8 -z-10 rounded-[2rem] bg-white/5 blur-2xl" />
+            <div aria-hidden className="absolute -inset-10 -z-10 rounded-[2.5rem] bg-[radial-gradient(closest-side,oklch(0.577_0.229_27.9/0.10),transparent)] blur-2xl" />
             <motion.img
               src="img/certificate-risiq.png"
               alt="A RISIQ battery-health certificate: 94% state of health, Grade A, with a QR code for public verification"
@@ -93,7 +95,7 @@ export default function Home() {
               animate={reduce ? undefined : { y: [0, -12, 0] }}
               transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
               className="w-full rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,0.5)]" />
-            <span className="absolute -bottom-3 -left-3 flex items-center gap-2 rounded-full border border-white/15 bg-[oklch(0.22_0.04_255)] px-4 py-2 font-mono text-xs text-teal shadow-lg">
+            <span className="absolute -bottom-4 -left-4 flex items-center gap-2 rounded-full border bg-card px-4 py-2.5 font-mono text-xs text-primary shadow-xl">
               <QrCode className="size-3.5" />Scan to verify · &lt; 2 s
             </span>
           </div>
@@ -120,8 +122,12 @@ export default function Home() {
       <Section className="py-16">
         <RevealGroup className="grid gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-2 lg:grid-cols-4">
           {STATS.map((s) => (
-            <motion.div key={s.v} variants={revealItem} className="bg-card p-7">
-              <span className="block font-mono text-3xl font-semibold text-amber tabular md:text-4xl">{s.v}</span>
+            <motion.div key={s.v} variants={revealItem} className="bg-card p-7 transition-colors hover:bg-accent/40">
+              <span className="block font-mono text-3xl font-semibold text-amber tabular md:text-4xl">
+                {s.n !== undefined
+                  ? <CountUp to={s.n} prefix={s.prefix ?? ''} suffix={s.suffix ?? ''} />
+                  : s.v}
+              </span>
               <span className="mt-3 block text-sm text-muted-foreground">{s.l}</span>
             </motion.div>
           ))}
@@ -134,16 +140,16 @@ export default function Home() {
 
       {/* ------------------------------------------------- the blind spot */}
       <Section muted>
-        <SectionHead eyebrow="The Blind Spot" title="For an EV, the odometer tells you almost nothing.">
-          An electric motor has one moving part and can outlast the whole car. The battery cannot — and it is 40–50% of the vehicle's value. Same mileage, same price on paper, wildly different batteries.
+        <SectionHead eyebrow="The Blind Spot" title="Two cars. Same mileage. Very different value.">
+          Electric motors barely wear out. Batteries do — and they are roughly half what the car is worth. Two cars can show the same number on the dash and be thousands of dollars apart.
         </SectionHead>
         <Reveal><OdometerProof /></Reveal>
       </Section>
 
       {/* ------------------------------------------------ audience router */}
       <Section>
-        <SectionHead eyebrow="You Are" title="The institutions carrying Ethiopia's EV risk.">
-          Every electric vehicle on an Addis road sits on somebody's balance sheet. The founding-cohort invitation is addressed to Ethiopia's leading banks, insurers and micro-finance institutions.
+        <SectionHead eyebrow="You Are" title="Who this is for.">
+          Every electric car in Addis sits on somebody's books. If you lend against one, insure one, or sell one, this is the number you have been missing.
         </SectionHead>
         <RevealGroup className="grid gap-6 md:grid-cols-3">
           {AUDIENCE.map(({ icon: Icon, t, d, to }) => (
@@ -172,8 +178,8 @@ export default function Home() {
 
       {/* ------------------------------------------------------ how it works */}
       <Section muted>
-        <SectionHead eyebrow="How It Works" title="Fifteen minutes, at your site.">
-          No OEM cooperation. No workshop downtime. A precision measurement, and a signed certificate.
+        <SectionHead eyebrow="How It Works" title="How it works, in four steps.">
+          We come to your yard. Fifteen minutes later you have a report you can show a customer, a credit committee, or a court.
         </SectionHead>
         <RevealGroup className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {STEPS.map(({ icon: Icon, n, t, d }) => (
@@ -223,15 +229,15 @@ export default function Home() {
       <Section>
         <div className="grid items-center gap-14 lg:grid-cols-2">
           <Reveal>
-            <SectionHead eyebrow="What We Issue" title="A certificate institutions can underwrite.">
-              Every RISIQ test ends in one thing: a verifiable document that turns an invisible battery into a number you can lend against, insure, and sell on.
+            <SectionHead eyebrow="What We Issue" title="What you get.">
+              One clear document. A health score, an A–D grade, what the battery can still hold, and how far it will really go — with a code anyone can scan to check it is genuine.
             </SectionHead>
             <ul className="grid gap-4">
               {[
-                ['A measured State-of-Health %', 'Grounded in precision electrical measurement — not a figure the car reports about itself.'],
-                ['Tamper-evident & signed', 'Cryptographically sealed. Edit the PDF and verification breaks.'],
-                ['QR-verifiable in under 2 seconds', 'Anyone can scan and confirm against the public registry.'],
-                ['Dispute-grade evidence', 'An independent, timestamped record for a default, a claim, or a resale disagreement.'],
+                ['A real health score', 'Measured from the car itself — not a number the car claims about its own battery.'],
+                ['Impossible to fake', 'Change one detail on the document and the check stops working.'],
+                ['Anyone can check it', 'Scan the code with a phone and see the original record in seconds.'],
+                ['Holds up in a dispute', 'An independent, dated record if a loan defaults or a sale goes wrong.'],
               ].map(([t, d]) => (
                 <li key={t} className="flex gap-3">
                   <ShieldCheck className="mt-0.5 size-5 shrink-0 text-teal" />

@@ -67,7 +67,12 @@ export function Layout() {
       <footer className="mt-28 border-t bg-card py-12">
         <div className="mx-auto grid max-w-[1440px] gap-6 px-6 text-sm text-muted-foreground md:grid-cols-2">
           <div><img src="img/risiq-logo.png" alt="RISIQ" width={1600} height={614} className="mb-4 h-8 w-auto" />
-            <p className="max-w-[42ch]">Independent, engineering-grade EV battery-health certification for Ethiopia's electric fleet. Part of RISIQ Group.</p></div>
+            <p className="max-w-[44ch]">Know what an electric car is really worth, before you buy it, lend against it, or insure it.</p>
+            <p className="mt-4 max-w-[44ch] text-xs">
+              Built by <b className="text-foreground">RISIQ Tech</b>, a subsidiary of{' '}
+              <b className="text-foreground">RISIQ Group</b>, in collaboration with{' '}
+              <b className="text-foreground">Eniris</b>.
+            </p></div>
           <nav className="flex flex-wrap gap-x-5 gap-y-2 md:justify-end" aria-label="Footer">
             {NAV.slice(1).map((n) => (
               <Link key={n.to} to={n.to} className="hover:text-primary hover:underline">{n.label}</Link>
