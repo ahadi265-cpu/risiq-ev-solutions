@@ -4,8 +4,11 @@
     <meta charset="UTF-8" />
     <title>RISIQ EV Solutions</title>
     <script>
-      /* Stash the requested deep link, then hand control back to the SPA. */
-      sessionStorage.setItem('spa-redirect', location.pathname + location.search + location.hash)
+      /* Stash the requested deep link, then hand control back to the SPA.
+         Legacy static URLs (/verify.html?id=…) map onto the SPA routes. */
+      var p = location.pathname, m = p.match(/^\/([a-z-]+)\.html$/i)
+      if (m) p = m[1] === 'index' ? '/' : '/' + m[1]
+      sessionStorage.setItem('spa-redirect', p + location.search + location.hash)
       location.replace(document.querySelector('base')?.href || '/')
     </script>
   </head>

@@ -17,6 +17,7 @@ export default function App() {
         <Route path="pilot" element={<Pilot />} />
         <Route path="tools" element={<Tools />} />
         <Route path="verify" element={<Verify />} />
+        <Route path="v/:id" element={<Verify />} /> {/* QR codes on printed certificates */}
         <Route path="how-it-works" element={<HowItWorks />} />
         <Route path="partners" element={<Partners />} />
         <Route path="about" element={<About />} />

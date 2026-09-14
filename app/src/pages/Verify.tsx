@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { QrCode, Search, ShieldCheck, Loader2, XCircle, Check, AlertTriangle, Info } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -35,6 +36,9 @@ export default function Verify() {
   const [step, setStep] = useState(-1)
   const [cid, setCid] = useState('')
   const timers = useRef<number[]>([])
+  const params = useParams()
+  const [search] = useSearchParams()
+  const autoRan = useRef(false)
 
   const run = (raw: string) => {
     const id = raw.trim().toUpperCase()
@@ -46,6 +50,12 @@ export default function Verify() {
     timers.current.push(window.setTimeout(
       () => setPhase(CERTIFICATES[id] ? 'done' : 'missing'), 600 * (STEPS.length + 0.4)))
   }
+
+  /* A scanned QR (/v/RISIQ-0001) or a legacy link (/verify?id=…) verifies on arrival. */
+  const wanted = params.id ?? search.get('id')
+  useEffect(() => {
+    if (wanted && !autoRan.current) { autoRan.current = true; setQuery(wanted); run(wanted) }
+  }, [wanted]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const scan = () => {
     const ids = Object.keys(CERTIFICATES)
