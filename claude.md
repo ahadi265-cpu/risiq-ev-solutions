@@ -43,11 +43,12 @@ The site is hosted on **GitHub Pages** (static host), but MUST feel like a dynam
 ---
 
 # Design System Guidelines
-- **Color Palette:** High-contrast tech palette. Deep slate/black background (`#0B0F17`), neon cyan/emerald accents (`#00F2FE`, `#10B981`), and subtle glassmorphic card overlays (`backdrop-blur-md`).
-- **Typography:** Modern sans-serif (Inter / Plus Jakarta Sans) with crisp hierarchy and legible tabular numbers for metrics.
-- **Interactivity Standard:** Minimal static elements. Hover states must scale subtly, cards should possess smooth borders, and statistics must count up dynamically when scrolled into view.
-
----
+- **Brand palette (decided 2026-09):** RISIQ is a white-and-red brand, like eniris.com. The default theme is a soft paper ground (`oklch(0.968 0.004 255)`, not pure white) with RISIQ red `#ed1c24` / `#d8121b` as the accent, teal `#0d9488` for measured/positive data, amber `#b45309` for warnings and highlights, and grade colours A–D. A full dark theme (`.dark`, ground `oklch(0.178 0.022 258)`) ships behind the header toggle and is persisted in `localStorage['risiq-theme']`. Do **not** repaint the default to a dark neon palette — that direction was tried and rejected as off-brand.
+- **Surfaces:** subtle glassmorphic cards (`.glass`, `backdrop-blur`) on both themes; `.bg-grid` texture behind heroes and feature panels.
+- **Typography:** modern sans-serif with crisp hierarchy and tabular numbers for every metric.
+- **Interactivity standard:** minimal static elements. Hover states scale subtly, statistics count up on scroll, tabs/switchers everywhere an audience or mode can be chosen.
+- **Animation rule (hard-won):** anything that holds copy enters via CSS keyframes (`.animate-rise`) with a `key` remount — never `initial={{opacity:0}}` Motion tweens or GSAP `from()` on structural content, which have stranded panels invisible three times. Motion/GSAP are for hover, layout (`layoutId`) and transform-only scroll effects.
+- **Tone:** marketing-first, less technical. Domain anchors stay intact: Addis Ababa, locked Chinese imports (BYD, Changan, Jetour), socket-side measurement, Eniris technology partnership. No unverifiable claims; the OBD line on the calculator is labelled illustrative.
 
 # Deliverables Requested
 1. Initialize the project directory with `vite`, `tailwind`, `framer-motion`, `recharts`, `lucide-react`, and `shadcn/ui`.
@@ -55,4 +56,5 @@ The site is hosted on **GitHub Pages** (static host), but MUST feel like a dynam
 3. Include a `.nojekyll` file in the build output.
 4. Generate `.github/workflows/deploy.yml` configured to build TypeScript and automatically deploy static files to GitHub Pages via `actions/deploy-pages`.
 
-Let's begin setup. First, initialize the package structure and configuration files.
+# Status (2026-09-14)
+All five components above are built in `app/` (plus an audience switcher on Home, a store-and-forward "Network drop" tab in the test visualizer, anomaly flags on certificates, and an OBD-vs-socket decay chart). `.github/workflows/deploy.yml` is in place. The React app goes live once GitHub Pages → Settings → Source is switched to **GitHub Actions**; until then the static HTML at the repo root is what visitors see.

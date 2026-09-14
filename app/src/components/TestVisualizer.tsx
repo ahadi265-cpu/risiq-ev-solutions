@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import { Play, RotateCcw, Plug, Gauge, ShieldCheck, Sigma, FileSignature, Check } from 'lucide-react'
+import { Play, RotateCcw, Plug, Gauge, ShieldCheck, Sigma, FileSignature, Check, Wifi, WifiOff, Database, Cloud, ArrowRight } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
@@ -160,17 +160,144 @@ function RunView({ run }: { run: Run }) {
   )
 }
 
+/* Store-and-forward: the rig samples at 1 Hz into a local buffer and forwards
+   to the cloud whenever a link exists. Cutting the link mid-run only grows the
+   buffer; restoring it drains the backlog. The run itself never notices. */
+const RUN_S = 15 * 60, DUR = 12_000, CATCH_UP = 4 /* backlog drains at 4× the sample rate */
+
+function OfflineView() {
+  const reduce = useReducedMotion()
+  const [t, setT] = useState(0)          // simulated seconds elapsed
+  const [synced, setSynced] = useState(0)
+  const [online, setOnline] = useState(true)
+  const [playing, setPlaying] = useState(false)
+  const [drops, setDrops] = useState(0)
+  const raf = useRef(0)
+  const state = useRef({ t: 0, synced: 0, online: true, last: 0 })
+  useEffect(() => () => cancelAnimationFrame(raf.current), [])
+
+  const play = () => {
+    cancelAnimationFrame(raf.current)
+    state.current = { t: 0, synced: 0, online: true, last: 0 }
+    setT(0); setSynced(0); setOnline(true); setDrops(0)
+    if (reduce) { setT(RUN_S); setSynced(RUN_S); return }
+    setPlaying(true)
+    const tick = (ts: number) => {
+      const st = state.current
+      if (!st.last) st.last = ts
+      const dt = (ts - st.last) / 1000 * (RUN_S / (DUR / 1000)); st.last = ts
+      st.t = Math.min(RUN_S, st.t + dt)
+      if (st.online) st.synced = Math.min(st.t, st.synced + dt * CATCH_UP)
+      setT(st.t); setSynced(st.synced)
+      if (st.t < RUN_S || st.synced < st.t) raf.current = requestAnimationFrame(tick)
+      else setPlaying(false)
+    }
+    raf.current = requestAnimationFrame(tick)
+  }
+  const toggle = () => {
+    const next = !state.current.online
+    state.current.online = next; setOnline(next)
+    if (!next) setDrops((d) => d + 1)
+  }
+
+  const produced = Math.floor(t)
+  const buffered = Math.max(0, produced - Math.floor(synced))
+  const done = t >= RUN_S && buffered === 0
+  const NODES = [
+    { icon: Gauge, k: 'Rig meter', v: produced, d: 'samples at 1 Hz' },
+    { icon: Database, k: 'Local buffer', v: buffered, d: buffered ? 'held until link returns' : 'empty' },
+    { icon: Cloud, k: 'Cloud analytics', v: Math.floor(synced), d: 'received' },
+  ]
+
+  return (
+    <div className="grid gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span className="rounded-lg border bg-muted px-3 py-1.5 font-mono text-sm tabular">{clock(t / 60)}</span>
+          <span className="text-sm text-muted-foreground">of {clock(15)} · Rapid Check, DC 60 kW</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={toggle} disabled={!playing} size="sm" variant={online ? 'outline' : 'default'}>
+            {online ? <><WifiOff />Cut the network</> : <><Wifi />Restore the network</>}
+          </Button>
+          <Button onClick={play} disabled={playing} size="sm">
+            {playing ? <><RotateCcw className="animate-spin" />Running…</> : <><Play />Play the run</>}
+          </Button>
+        </div>
+      </div>
+
+      <div className="h-2 overflow-hidden rounded-full border bg-muted">
+        <motion.i className="block h-full rounded-full bg-gradient-to-r from-primary to-chart-3"
+          animate={{ width: `${(t / RUN_S) * 100}%` }} transition={{ duration: reduce ? 0 : 0.12, ease: 'linear' }} />
+      </div>
+
+      <div className="grid items-stretch gap-3 lg:grid-cols-[1fr_auto_1fr_auto_1fr]">
+        {NODES.map((n, i) => {
+          const Icon = n.icon
+          const hot = i === 1 && buffered > 0
+          return (
+            <div key={n.k} className="contents">
+              <div className={cn('rounded-xl border p-5 transition-colors duration-300',
+                hot ? 'border-amber bg-amber/8' : 'bg-card/60')}>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[0.66rem] tracking-[0.13em] text-muted-foreground uppercase">{n.k}</span>
+                  <Icon className={cn('size-4', hot ? 'text-amber' : 'text-primary')} />
+                </div>
+                <b className={cn('mt-2 block font-mono text-3xl tabular', hot ? 'text-amber' : 'text-gradient')}>{n.v.toLocaleString()}</b>
+                <small className="mt-1 block text-xs text-muted-foreground">{n.d}</small>
+              </div>
+              {i < 2 && (
+                <div className="hidden items-center lg:flex" aria-hidden>
+                  <ArrowRight className={cn('size-5 transition-colors', i === 1 && !online ? 'text-destructive' : 'text-muted-foreground')} />
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      <div className={cn('flex flex-wrap items-center gap-3 rounded-xl border px-5 py-4 text-sm transition-colors duration-300',
+        !online ? 'border-destructive/40 bg-destructive/5' : done ? 'border-grade-a/40 bg-grade-a/8' : 'bg-card/60')}>
+        {!online ? <WifiOff className="size-4 shrink-0 text-destructive" /> : done ? <Check className="size-4 shrink-0 text-grade-a" strokeWidth={3} /> : <Wifi className="size-4 shrink-0 text-teal" />}
+        <span>
+          {!online && <><b>Link down.</b> The meter keeps sampling; {buffered.toLocaleString()} samples are timestamped and held on the rig.</>}
+          {online && buffered > 0 && <><b>Link restored.</b> Forwarding the backlog — {buffered.toLocaleString()} samples still to send.</>}
+          {online && buffered === 0 && !done && t > 0 && <><b>Streaming live.</b> Cut the network at any point to see what happens.</>}
+          {online && t === 0 && <><b>Ready.</b> Play the run, then cut the network mid-test.</>}
+          {done && <><b>Complete.</b> {RUN_S.toLocaleString()} of {RUN_S.toLocaleString()} samples in the cloud{drops ? ` after ${drops} ${drops === 1 ? 'drop' : 'drops'}` : ''} — the quality gates run on the full series, not on what happened to arrive.</>}
+        </span>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        {[
+          { k: 'Timestamped where', v: 'On the rig', d: 'its own clock, not the network’s' },
+          { k: 'Buffer capacity', v: '> 24 h', d: 'of 1 Hz samples, local flash' },
+          { k: 'Effect on the result', v: 'None', d: 'a drop never voids a run' },
+        ].map((f) => (
+          <div key={f.k} className="rounded-xl border bg-card/60 p-4">
+            <span className="font-mono text-[0.66rem] tracking-[0.13em] text-muted-foreground uppercase">{f.k}</span>
+            <b className="mt-2 block font-mono text-2xl text-gradient tabular">{f.v}</b>
+            <small className="mt-1 block text-xs text-muted-foreground">{f.d}</small>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function TestVisualizer() {
   return (
     <Card className="bg-card/50">
       <CardContent>
         <Tabs defaultValue="rapid">
-          <TabsList>
+          <TabsList className="flex-wrap">
             <TabsTrigger value="rapid">Rapid Check</TabsTrigger>
             <TabsTrigger value="reference">Reference Test</TabsTrigger>
+            <TabsTrigger value="offline"><WifiOff />Network drop</TabsTrigger>
           </TabsList>
           <TabsContent value="rapid"><RunView run={RUNS.rapid} /></TabsContent>
           <TabsContent value="reference"><RunView run={RUNS.reference} /></TabsContent>
+          <TabsContent value="offline"><OfflineView /></TabsContent>
         </Tabs>
       </CardContent>
     </Card>

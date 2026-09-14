@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
-import { QrCode, Search, ShieldCheck, Loader2, XCircle, Check } from 'lucide-react'
+import { motion } from 'motion/react'
+import { QrCode, Search, ShieldCheck, Loader2, XCircle, Check, AlertTriangle, Info } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -120,16 +120,14 @@ export default function Verify() {
         </ol>
       )}
 
-      <AnimatePresence mode="wait">
-        {phase === 'missing' && (
-          <motion.div key="missing" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="mt-7 rounded-xl border border-destructive/25 bg-destructive/5 p-6">
-            <b className="block">No certificate found for “{cid}”</b>
-            <p className="mt-1.5 text-sm text-muted-foreground">Check the ID printed under the QR code, or scan the code directly. Only certificates issued by RISIQ resolve here.</p>
-          </motion.div>
-        )}
-        {cert && <CertCard key={cid} id={cid} cert={cert} />}
-      </AnimatePresence>
+      {/* Keyed remount + CSS entry — a stalled Motion tween once left this card at opacity 0. */}
+      {phase === 'missing' && (
+        <div key={cid} className="animate-rise mt-7 rounded-xl border border-destructive/25 bg-destructive/5 p-6">
+          <b className="block">No certificate found for “{cid}”</b>
+          <p className="mt-1.5 text-sm text-muted-foreground">Check the ID printed under the QR code, or scan the code directly. Only certificates issued by RISIQ resolve here.</p>
+        </div>
+      )}
+      {cert && <CertCard key={cid} id={cid} cert={cert} />}
     </Section>
   )
 }
@@ -143,9 +141,7 @@ function CertCard({ id, cert }: { id: string; cert: typeof CERTIFICATES[string] 
   const idx = (v: number) => clamp(Math.floor(((v - lo) / (hi - lo || 1)) * RAMP.length), 0, RAMP.length - 1)
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="mt-7 grid gap-7 rounded-2xl border bg-gradient-to-br from-card to-muted/40 p-8 shadow-xl">
+    <div className="animate-rise mt-7 grid gap-7 rounded-2xl border bg-gradient-to-br from-card to-muted/40 p-8 shadow-xl">
       <div className="flex flex-wrap items-start justify-between gap-6 border-b border-dashed pb-6">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full border border-grade-a/30 bg-grade-a/10 px-3 py-1 font-mono text-[0.68rem] tracking-wider text-grade-a uppercase">
@@ -155,8 +151,7 @@ function CertCard({ id, cert }: { id: string; cert: typeof CERTIFICATES[string] 
           <span className="mt-1.5 block font-mono text-sm text-muted-foreground">{id}</span>
         </div>
         <div className="grid justify-items-center gap-2.5">
-          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-            className="font-mono text-4xl font-semibold tabular">{soh}%</motion.span>
+          <span className="font-mono text-4xl font-semibold tabular">{soh}%</span>
           <Badge variant={cert.grade.toLowerCase() as 'a'}>Grade {cert.grade}</Badge>
         </div>
       </div>
@@ -172,6 +167,28 @@ function CertCard({ id, cert }: { id: string; cert: typeof CERTIFICATES[string] 
       </dl>
 
       <div className="grid gap-3">
+        <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">Anomaly flags</span>
+        {cert.flags.length === 0 ? (
+          <p className="flex items-center gap-2.5 rounded-xl border border-grade-a/30 bg-grade-a/8 px-4 py-3 text-sm">
+            <Check className="size-4 shrink-0 text-grade-a" strokeWidth={3} />
+            <span><b>None raised.</b> <span className="text-muted-foreground">All four quality gates passed at issue with no cell, temperature or plausibility anomalies.</span></span>
+          </p>
+        ) : (
+          <ul className="grid gap-2">
+            {cert.flags.map((f) => (
+              <li key={f.text} className={cn('flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm',
+                f.level === 'warning' ? 'border-grade-d/30 bg-grade-d/8' : 'border-amber/30 bg-amber/8')}>
+                {f.level === 'warning'
+                  ? <AlertTriangle className="mt-0.5 size-4 shrink-0 text-grade-d" />
+                  : <Info className="mt-0.5 size-4 shrink-0 text-amber" />}
+                <span>{f.text}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="grid gap-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">Cell-level degradation</span>
           <span className="flex items-center gap-1">
@@ -184,12 +201,10 @@ function CertCard({ id, cert }: { id: string; cert: typeof CERTIFICATES[string] 
           aria-label={`${CELLS} cells span ${lo.toFixed(1)}% to ${hi.toFixed(1)}% state of health.`}>
           {cells.map((v, i) => (
             <motion.button key={i} type="button" onClick={() => setSel(sel === i ? null : i)}
-              initial={{ opacity: 0, scale: 0.4 }} animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.006, duration: 0.3 }}
               whileHover={{ scale: 1.22, zIndex: 1 }}
-              className={cn('aspect-square cursor-pointer rounded-[3px]',
+              className={cn('animate-pop aspect-square cursor-pointer rounded-[3px]',
                 i === weakest && 'ring-2 ring-amber', sel === i && 'ring-2 ring-foreground')}
-              style={{ background: RAMP[idx(v)] }}
+              style={{ background: RAMP[idx(v)], animationDelay: `${i * 6}ms` }}
               aria-label={`Cell ${i + 1}, ${v.toFixed(1)} percent`} />
           ))}
         </div>
@@ -213,6 +228,6 @@ function CertCard({ id, cert }: { id: string; cert: typeof CERTIFICATES[string] 
           ))}
         </ul>
       </div>
-    </motion.div>
+    </div>
   )
 }

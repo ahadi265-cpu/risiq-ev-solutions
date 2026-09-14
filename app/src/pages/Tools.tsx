@@ -155,7 +155,7 @@ export default function Tools() {
                   Health over time
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  this car vs. a gently-used baseline
+                  socket-measured vs. what the dashboard reports
                 </span>
               </div>
               <div className="mt-3 h-[230px] w-full">
@@ -180,17 +180,17 @@ export default function Tools() {
                         color: 'var(--card-foreground)', fontSize: 12,
                       }}
                       labelFormatter={(v) => `Year ${v}`}
-                      formatter={(v, n) => [`${v}%`, n === 'actual' ? 'This car' : 'Gentle use']} />
+                      formatter={(v, n) => [`${v}%`, n === 'actual' ? 'Socket-measured' : 'OBD estimate']} />
                     <Legend verticalAlign="top" height={28} iconType="plainline"
                       formatter={(v) => (
                         <span style={{ color: 'var(--muted-foreground)', fontSize: 12 }}>
-                          {v === 'actual' ? 'This car' : 'Gentle-use baseline'}
+                          {v === 'actual' ? 'True socket-measured SoH' : 'Standard OBD estimate'}
                         </span>
                       )} />
                     <ReferenceLine y={80} stroke="var(--border)" strokeDasharray="4 4"
                       label={{ value: '80% — warranty floor', position: 'insideBottomRight',
                                fill: 'var(--muted-foreground)', fontSize: 10.5 }} />
-                    <Area type="monotone" dataKey="standard" stroke="var(--muted-foreground)" strokeWidth={1.5}
+                    <Area type="monotone" dataKey="obd" stroke="var(--muted-foreground)" strokeWidth={1.5}
                       strokeDasharray="5 4" fill="none" dot={false} />
                     <Area type="monotone" dataKey="actual" stroke="var(--primary)" strokeWidth={2.5}
                       fill="url(#gActual)" dot={false} activeDot={{ r: 4 }} />
@@ -198,7 +198,7 @@ export default function Tools() {
                 </ResponsiveContainer>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                The gap between the two lines is what heat, hard use and fast charging cost this particular car.
+                The gap between the lines is what a buyer relying on the dashboard never sees. An OBD readout is the car's own estimate of itself; the socket measurement is what the pack actually holds. The OBD line is illustrative, not a reading from any specific vehicle.
               </p>
             </div>
 

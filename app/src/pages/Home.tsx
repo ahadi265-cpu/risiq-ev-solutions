@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import {
-  Plug, Crosshair, Timer, ShieldCheck, ArrowRight, Landmark, PiggyBank,
-  Building2, QrCode, ScanLine, Cpu, FileCheck2, Lock,
+  Plug, Crosshair, Timer, ShieldCheck, ArrowRight,
+  QrCode, ScanLine, Cpu, FileCheck2, Lock,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,6 +14,7 @@ import { LogoMarquee } from '@/components/LogoMarquee'
 import { OdometerProof } from '@/components/OdometerProof'
 import { BriefingModal } from '@/components/BriefingModal'
 import { CountUp } from '@/components/CountUp'
+import { AudienceSwitcher } from '@/components/AudienceSwitcher'
 
 const CAPS = [
   { icon: Plug, title: 'Socket-side measurement', note: 'no OEM unlock needed' },
@@ -35,15 +36,6 @@ const STATS: Stat[] = [
   { v: '115,000', n: 115000, l: 'Electric cars on Ethiopian roads today, up from under 10,000 in 2023' },
   { v: '500,000', n: 500000, l: 'The national target for electric vehicles by 2030' },
   { v: '$6B', n: 6, prefix: '$', suffix: 'B', l: 'Annual fuel import bill the switch is designed to end' },
-]
-
-const AUDIENCE = [
-  { icon: Landmark, t: 'Commercial banks', to: '/pilot',
-    d: 'Value the battery at origination and at resale, so a five-year loan is written against collateral you can model — not a number nobody can check.' },
-  { icon: PiggyBank, t: 'Micro-finance', to: '/pilot',
-    d: 'Screen the batteries your borrowers depend on to earn. A degraded pack is a missed repayment long before it is a repossession.' },
-  { icon: Building2, t: 'Insurers', to: '/pilot',
-    d: 'Price the risk you already carry. An independently measured state of health at underwriting, and again at claim, settles disputes before they start.' },
 ]
 
 const STEPS = [
@@ -149,29 +141,9 @@ export default function Home() {
       {/* ------------------------------------------------ audience router */}
       <Section>
         <SectionHead eyebrow="You Are" title="Who this is for.">
-          Every electric car in Addis sits on somebody's books. If you lend against one, insure one, or sell one, this is the number you have been missing.
+          Every electric car in Addis sits on somebody's books. Pick your seat at the table — the certificate is the same, what it unlocks is not.
         </SectionHead>
-        <RevealGroup className="grid gap-6 md:grid-cols-3">
-          {AUDIENCE.map(({ icon: Icon, t, d, to }) => (
-            <motion.div key={t} variants={revealItem}>
-              <Card className="group h-full transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl">
-                <CardContent className="flex h-full flex-col">
-                  <span className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                    <Icon className="size-5" />
-                  </span>
-                  <h3 className="mt-5 text-xl font-semibold text-teal">{t}</h3>
-                  <p className="mt-3 flex-1 text-sm text-muted-foreground">{d}</p>
-                  <Link to={to} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-teal">
-                    More information
-                    <span className="grid size-7 place-items-center rounded-full border transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-teal group-hover:text-white">
-                      <ArrowRight className="size-3.5" />
-                    </span>
-                  </Link>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </RevealGroup>
+        <Reveal><AudienceSwitcher /></Reveal>
       </Section>
 
       <LogoMarquee />
