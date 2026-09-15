@@ -212,3 +212,47 @@
     .animate-rise, .animate-rise-cert, .animate-pop { animation: none; opacity: 1; transform: none; }
   }
 }
+
+/* ---------- ambient orbs: teal/emerald glow with one faint brand-red, drifting */
+@layer utilities {
+  .orb { filter: blur(70px); opacity: 0.55; animation: drift 18s ease-in-out infinite alternate; will-change: transform; }
+  .orb-a { background: radial-gradient(circle at 40% 40%, oklch(0.766 0.137 172 / 0.55), transparent 65%); }
+  .orb-b { background: radial-gradient(circle at 50% 50%, oklch(0.72 0.14 200 / 0.45), transparent 65%); animation-duration: 24s; animation-delay: -6s; }
+  .orb-c { background: radial-gradient(circle at 50% 50%, oklch(0.62 0.20 27 / 0.28), transparent 65%); animation-duration: 21s; animation-delay: -12s; }
+  .dark .orb { opacity: 0.5; }
+  .dark .orb-a { background: radial-gradient(circle at 40% 40%, oklch(0.72 0.14 172 / 0.45), transparent 65%); }
+  .dark .orb-b { background: radial-gradient(circle at 50% 50%, oklch(0.7 0.15 200 / 0.38), transparent 65%); }
+  @keyframes drift {
+    from { transform: translate3d(0, 0, 0) scale(1); }
+    to   { transform: translate3d(6%, 8%, 0) scale(1.12); }
+  }
+
+  /* running gradient border, revealed on hover */
+  @property --angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+  .glow-card { position: relative; isolation: isolate; }
+  .glow-card::before {
+    content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 1.5px;
+    background: conic-gradient(from var(--angle), transparent 0 55%, var(--primary) 72%, var(--teal) 86%, transparent 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity: 0; transition: opacity 0.35s ease;
+    animation: spin-angle 2.8s linear infinite; animation-play-state: paused;
+  }
+  .glow-card:hover::before, .glow-card:focus-within::before { opacity: 1; animation-play-state: running; }
+  @keyframes spin-angle { to { --angle: 360deg; } }
+
+  /* dashed data links crawl */
+  .dash-run { animation: dash-run 1.2s linear infinite; }
+  @keyframes dash-run { to { stroke-dashoffset: -24; } }
+
+  /* theme switch: colours cross-fade for the duration of the toggle only */
+  .theme-anim, .theme-anim *, .theme-anim *::before, .theme-anim *::after {
+    transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease,
+                fill 0.5s ease, stroke 0.5s ease, box-shadow 0.5s ease !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orb, .glow-card::before, .dash-run { animation: none; }
+  }
+}

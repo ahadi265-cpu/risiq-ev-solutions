@@ -14,6 +14,9 @@ import { LogoMarquee } from '@/components/LogoMarquee'
 import { OdometerProof } from '@/components/OdometerProof'
 import { BriefingModal } from '@/components/BriefingModal'
 import { CountUp } from '@/components/CountUp'
+import { HeroCertificate } from '@/components/HeroCertificate'
+import { CertificateInspector } from '@/components/CertificateInspector'
+import { SocketSimulator } from '@/components/SocketSimulator'
 import { AudienceSwitcher } from '@/components/AudienceSwitcher'
 
 const CAPS = [
@@ -23,11 +26,12 @@ const CAPS = [
   { icon: ShieldCheck, title: 'QR-verified certificate', note: 'public registry < 2 s' },
 ]
 
-const METRICS = [
-  { k: 'Time per car', v: '15', u: 'min', d: 'At your yard, with no downtime' },
-  { k: 'Accuracy', v: '±3', u: '%', d: 'Measured, never self-reported' },
+type Metric = { k: string; v?: string; n?: number; prefix?: string; u: string; d: string }
+const METRICS: Metric[] = [
+  { k: 'Time per car', n: 15, u: 'min', d: 'At your yard, with no downtime' },
+  { k: 'Accuracy', n: 3, prefix: '±', u: '%', d: 'Measured, never self-reported' },
   { k: 'Cars we can test', v: 'Any', u: 'EV', d: 'Including locked imports' },
-  { k: 'To verify one', v: '2', u: 'sec', d: 'Scan the code, see the record' },
+  { k: 'To verify one', n: 2, u: 'sec', d: 'Scan the code, see the record' },
 ]
 
 type Stat = { v: string; l: string; n?: number; prefix?: string; suffix?: string }
@@ -67,26 +71,22 @@ export default function Home() {
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <BriefingModal trigger={<Button size="lg">Book a pilot briefing</Button>} />
-              <Button asChild size="lg" variant="outline">
-                <Link to="/verify"><ShieldCheck />Sample certificate demo</Link>
-              </Button>
+              <CertificateInspector trigger={
+                <Button size="lg" variant="outline"><ShieldCheck />Sample certificate demo</Button>} />
             </div>
             <p className="mt-6 font-mono text-xs tracking-wide text-muted-foreground">
               Part of RISIQ Group · in technology partnership with Eniris
             </p>
           </div>
 
-          {/* the product itself, not a stock photo */}
+          {/* the product itself — a live card, not a stock photo. Hover to tilt. */}
           <div className="animate-rise-cert relative mx-auto w-full max-w-[440px]">
             <div aria-hidden className="absolute -inset-10 -z-10 rounded-[2.5rem] bg-[radial-gradient(closest-side,oklch(0.577_0.229_27.9/0.10),transparent)] blur-2xl" />
-            <motion.img
-              src="img/certificate-risiq.png"
-              alt="A RISIQ battery-health certificate: 94% state of health, Grade A, with a QR code for public verification"
-              width={2000} height={2540}
-              data-parallax="-6"
-              animate={reduce ? undefined : { y: [0, -12, 0] }}
-              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-full rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,0.5)]" />
+            <motion.div data-parallax="-6"
+              animate={reduce ? undefined : { y: [0, -10, 0] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}>
+              <HeroCertificate />
+            </motion.div>
             <span className="absolute -bottom-4 -left-4 flex items-center gap-2 rounded-full border bg-card px-4 py-2.5 font-mono text-xs text-primary shadow-xl">
               <QrCode className="size-3.5" />Scan to verify · &lt; 2 s
             </span>
@@ -97,10 +97,12 @@ export default function Home() {
           <RevealGroup className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {METRICS.map((m) => (
               <motion.div key={m.k} variants={revealItem}
-                className="group rounded-2xl border bg-card/70 p-6 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:ring-glow">
+                className="glow-card group rounded-2xl border bg-card/70 p-6 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                 <span className="font-mono text-[0.68rem] tracking-[0.14em] text-muted-foreground uppercase">{m.k}</span>
                 <div className="mt-3 flex items-baseline gap-1.5">
-                  <span className="font-mono text-3xl font-semibold text-gradient md:text-4xl">{m.v}</span>
+                  <span className="font-mono text-3xl font-semibold text-gradient md:text-4xl">
+                    {m.n !== undefined ? <CountUp to={m.n} prefix={m.prefix ?? ''} duration={1100} /> : m.v}
+                  </span>
                   <span className="font-mono text-sm text-muted-foreground">{m.u}</span>
                 </div>
                 <span className="mt-2 block text-sm text-muted-foreground">{m.d}</span>
@@ -136,6 +138,14 @@ export default function Home() {
           Electric motors barely wear out. Batteries do — and they are roughly half what the car is worth. Two cars can show the same number on the dash and be thousands of dollars apart.
         </SectionHead>
         <Reveal><OdometerProof /></Reveal>
+      </Section>
+
+      {/* ------------------------------------------- socket vs OBD simulator */}
+      <Section>
+        <SectionHead eyebrow="Why The Socket" title="Locked cars can refuse a question. They cannot refuse electricity.">
+          Most EVs arriving in Ethiopia encrypt the diagnostic port a normal reader depends on. Switch between the two methods to see why RISIQ measures at the plug instead.
+        </SectionHead>
+        <Reveal><SocketSimulator /></Reveal>
       </Section>
 
       {/* ------------------------------------------------ audience router */}

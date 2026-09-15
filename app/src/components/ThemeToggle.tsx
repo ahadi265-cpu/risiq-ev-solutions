@@ -16,9 +16,18 @@ export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>(initial)
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark')
-    document.documentElement.style.colorScheme = theme
+    const root = document.documentElement
+    const apply = () => {
+      root.classList.toggle('dark', theme === 'dark')
+      root.style.colorScheme = theme
+    }
+    // cross-fade every colour for the duration of the switch, then drop the transitions
+    root.classList.add('theme-anim')
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => void }
+    if (doc.startViewTransition) doc.startViewTransition(apply); else apply()
+    const t = window.setTimeout(() => root.classList.remove('theme-anim'), 600)
     try { localStorage.setItem(KEY, theme) } catch { /* private mode */ }
+    return () => clearTimeout(t)
   }, [theme])
 
   return (

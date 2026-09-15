@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Section, SectionHead } from '@/components/Layout'
 import { Reveal, RevealGroup, revealItem } from '@/components/Reveal'
 import { TestVisualizer } from '@/components/TestVisualizer'
+import { SocketSimulator } from '@/components/SocketSimulator'
 import { ArchitectureVisualizer } from '@/components/ArchitectureVisualizer'
 import { cn } from '@/lib/utils'
 
@@ -102,6 +103,7 @@ export default function HowItWorks() {
             </Card>
           </Reveal>
         </div>
+        <Reveal className="mt-8"><SocketSimulator /></Reveal>
       </Section>
 
       <Section>

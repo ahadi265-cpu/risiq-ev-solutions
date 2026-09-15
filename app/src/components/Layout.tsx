@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { useGsapReveal } from '@/lib/useGsapReveal'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { AmbientOrbs } from '@/components/AmbientOrbs'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -23,6 +24,7 @@ export function Layout() {
   useGsapReveal()
   return (
     <div className="min-h-dvh flex flex-col">
+      <AmbientOrbs />
       <header className="sticky top-3 z-40 mx-3">
         <nav className="glass mx-auto flex max-w-[1440px] items-center justify-between gap-5 rounded-full px-5 py-2.5 shadow-sm">
           <Link to="/" className="flex items-center gap-3" aria-label="RISIQ EV Solutions — home">

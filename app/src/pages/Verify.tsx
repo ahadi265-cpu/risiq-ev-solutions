@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { motion } from 'motion/react'
 import { QrCode, Search, ShieldCheck, Loader2, XCircle, Check, AlertTriangle, Info } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -8,11 +7,8 @@ import { Input } from '@/components/ui/input'
 import { Section } from '@/components/Layout'
 import { Reveal } from '@/components/Reveal'
 import { cn } from '@/lib/utils'
-import { CERTIFICATES, clamp, hashStr, mulberry32 } from '@/lib/data'
-
-/* one hue, light→dark; validated for monotone lightness and light-end contrast */
-const RAMP = ['#3cc4ae', '#1eab97', '#12897c', '#0d6b61', '#084f47']
-const COLS = 12, ROWS = 8, CELLS = COLS * ROWS
+import { CERTIFICATES, hashStr } from '@/lib/data'
+import { CellHeatmap } from '@/components/CellHeatmap'
 
 const STEPS = [
   'Locating certificate in the registry',
@@ -20,15 +16,6 @@ const STEPS = [
   'Confirming quality gates passed at issue',
   'Record verified',
 ]
-
-/** Cells diverge as a pack ages, so spread widens as health falls. Values derive
- *  from the id, so one certificate always draws the same map. */
-function cellMap(id: string, soh: number) {
-  const rnd = mulberry32(hashStr(id))
-  const spread = 1.1 + (100 - soh) * 0.13
-  return Array.from({ length: CELLS }, () =>
-    clamp(soh + (rnd() + rnd() + rnd() - 1.5) * spread, 35, 100))
-}
 
 export default function Verify() {
   const [query, setQuery] = useState('')
@@ -144,11 +131,6 @@ export default function Verify() {
 
 function CertCard({ id, cert }: { id: string; cert: typeof CERTIFICATES[string] }) {
   const soh = cert.stateOfHealth
-  const cells = useMemo(() => cellMap(id, soh), [id, soh])
-  const lo = Math.min(...cells), hi = Math.max(...cells)
-  const weakest = cells.indexOf(lo)
-  const [sel, setSel] = useState<number | null>(null)
-  const idx = (v: number) => clamp(Math.floor(((v - lo) / (hi - lo || 1)) * RAMP.length), 0, RAMP.length - 1)
 
   return (
     <div className="animate-rise mt-7 grid gap-7 rounded-2xl border bg-gradient-to-br from-card to-muted/40 p-8 shadow-xl">
@@ -198,32 +180,7 @@ function CertCard({ id, cert }: { id: string; cert: typeof CERTIFICATES[string] 
         )}
       </div>
 
-      <div className="grid gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">Cell-level degradation</span>
-          <span className="flex items-center gap-1">
-            <small className="font-mono text-xs text-muted-foreground">{lo.toFixed(0)}%</small>
-            {RAMP.map((c) => <i key={c} className="block h-2.5 w-5" style={{ background: c }} />)}
-            <small className="font-mono text-xs text-muted-foreground">{hi.toFixed(0)}%</small>
-          </span>
-        </div>
-        <div className="grid grid-cols-12 gap-1" role="img"
-          aria-label={`${CELLS} cells span ${lo.toFixed(1)}% to ${hi.toFixed(1)}% state of health.`}>
-          {cells.map((v, i) => (
-            <motion.button key={i} type="button" onClick={() => setSel(sel === i ? null : i)}
-              whileHover={{ scale: 1.22, zIndex: 1 }}
-              className={cn('animate-pop aspect-square cursor-pointer rounded-[3px]',
-                i === weakest && 'ring-2 ring-amber', sel === i && 'ring-2 ring-foreground')}
-              style={{ background: RAMP[idx(v)], animationDelay: `${i * 6}ms` }}
-              aria-label={`Cell ${i + 1}, ${v.toFixed(1)} percent`} />
-          ))}
-        </div>
-        <p className="text-sm text-muted-foreground">
-          {sel !== null
-            ? <><b className="text-foreground">Cell {sel + 1}</b> — {cells[sel].toFixed(1)}% of nominal, module {Math.floor(sel / COLS) + 1} of {ROWS}.</>
-            : <><b className="text-foreground">Weakest cell {weakest + 1}</b> at {lo.toFixed(1)}%, {(soh - lo).toFixed(1)} pp below pack average. Select any cell to inspect it.</>}
-        </p>
-      </div>
+      <CellHeatmap id={id} soh={soh} />
 
       <div className="grid gap-3 rounded-xl border bg-muted/40 p-5">
         <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">Cryptographic status</span>
