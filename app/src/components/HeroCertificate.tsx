@@ -125,13 +125,13 @@ export function HeroCertificate({ className }: { className?: string }) {
         </header>
 
         <div className="grid justify-items-center gap-3 py-1">
-          <SohGauge value={CERT.stateOfHealth} />
+          <SohGauge value={CERT.stateOfHealth} size={148} stroke={10} />
           <span className="rounded-full bg-grade-a px-3 py-1 font-mono text-[0.62rem] font-semibold tracking-[0.16em] text-white uppercase">Grade {CERT.grade}</span>
         </div>
 
         <dl className="grid gap-0 border-t border-dashed">
           {ROWS.map(([k, v]) => (
-            <div key={k} className="flex items-baseline justify-between gap-3 border-b border-dashed py-1.5 text-[0.7rem]">
+            <div key={k} className="flex items-baseline justify-between gap-3 border-b border-dashed py-2 text-[0.78rem]">
               <dt className="text-muted-foreground">{k}</dt><dd className="font-mono text-right">{v}</dd>
             </div>
           ))}

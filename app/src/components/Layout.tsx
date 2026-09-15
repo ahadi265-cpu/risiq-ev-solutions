@@ -25,41 +25,42 @@ export function Layout() {
   return (
     <div className="min-h-dvh flex flex-col">
       <AmbientOrbs />
-      <header className="sticky top-3 z-40 mx-3">
-        <nav className="glass mx-auto flex max-w-[1440px] items-center justify-between gap-5 rounded-full px-5 py-2.5 shadow-sm">
-          <Link to="/" className="flex items-center gap-3" aria-label="RISIQ EV Solutions — home">
-            <img src="img/risiq-logo.png" alt="RISIQ" width={1600} height={614} className="h-9 w-auto" />
-            <span className="hidden font-mono text-[0.6rem] font-medium tracking-[0.14em] text-muted-foreground uppercase sm:inline">EV Solutions</span>
+      <header className="glass sticky top-0 z-40 shadow-sm">
+        <nav className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-6 py-3 md:py-4">
+          <Link to="/" className="flex items-center gap-3.5" aria-label="RISIQ EV Solutions — home">
+            <img src="img/risiq-logo.png" alt="RISIQ" width={1600} height={614} className="h-11 w-auto md:h-14" />
+            <span className="hidden font-mono text-[0.68rem] font-semibold tracking-[0.2em] text-muted-foreground uppercase md:inline">EV Solutions</span>
           </Link>
-          <ul className="hidden items-center gap-0.5 lg:flex">
+          <ul className="hidden items-center gap-1 lg:flex">
             {NAV.map((n) => (
               <li key={n.to}>
                 <NavLink to={n.to} end={n.end} className={({ isActive }) => cn(
-                  'relative rounded-full px-3 py-2 text-[0.87rem] transition-colors',
-                  isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground')}>
+                  'relative block rounded-lg px-3.5 py-2.5 text-[0.98rem] font-semibold transition-colors',
+                  isActive ? 'text-brand' : 'text-foreground hover:text-brand')}>
                   {({ isActive }) => (<>
                     {n.label}
-                    {isActive && <motion.span layoutId="nav-pill" className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-primary" transition={{ type: 'spring', stiffness: 380, damping: 30 }} />}
+                    {isActive && <motion.span layoutId="nav-pill" className="absolute inset-x-3.5 -bottom-0.5 h-[3px] rounded-full bg-brand" transition={{ type: 'spring', stiffness: 380, damping: 30 }} />}
                   </>)}
                 </NavLink>
               </li>
             ))}
           </ul>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button asChild size="sm" className="hidden sm:inline-flex"><Link to="/pilot">Register for the Pilot</Link></Button>
+            <Button asChild className="hidden sm:inline-flex rounded-lg bg-brand px-5 hover:bg-brand-dark"><Link to="/pilot">Register for the Pilot</Link></Button>
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu" aria-expanded={open}>
               {open ? <X /> : <Menu />}
             </Button>
           </div>
         </nav>
+        <div aria-hidden className="brand-rule h-[5px]" />
         {open && (
           <motion.ul initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-            className="mx-auto mt-2 max-w-[1440px] rounded-2xl border bg-card p-2 shadow-lg lg:hidden">
+            className="mx-4 mt-2 rounded-2xl border bg-card p-2 shadow-lg lg:hidden">
             {NAV.map((n) => (
               <li key={n.to}>
                 <NavLink to={n.to} end={n.end} onClick={() => setOpen(false)}
-                  className="block rounded-lg px-4 py-3 text-sm hover:bg-accent">{n.label}</NavLink>
+                  className="block rounded-lg px-4 py-3 text-base font-semibold hover:bg-accent">{n.label}</NavLink>
               </li>
             ))}
           </motion.ul>
@@ -68,25 +69,26 @@ export function Layout() {
 
       <main className="flex-1"><Outlet /></main>
 
-      <footer className="mt-28 border-t bg-card py-12">
-        <div className="mx-auto grid max-w-[1440px] gap-6 px-6 text-sm text-muted-foreground md:grid-cols-2">
-          <div><img src="img/risiq-logo.png" alt="RISIQ" width={1600} height={614} className="mb-4 h-8 w-auto" />
+      <footer className="dark relative mt-28 overflow-hidden bg-background py-16 text-foreground">
+        <div aria-hidden className="brand-rule absolute inset-x-0 top-0 h-[5px]" />
+        <div className="mx-auto grid max-w-[1440px] gap-8 px-6 text-sm text-muted-foreground md:grid-cols-2">
+          <div><img src="img/risiq-logo.png" alt="RISIQ" width={1600} height={614} className="mb-5 h-10 w-auto" />
             <p className="max-w-[44ch]">Know what an electric car is really worth, before you buy it, lend against it, or insure it.</p>
             <p className="mt-4 max-w-[44ch] text-xs">
               Built by <b className="text-foreground">RISIQ Tech</b>, a subsidiary of{' '}
               <b className="text-foreground">RISIQ Group</b>, in collaboration with{' '}
               <b className="text-foreground">Eniris</b>.
             </p></div>
-          <nav className="flex flex-wrap gap-x-5 gap-y-2 md:justify-end" aria-label="Footer">
+          <nav className="flex flex-wrap gap-x-6 gap-y-2.5 text-base font-medium text-foreground/80 md:justify-end" aria-label="Footer">
             {NAV.slice(1).map((n) => (
-              <Link key={n.to} to={n.to} className="hover:text-primary hover:underline">{n.label}</Link>
+              <Link key={n.to} to={n.to} className="hover:text-brand hover:underline">{n.label}</Link>
             ))}
           </nav>
           <p className="md:col-span-2 md:text-right">
-            Addis Ababa, Ethiopia · <a className="text-primary hover:underline" href="mailto:Khalid@risiqbs.com">Khalid@risiqbs.com</a>
+            Addis Ababa, Ethiopia · <a className="text-brand hover:underline" href="mailto:Khalid@risiqbs.com">Khalid@risiqbs.com</a>
             <br className="hidden md:block" />
-            <a className="text-primary hover:underline" href="tel:+251911223871">+251 911 223 871</a>{' '}
-            &middot; <a className="text-primary hover:underline" href="tel:+32489976231">+32 489 97 62 31</a>
+            <a className="text-brand hover:underline" href="tel:+251911223871">+251 911 223 871</a>{' '}
+            &middot; <a className="text-brand hover:underline" href="tel:+32489976231">+32 489 97 62 31</a>
           </p>
         </div>
       </footer>
@@ -98,7 +100,7 @@ export function Section({ children, className, muted = false }: {
   children: React.ReactNode; className?: string; muted?: boolean
 }) {
   return (
-    <section className={cn('py-20 md:py-24', muted && 'bg-muted/40', className)}>
+    <section className={cn('py-20 md:py-24', muted && 'bg-muted', className)}>
       <div className="mx-auto max-w-[1440px] px-6">{children}</div>
     </section>
   )

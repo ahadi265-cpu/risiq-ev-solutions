@@ -54,38 +54,38 @@ export default function Home() {
   return (
     <>
       {/* ---------------------------------------------------------- hero */}
-      <section className="bg-grid relative isolate overflow-hidden py-20 md:py-28">
-        <div aria-hidden className="pointer-events-none absolute -inset-x-24 -top-1/3 h-[130%] -z-10 opacity-80
-          [background:radial-gradient(40%_44%_at_20%_18%,oklch(0.766_0.137_172/0.20),transparent_68%),radial-gradient(34%_40%_at_84%_70%,oklch(0.7_0.14_210/0.16),transparent_70%)]" />
-        <div className="mx-auto grid max-w-[1440px] items-center gap-14 px-6 lg:grid-cols-[1.05fr_0.95fr]">
+      <section className="bg-grid relative isolate overflow-hidden py-24 md:py-32 lg:py-36">
+        <div aria-hidden className="pointer-events-none absolute -inset-x-24 -top-1/3 h-[130%] -z-10
+          [background:radial-gradient(42%_46%_at_16%_22%,oklch(0.62_0.21_29/0.13),transparent_68%),radial-gradient(36%_42%_at_86%_72%,oklch(0.75_0.14_60/0.12),transparent_70%)]" />
+        <div className="mx-auto grid max-w-[1440px] items-center gap-16 px-6 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="animate-rise">
-            <span className="flex items-center gap-2.5 font-mono text-xs tracking-[0.14em] text-amber uppercase">
-              <span className="size-1.5 rounded-full bg-amber ring-3 ring-amber/25" />EV Battery Intelligence &amp; Certification
+            <span className="flex items-center gap-3 font-mono text-sm font-semibold tracking-[0.18em] text-brand uppercase">
+              <span className="size-2 rounded-full bg-brand ring-4 ring-brand/20" />EV Battery Intelligence &amp; Certification
             </span>
-            <h1 className="mt-6 text-5xl font-bold tracking-tight md:text-[4.2rem] md:leading-[1.02]">
+            <h1 className="mt-7 text-[3.4rem] leading-[1.02] font-bold tracking-tight md:text-[5rem] lg:text-[5.8rem]">
               Know what the car is<br className="hidden md:block" />
               <span className="text-gradient">really worth.</span>
             </h1>
-            <p className="mt-6 max-w-[54ch] text-lg text-muted-foreground">
+            <p className="mt-8 max-w-[52ch] text-xl text-muted-foreground md:text-2xl md:leading-snug">
               On an electric car, the battery is half the value — and the odometer tells you nothing about it. RISIQ gives you an independent, verifiable battery report in fifteen minutes, so you can buy, lend and insure with confidence.
             </p>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <BriefingModal trigger={<Button size="lg">Book a pilot briefing</Button>} />
+            <div className="mt-11 flex flex-wrap gap-4">
+              <BriefingModal trigger={<Button size="lg" className="h-14 rounded-lg bg-brand px-9 text-base hover:bg-brand-dark">Book a pilot briefing</Button>} />
               <CertificateInspector trigger={
-                <Button size="lg" variant="outline"><ShieldCheck />Sample certificate demo</Button>} />
+                <Button size="lg" variant="outline" className="h-14 rounded-lg px-9 text-base"><ShieldCheck />Sample certificate demo</Button>} />
             </div>
-            <p className="mt-6 font-mono text-xs tracking-wide text-muted-foreground">
+            <p className="mt-8 font-mono text-sm tracking-wide text-muted-foreground">
               Part of RISIQ Group · in technology partnership with Eniris
             </p>
           </div>
 
           {/* the product itself — a live card, not a stock photo. Hover to tilt. */}
-          <div className="animate-rise-cert relative mx-auto w-full max-w-[440px]">
-            <div aria-hidden className="absolute -inset-10 -z-10 rounded-[2.5rem] bg-[radial-gradient(closest-side,oklch(0.577_0.229_27.9/0.10),transparent)] blur-2xl" />
+          <div className="animate-rise-cert relative mx-auto w-full max-w-[520px]">
+            <div aria-hidden className="absolute -inset-12 -z-10 rounded-[3rem] bg-[radial-gradient(closest-side,oklch(0.62_0.21_29/0.14),transparent)] blur-2xl" />
             <motion.div data-parallax="-6"
               animate={reduce ? undefined : { y: [0, -10, 0] }}
               transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}>
-              <HeroCertificate />
+              <HeroCertificate className="max-w-[520px]" />
             </motion.div>
             <span className="absolute -bottom-4 -left-4 flex items-center gap-2 rounded-full border bg-card px-4 py-2.5 font-mono text-xs text-primary shadow-xl">
               <QrCode className="size-3.5" />Scan to verify · &lt; 2 s
@@ -94,18 +94,18 @@ export default function Home() {
         </div>
 
         <div className="mx-auto max-w-[1440px] px-6">
-          <RevealGroup className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <RevealGroup className="mt-20 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {METRICS.map((m) => (
               <motion.div key={m.k} variants={revealItem}
-                className="glow-card group rounded-2xl border bg-card/70 p-6 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <span className="font-mono text-[0.68rem] tracking-[0.14em] text-muted-foreground uppercase">{m.k}</span>
-                <div className="mt-3 flex items-baseline gap-1.5">
-                  <span className="font-mono text-3xl font-semibold text-gradient md:text-4xl">
+                className="glow-card group rounded-2xl border bg-card/80 p-7 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8">
+                <span className="font-mono text-xs tracking-[0.16em] text-muted-foreground uppercase">{m.k}</span>
+                <div className="mt-4 flex items-baseline gap-2">
+                  <span className="font-mono text-4xl font-semibold text-gradient md:text-5xl">
                     {m.n !== undefined ? <CountUp to={m.n} prefix={m.prefix ?? ''} duration={1100} /> : m.v}
                   </span>
-                  <span className="font-mono text-sm text-muted-foreground">{m.u}</span>
+                  <span className="font-mono text-base text-muted-foreground">{m.u}</span>
                 </div>
-                <span className="mt-2 block text-sm text-muted-foreground">{m.d}</span>
+                <span className="mt-3 block text-[0.95rem] text-muted-foreground">{m.d}</span>
               </motion.div>
             ))}
           </RevealGroup>
