@@ -1,28 +1,44 @@
 import { useEffect, useRef, useState } from 'react'
-import { useInView, useReducedMotion } from 'motion/react'
+import { useReducedMotion } from 'motion/react'
 
 /** Counts up when scrolled into view. Renders the final value immediately under
- *  reduced motion, and never hides the number while waiting. */
+ *  reduced motion, and a settle timer guarantees the final value even when the
+ *  frame loop is starved — the number is never left resting at 0. */
 export function CountUp({ to, decimals = 0, prefix = '', suffix = '', duration = 1400 }: {
   to: number; decimals?: number; prefix?: string; suffix?: string; duration?: number
 }) {
   const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, amount: 0.4 })
   const reduce = useReducedMotion()
   const [val, setVal] = useState(reduce ? to : 0)
 
   useEffect(() => {
-    if (reduce || !inView) return
-    let raf = 0, start: number | null = null
-    const tick = (ts: number) => {
-      if (start === null) start = ts
-      const p = Math.min((ts - start) / duration, 1)
-      setVal(to * (1 - Math.pow(1 - p, 3)))
-      if (p < 1) raf = requestAnimationFrame(tick)
+    const el = ref.current
+    if (!el) return
+    if (reduce) { setVal(to); return }
+
+    let raf = 0, settle = 0, started = false
+    const start = () => {
+      if (started) return
+      started = true
+      let t0: number | null = null
+      const tick = (ts: number) => {
+        if (t0 === null) t0 = ts
+        const p = Math.min((ts - t0) / duration, 1)
+        setVal(to * (1 - Math.pow(1 - p, 3)))
+        if (p < 1) raf = requestAnimationFrame(tick)
+      }
+      raf = requestAnimationFrame(tick)
+      settle = window.setTimeout(() => setVal(to), duration + 250)
     }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [inView, to, duration, reduce])
+
+    const r = el.getBoundingClientRect()
+    const onScreen = r.top < window.innerHeight && r.bottom > 0
+    if (onScreen || !('IntersectionObserver' in window)) { start(); return () => { cancelAnimationFrame(raf); clearTimeout(settle) } }
+
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { start(); io.disconnect() } }, { threshold: 0.3 })
+    io.observe(el)
+    return () => { io.disconnect(); cancelAnimationFrame(raf); clearTimeout(settle) }
+  }, [to, duration, reduce])
 
   return (
     <span ref={ref} className="tabular">

@@ -65,9 +65,12 @@ npx shadcn@latest add tooltip sheet select
 ```
 src/
   components/ui/    shadcn primitives (owned source, safe to edit)
-  components/       Layout, Reveal — app-level composition
-  pages/            Home, Pilot, Tools, Verify
+  components/       Layout (nav dropdown, footer, dock), Reveal (CSS-driven),
+                    ServiceTabs, FloatingDock, hero/certificate widgets
+  pages/            Home (eager) + lazy Pilot, Tools, Verify, HowItWorks,
+                    Partners, About, Contact
   lib/data.ts       fleet data, the battery model, certificate registry
+  lib/usePageMeta   per-route <title>, description and canonical
   lib/utils.ts      cn()
 ```
 

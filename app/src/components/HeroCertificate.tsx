@@ -52,7 +52,7 @@ export function SohGauge({ value, size = 128, stroke = 9, className, delay = 300
 }
 
 /** Deterministic pseudo-QR so the mockup carries a believable code. */
-function QrMark({ seed, cells = 21 }: { seed: string; cells?: number }) {
+export function QrMark({ seed, cells = 21 }: { seed: string; cells?: number }) {
   const rnd = mulberry32(hashStr(seed))
   const bits = Array.from({ length: cells * cells }, (_, i) => {
     const x = i % cells, y = Math.floor(i / cells)

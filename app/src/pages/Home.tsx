@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import {
-  Plug, Crosshair, Timer, ShieldCheck, ArrowRight,
-  QrCode, ScanLine, Cpu, FileCheck2, Lock,
+  Plug, Crosshair, Timer, ShieldCheck, ArrowRight, QrCode, ScanLine, Cpu, FileCheck2, Lock,
+  Building2, Landmark, Ship, Scale,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -18,6 +18,8 @@ import { HeroCertificate } from '@/components/HeroCertificate'
 import { CertificateInspector } from '@/components/CertificateInspector'
 import { SocketSimulator } from '@/components/SocketSimulator'
 import { AudienceSwitcher } from '@/components/AudienceSwitcher'
+import { ServiceTabs } from '@/components/ServiceTabs'
+import { cn } from '@/lib/utils'
 
 const CAPS = [
   { icon: Plug, title: 'Socket-side measurement', note: 'no OEM unlock needed' },
@@ -36,10 +38,17 @@ const METRICS: Metric[] = [
 
 type Stat = { v: string; l: string; n?: number; prefix?: string; suffix?: string }
 const STATS: Stat[] = [
-  { v: '2024', n: 2024, l: 'The year Ethiopia became the first country to ban petrol and diesel car imports' },
+  { v: '2024', l: 'The year Ethiopia became the first country to ban petrol and diesel car imports' },
   { v: '115,000', n: 115000, l: 'Electric cars on Ethiopian roads today, up from under 10,000 in 2023' },
   { v: '500,000', n: 500000, l: 'The national target for electric vehicles by 2030' },
   { v: '$6B', n: 6, prefix: '$', suffix: 'B', l: 'Annual fuel import bill the switch is designed to end' },
+]
+/* eniris-style stacked tiles: soft, brand, ink, card */
+const TONES = [
+  { box: 'bg-brand-soft border border-brand/15', num: 'text-brand', txt: 'text-foreground/80' },
+  { box: 'bg-brand text-white', num: 'text-white', txt: 'text-white/85' },
+  { box: 'bg-ink text-white', num: 'text-amber', txt: 'text-white/80' },
+  { box: 'bg-card border', num: 'text-amber', txt: 'text-muted-foreground' },
 ]
 
 const STEPS = [
@@ -49,39 +58,68 @@ const STEPS = [
   { icon: FileCheck2, n: '04', t: 'Certify', d: 'You get the certificate on the spot, with a code anyone can scan to confirm it is genuine.' },
 ]
 
+/* The hero's audience rail — the same four seats the switcher below offers. */
+const QUICK = [
+  { id: 'insurers', label: 'Insurers', sub: 'Price the risk you carry', icon: Building2 },
+  { id: 'banks', label: 'Banks & MFIs', sub: 'Collateral you can model', icon: Landmark },
+  { id: 'importers', label: 'Importers', sub: 'Prove the pack on arrival', icon: Ship },
+  { id: 'regulators', label: 'Regulators', sub: 'One national standard', icon: Scale },
+]
+const pickAudience = (id: string) => (e: React.MouseEvent) => {
+  e.preventDefault()
+  window.dispatchEvent(new CustomEvent('risiq:audience', { detail: id }))
+  document.getElementById('audience')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 export default function Home() {
   const reduce = useReducedMotion()
   return (
     <>
-      {/* ---------------------------------------------------------- hero */}
-      <section className="bg-grid relative isolate overflow-hidden py-24 md:py-32 lg:py-36">
-        <div aria-hidden className="pointer-events-none absolute -inset-x-24 -top-1/3 h-[130%] -z-10
-          [background:radial-gradient(42%_46%_at_16%_22%,oklch(0.62_0.21_29/0.13),transparent_68%),radial-gradient(36%_42%_at_86%_72%,oklch(0.75_0.14_60/0.12),transparent_70%)]" />
-        <div className="mx-auto grid max-w-[1440px] items-center gap-16 px-6 lg:grid-cols-[1.05fr_0.95fr]">
+      {/* ------------------------------------------ hero: full-bleed brand band */}
+      <section className="hero-band relative isolate overflow-hidden text-white">
+        <div aria-hidden className="hero-grid absolute inset-0 -z-10" />
+        {/* watermark emblem, the way eniris fades its mark behind the headline */}
+        <svg aria-hidden viewBox="0 0 100 100"
+          className="pointer-events-none absolute top-1/2 -left-[16%] -z-10 size-[min(120vw,1100px)] -translate-y-1/2 text-white/[0.07]">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" strokeWidth="9" strokeDasharray="200 40" strokeLinecap="round" transform="rotate(120 50 50)" />
+          <path d="M55 22 L38 54 h12 l-5 24 L64 46 H52 z" fill="currentColor" />
+        </svg>
+
+        <div className="mx-auto grid max-w-[1440px] items-center gap-14 px-6 pt-20 pb-16 md:pt-24 lg:grid-cols-[1.05fr_0.95fr] lg:pt-28 lg:pb-20">
           <div className="animate-rise">
-            <span className="flex items-center gap-3 font-mono text-sm font-semibold tracking-[0.18em] text-brand uppercase">
-              <span className="size-2 rounded-full bg-brand ring-4 ring-brand/20" />EV Battery Intelligence &amp; Certification
+            <span className="flex items-center gap-3 font-mono text-sm font-semibold tracking-[0.18em] text-white/85 uppercase">
+              <span className="size-2 rounded-full bg-white ring-4 ring-white/25" />EV Battery Intelligence &amp; Certification
             </span>
-            <h1 className="mt-7 text-[3.4rem] leading-[1.02] font-bold tracking-tight md:text-[5rem] lg:text-[5.8rem]">
-              Know what the car is<br className="hidden md:block" />
-              <span className="text-gradient">really worth.</span>
+            <h1 className="mt-7 text-[2.9rem] leading-[1.02] font-bold tracking-tight sm:text-[3.6rem] md:text-[5rem] lg:text-[5.8rem]">
+              Know what the car is<br className="hidden md:block" />{' '}
+              <span className="relative inline-block">
+                really worth.
+                <svg aria-hidden viewBox="0 0 300 20" preserveAspectRatio="none" fill="none"
+                  className="absolute -bottom-1 left-0 h-[0.22em] w-full text-white/60 md:-bottom-2">
+                  <path d="M4 14 C 80 5, 170 3, 296 10" stroke="currentColor" strokeWidth="5" strokeLinecap="round"
+                    vectorEffect="non-scaling-stroke" pathLength={1} className="draw-line" />
+                </svg>
+              </span>
             </h1>
-            <p className="mt-8 max-w-[52ch] text-xl text-muted-foreground md:text-2xl md:leading-snug">
+            <p className="mt-8 max-w-[52ch] text-xl text-white/85 md:text-2xl md:leading-snug">
               On an electric car, the battery is half the value — and the odometer tells you nothing about it. RISIQ gives you an independent, verifiable battery report in fifteen minutes, so you can buy, lend and insure with confidence.
             </p>
             <div className="mt-11 flex flex-wrap gap-4">
-              <BriefingModal trigger={<Button size="lg" className="h-14 rounded-lg bg-brand px-9 text-base hover:bg-brand-dark">Book a pilot briefing</Button>} />
+              <BriefingModal trigger={
+                <Button size="lg" className="h-14 rounded-lg bg-white px-9 text-base text-brand shadow-xl hover:bg-white hover:text-brand-dark">Book a pilot briefing</Button>} />
               <CertificateInspector trigger={
-                <Button size="lg" variant="outline" className="h-14 rounded-lg px-9 text-base"><ShieldCheck />Sample certificate demo</Button>} />
+                <Button size="lg" variant="outline" className="h-14 rounded-lg border-white/35 bg-white/10 px-9 text-base text-white hover:border-white hover:bg-white hover:text-brand">
+                  <ShieldCheck />Sample certificate demo
+                </Button>} />
             </div>
-            <p className="mt-8 font-mono text-sm tracking-wide text-muted-foreground">
+            <p className="mt-8 font-mono text-sm tracking-wide text-white/65">
               Part of RISIQ Group · in technology partnership with Eniris
             </p>
           </div>
 
           {/* the product itself — a live card, not a stock photo. Hover to tilt. */}
           <div className="animate-rise-cert relative mx-auto w-full max-w-[520px]">
-            <div aria-hidden className="absolute -inset-12 -z-10 rounded-[3rem] bg-[radial-gradient(closest-side,oklch(0.62_0.21_29/0.14),transparent)] blur-2xl" />
+            <div aria-hidden className="absolute -inset-12 -z-10 rounded-[3rem] bg-[radial-gradient(closest-side,oklch(1_0_0/0.22),transparent)] blur-2xl" />
             <motion.div data-parallax="-6"
               animate={reduce ? undefined : { y: [0, -10, 0] }}
               transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}>
@@ -93,43 +131,53 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mx-auto max-w-[1440px] px-6">
-          <RevealGroup className="mt-20 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {METRICS.map((m) => (
-              <motion.div key={m.k} variants={revealItem}
-                className="glow-card group rounded-2xl border bg-card/80 p-7 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8">
-                <span className="font-mono text-xs tracking-[0.16em] text-muted-foreground uppercase">{m.k}</span>
-                <div className="mt-4 flex items-baseline gap-2">
-                  <span className="font-mono text-4xl font-semibold text-gradient md:text-5xl">
-                    {m.n !== undefined ? <CountUp to={m.n} prefix={m.prefix ?? ''} duration={1100} /> : m.v}
+        {/* audience rail — eniris puts its four segments here; ours are the four seats */}
+        <div className="relative border-t border-white/15 bg-black/10">
+          <ul className="mx-auto grid max-w-[1440px] grid-cols-2 divide-white/10 px-6 md:grid-cols-4 md:divide-x">
+            {QUICK.map(({ id, label, sub, icon: Icon }) => (
+              <li key={id}>
+                <a href="#audience" onClick={pickAudience(id)}
+                  className="group flex items-center gap-4 py-5 pr-4 transition-colors hover:text-white md:justify-center md:py-6">
+                  <Icon className="size-7 shrink-0 text-white/80 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:text-white" strokeWidth={1.6} />
+                  <span className="leading-tight">
+                    <b className="block text-base font-semibold md:text-lg">{label}</b>
+                    <small className="block text-xs text-white/65">{sub}</small>
                   </span>
-                  <span className="font-mono text-base text-muted-foreground">{m.u}</span>
-                </div>
-                <span className="mt-3 block text-[0.95rem] text-muted-foreground">{m.d}</span>
-              </motion.div>
+                  <ArrowRight className="ml-auto size-4 -translate-x-2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:ml-2" />
+                </a>
+              </li>
             ))}
-          </RevealGroup>
+          </ul>
         </div>
       </section>
 
-      {/* ------------------------------------------------ market context */}
-      <Section className="py-16">
-        <RevealGroup className="grid gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-2 lg:grid-cols-4">
-          {STATS.map((s) => (
-            <motion.div key={s.v} variants={revealItem} className="bg-card p-7 transition-colors hover:bg-accent/40">
-              <span className="block font-mono text-3xl font-semibold text-amber tabular md:text-4xl">
-                {s.n !== undefined
-                  ? <CountUp to={s.n} prefix={s.prefix ?? ''} suffix={s.suffix ?? ''} />
-                  : s.v}
-              </span>
-              <span className="mt-3 block text-sm text-muted-foreground">{s.l}</span>
+      <LogoMarquee />
+
+      {/* --------------------------------------------------------- metrics */}
+      <Section className="py-16 md:py-20">
+        <RevealGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {METRICS.map((m) => (
+            <motion.div key={m.k} variants={revealItem}
+              className="glow-card group rounded-2xl border bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8">
+              <span className="font-mono text-xs tracking-[0.16em] text-muted-foreground uppercase">{m.k}</span>
+              <div className="mt-4 flex items-baseline gap-2">
+                <span className="font-mono text-4xl font-semibold text-gradient md:text-5xl">
+                  {m.n !== undefined ? <CountUp to={m.n} prefix={m.prefix ?? ''} duration={1100} /> : m.v}
+                </span>
+                <span className="font-mono text-base text-muted-foreground">{m.u}</span>
+              </div>
+              <span className="mt-3 block text-[0.95rem] text-muted-foreground">{m.d}</span>
             </motion.div>
           ))}
         </RevealGroup>
-        <p className="mt-6 max-w-[80ch] text-sm text-muted-foreground">
-          Powered by the Grand Ethiopian Renaissance Dam — abundant, low-cost hydropower to charge an entire national fleet.
-          <span className="text-muted-foreground/70"> Sources: IEA policy database · UNECA National E-Mobility Strategy 2025–2030.</span>
-        </p>
+      </Section>
+
+      {/* ----------------------------------------------------- what we offer */}
+      <Section className="pt-4">
+        <SectionHead eyebrow="What We Offer" title="Two tests, one certificate, a registry behind it.">
+          Pick the test that fits the decision. Both end in the same signed document, and both work on cars the manufacturer has locked.
+        </SectionHead>
+        <Reveal><ServiceTabs /></Reveal>
       </Section>
 
       {/* ------------------------------------------------- the blind spot */}
@@ -149,14 +197,47 @@ export default function Home() {
       </Section>
 
       {/* ------------------------------------------------ audience router */}
-      <Section>
+      <Section id="audience" muted>
         <SectionHead eyebrow="You Are" title="Who this is for.">
           Every electric car in Addis sits on somebody's books. Pick your seat at the table — the certificate is the same, what it unlocks is not.
         </SectionHead>
         <Reveal><AudienceSwitcher /></Reveal>
       </Section>
 
-      <LogoMarquee />
+      {/* ------------------------------------------- market context + photo */}
+      <Section>
+        <SectionHead eyebrow="Why Ethiopia, Why Now" title="A nation went electric, almost overnight.">
+          Ethiopia has moved faster on EVs than any country in Africa. The cars are already here; the trust layer around their batteries is not.
+        </SectionHead>
+        <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+          <RevealGroup className="grid gap-4 sm:grid-cols-2">
+            {STATS.map((s, i) => (
+              <motion.div key={s.v} variants={revealItem}
+                className={cn('flex flex-col justify-between rounded-2xl p-7 transition-transform duration-300 hover:-translate-y-1', TONES[i].box)}>
+                <span className={cn('block font-mono text-4xl font-semibold tabular md:text-[2.75rem]', TONES[i].num)}>
+                  {s.n !== undefined
+                    ? <CountUp to={s.n} prefix={s.prefix ?? ''} suffix={s.suffix ?? ''} />
+                    : s.v}
+                </span>
+                <span className={cn('mt-5 block text-sm leading-snug', TONES[i].txt)}>{s.l}</span>
+              </motion.div>
+            ))}
+          </RevealGroup>
+          <Reveal delay={0.1} className="relative min-h-[380px] overflow-hidden rounded-2xl border shadow-xl">
+            <img src="img/addis-sunset.jpg" width={1280} height={720} loading="lazy" data-parallax="-5"
+              alt="Addis Ababa skyline at dusk"
+              className="absolute inset-0 size-full scale-[1.12] object-cover" />
+            <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,oklch(0.18_0.03_255/0.92))]" />
+            <div className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
+              <span className="font-mono text-xs tracking-[0.16em] text-amber uppercase">Addis Ababa</span>
+              <p className="mt-2 max-w-[48ch] text-lg leading-snug font-medium md:text-xl">
+                Powered by the Grand Ethiopian Renaissance Dam — abundant, low-cost hydropower to charge an entire national fleet.
+              </p>
+              <p className="mt-3 text-xs text-white/60">Sources: IEA policy database · UNECA National E-Mobility Strategy 2025–2030.</p>
+            </div>
+          </Reveal>
+        </div>
+      </Section>
 
       {/* ------------------------------------------------------ how it works */}
       <Section muted>

@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { motion } from 'motion/react'
 import { Check, X, Minus, Info } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -104,11 +103,11 @@ export function CompareMatrix() {
               </tr>
             </thead>
             <tbody>
+              {/* CSS entrance on mount (project rule): a Motion opacity tween once left these rows invisible */}
               {rows.map((r) => (
-                <motion.tr key={r.capability} layout
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                <tr key={r.capability}
                   onMouseEnter={() => setActive(r.capability)} onMouseLeave={() => setActive(null)}
-                  className={cn('transition-colors', active === r.capability && 'bg-muted/50')}>
+                  className={cn('animate-rise transition-colors', active === r.capability && 'bg-muted/50')}>
                   <th scope="row" className="border-b p-3 text-left align-top font-medium">
                     {r.capability}
                     <span className="mt-1 flex items-start gap-1.5 text-xs font-normal text-muted-foreground">
@@ -130,7 +129,7 @@ export function CompareMatrix() {
                       </td>
                     )
                   })}
-                </motion.tr>
+                </tr>
               ))}
             </tbody>
           </table>

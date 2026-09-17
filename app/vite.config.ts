@@ -23,10 +23,12 @@ export default defineConfig({
     target: 'es2022',
     rollupOptions: {
       output: {
-        // keep the heavy chart and animation code out of the first paint
+        // Vendor groups for long-lived caching. Recharts is deliberately NOT
+        // grouped here: routes are lazy, so it lands in a chunk shared only by
+        // Pilot and Tools. Grouping it pulled shared helpers into that chunk
+        // and made the first paint preload 444 kB of charts.
         manualChunks(id: string) {
           if (!id.includes('node_modules')) return
-          if (id.includes('recharts') || id.includes('/d3-') || id.includes('victory')) return 'charts'
           if (id.includes('motion') || id.includes('framer')) return 'motion'
           if (id.includes('react-router')) return 'router'
           if (id.includes('/react/') || id.includes('/react-dom/')) return 'react'

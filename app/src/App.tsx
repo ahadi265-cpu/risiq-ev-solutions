@@ -1,13 +1,17 @@
+import { lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from '@/components/Layout'
 import Home from '@/pages/Home'
-import Pilot from '@/pages/Pilot'
-import Tools from '@/pages/Tools'
-import Verify from '@/pages/Verify'
-import HowItWorks from '@/pages/HowItWorks'
-import Partners from '@/pages/Partners'
-import About from '@/pages/About'
-import Contact from '@/pages/Contact'
+
+/* Home is eager — it is the first paint. Every other page is its own chunk,
+   so the Recharts bundle only loads when Pilot or Tools is actually opened. */
+const Pilot = lazy(() => import('@/pages/Pilot'))
+const Tools = lazy(() => import('@/pages/Tools'))
+const Verify = lazy(() => import('@/pages/Verify'))
+const HowItWorks = lazy(() => import('@/pages/HowItWorks'))
+const Partners = lazy(() => import('@/pages/Partners'))
+const About = lazy(() => import('@/pages/About'))
+const Contact = lazy(() => import('@/pages/Contact'))
 
 export default function App() {
   return (

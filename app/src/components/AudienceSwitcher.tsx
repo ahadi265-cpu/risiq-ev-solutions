@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { Building2, Landmark, Ship, Scale, ArrowRight, Check } from 'lucide-react'
@@ -40,6 +40,15 @@ const AUDIENCES: Audience[] = [
 
 export function AudienceSwitcher() {
   const [id, setId] = useState(AUDIENCES[0].id)
+  // the hero's audience rail preselects a seat via a window event — no prop drilling
+  useEffect(() => {
+    const on = (e: Event) => {
+      const d = (e as CustomEvent<string>).detail
+      if (AUDIENCES.some((a) => a.id === d)) setId(d)
+    }
+    window.addEventListener('risiq:audience', on)
+    return () => window.removeEventListener('risiq:audience', on)
+  }, [])
   const a = AUDIENCES.find((x) => x.id === id)!
   const Icon = a.icon
 

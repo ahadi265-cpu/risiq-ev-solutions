@@ -261,3 +261,54 @@
     .orb, .glow-card::before, .dash-run { animation: none; }
   }
 }
+
+/* ==========================================================================
+   Reveals — CSS-driven, observer-started (components/Reveal.tsx). Unlayered on
+   purpose so the pre-reveal state wins over utilities; the end state is the
+   element's own styles, never a declaration here, so hover transforms and
+   Motion inline transforms keep working after the entrance.
+   ========================================================================== */
+.reveal:not([data-in]),
+.reveal-group:not([data-in]) > .reveal-item {
+  opacity: 0;
+  transform: translateY(var(--reveal-y, 22px));
+}
+.reveal[data-in],
+.reveal-group[data-in] > .reveal-item {
+  animation: reveal-rise 0.65s var(--reveal-delay, 0s) cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+@keyframes reveal-rise {
+  from { opacity: 0; transform: translateY(var(--reveal-y, 22px)); }
+}
+@media (prefers-reduced-motion: reduce), print {
+  .reveal:not([data-in]),
+  .reveal-group:not([data-in]) > .reveal-item { opacity: 1; transform: none; }
+  .reveal[data-in],
+  .reveal-group[data-in] > .reveal-item { animation: none; }
+}
+
+/* ---------- eniris-style chrome: hero band, dropdown entrance, drawn underline */
+@layer utilities {
+  .hero-band {
+    background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 58%, oklch(0.56 0.21 29) 100%);
+  }
+  .hero-grid {
+    background-image:
+      linear-gradient(oklch(1 0 0 / 0.09) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(1 0 0 / 0.09) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(75% 85% at 62% 40%, #000 20%, transparent 100%);
+    mask-image: radial-gradient(75% 85% at 62% 40%, #000 20%, transparent 100%);
+  }
+  @keyframes drop { from { opacity: 0; transform: translateY(-8px); } }
+  .animate-drop { animation: drop 0.25s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  /* a stroke that draws itself once: pathLength="1" on the path */
+  .draw-line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw-line 1.2s 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  @keyframes draw-line { to { stroke-dashoffset: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-drop { animation: none; }
+    .draw-line { animation: none; stroke-dashoffset: 0; }
+  }
+}
