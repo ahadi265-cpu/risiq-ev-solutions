@@ -44,6 +44,7 @@ The site is hosted on **GitHub Pages** (static host), but MUST feel like a dynam
 
 # Design System Guidelines
 - **Brand palette (decided 2026-09):** RISIQ is a white-and-red brand, like eniris.com. The default theme follows risiqbs.com: warm white ground `#fefcfa`, neutral greys `#f5f5f5` / `#d4d4d4`, brand red `#e2231a` with `#b81a13` on hover, red glow orbs (no teal/cyan in the atmosphere), teal `#0d9488` for measured/positive data, amber `#b45309` for warnings and highlights, and grade colours A–D. A full dark theme (`.dark`, ground `oklch(0.178 0.022 258)`) ships behind the header toggle and is persisted in `localStorage['risiq-theme']`. Do **not** repaint the default to a dark neon palette — that direction was tried and rejected as off-brand.
+- **Hero (owner-approved 2026-09-17):** the Home hero is a full-bleed brand-red band with white type — RISIQ Group is a red-and-white brand, so keep it red. Do not revert to the white hero.
 - **Chrome (eniris.com scale):** full-width sticky header, logo `h-14`, bold `~1rem` nav, red "Register" button, 5px brand-red rule under the header; hero headline `~5.8rem` with a live certificate card; dark slate footer with the same red rule.
 - **Surfaces:** subtle glassmorphic cards (`.glass`, `backdrop-blur`) on both themes; `.bg-grid` texture behind heroes and feature panels.
 - **Typography:** modern sans-serif with crisp hierarchy and tabular numbers for every metric.
