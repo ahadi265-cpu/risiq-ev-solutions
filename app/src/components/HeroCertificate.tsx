@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useMotionValue, useSpring, useMotionTemplate, useReducedMotion } from 'motion/react'
 import { ShieldCheck, Zap } from 'lucide-react'
 import { CERTIFICATES, hashStr, mulberry32 } from '@/lib/data'
+import { Benchmark } from '@/components/Benchmark'
 import { cn } from '@/lib/utils'
 
 const ID = 'RISIQ-0001'
@@ -137,6 +138,8 @@ export function HeroCertificate({ className }: { className?: string }) {
             </div>
           ))}
         </dl>
+
+        <Benchmark level={CERT.benchmark} vehicle={CERT.vehicle} compact />
 
         <footer className="flex items-end justify-between gap-4">
           <div className="flex items-center gap-3">

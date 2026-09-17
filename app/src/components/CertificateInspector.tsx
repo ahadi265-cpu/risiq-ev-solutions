@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { CellHeatmap } from '@/components/CellHeatmap'
 import { SohGauge } from '@/components/HeroCertificate'
 import { CERTIFICATES } from '@/lib/data'
+import { Benchmark } from '@/components/Benchmark'
 import { cn } from '@/lib/utils'
 
 const IDS = Object.keys(CERTIFICATES)
@@ -64,6 +65,7 @@ export function CertificateInspector({ trigger }: { trigger: ReactNode }) {
                   </div>
                 ))}
               </dl>
+              <Benchmark level={cert.benchmark} vehicle={cert.vehicle} />
               <div className="grid gap-2">
                 <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">Anomaly flags</span>
                 {cert.flags.length === 0

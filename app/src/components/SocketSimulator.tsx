@@ -104,7 +104,7 @@ export function SocketSimulator({ className }: { className?: string }) {
             {/* charge port */}
             <rect x="94" y="72" width="16" height="16" rx="3" fill={mode === 'socket' ? 'var(--teal)' : 'var(--muted)'} stroke="var(--border)" />
             <text x="102" y="106" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="7.5" fill="var(--muted-foreground)" letterSpacing="1">CHARGE PORT</text>
-            <text x="102" y="160" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--muted-foreground)" letterSpacing="1">BYD · CHANGAN · JETOUR</text>
+            <text x="102" y="160" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--muted-foreground)" letterSpacing="1">BYD ATTO 3 · DOLPHIN · SONG PLUS</text>
           </g>
 
           {/* OBD path: dongle under the dash, request refused */}

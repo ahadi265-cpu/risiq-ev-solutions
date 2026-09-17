@@ -9,6 +9,7 @@ import { Reveal } from '@/components/Reveal'
 import { cn } from '@/lib/utils'
 import { CERTIFICATES, hashStr } from '@/lib/data'
 import { CellHeatmap } from '@/components/CellHeatmap'
+import { Benchmark } from '@/components/Benchmark'
 
 const STEPS = [
   'Locating certificate in the registry',
@@ -85,7 +86,7 @@ export default function Verify() {
               <span key={id}>
                 <button type="button" onClick={() => { setQuery(id); run(id) }}
                   className="cursor-pointer font-semibold text-primary underline-offset-4 hover:underline">
-                  Grade {c.grade} ({id})
+                  {c.vehicle} · Grade {c.grade}
                 </button>
                 {i < arr.length - 1 && <span className="mx-2 text-border">|</span>}
               </span>
@@ -179,6 +180,8 @@ function CertCard({ id, cert }: { id: string; cert: typeof CERTIFICATES[string] 
           </ul>
         )}
       </div>
+
+      <Benchmark level={cert.benchmark} vehicle={`${cert.vehicle} · ${cert.year}`} />
 
       <CellHeatmap id={id} soh={soh} />
 

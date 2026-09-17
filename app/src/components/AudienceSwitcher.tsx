@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { Building2, Landmark, Ship, Scale, ArrowRight, Check } from 'lucide-react'
+import { Building2, Landmark, Ship, Scale, ArrowRight, Check, CarFront } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -12,6 +12,12 @@ type Audience = {
 }
 
 const AUDIENCES: Audience[] = [
+  { id: 'buyers', label: 'Buyers & sellers', icon: CarFront,
+    title: 'Buying or selling a used BYD? Ask for the certificate.',
+    body: 'A used Atto 3 or Dolphin is priced on mileage and paintwork — the battery, half the car’s value, stays invisible. A RISIQ certificate makes it visible: one scan shows the buyer the measured, calibrated health, and the seller gets a faster sale at a fair price.',
+    points: ['Scan the QR code on any listing to confirm it is genuine', 'The same A–D grade a bank or insurer reads', 'Certified cars sell faster, with fewer disputes after the handshake'],
+    stat: { v: '50%', k: 'of a used EV’s value is the battery' },
+    cta: { to: '/verify', label: 'Verify a certificate' } },
   { id: 'insurers', label: 'Insurers', icon: Building2,
     title: 'Price the risk you already carry.',
     body: 'Every EV policy in Addis is underwritten blind to the battery — the single most expensive part to replace. A measured state of health at underwriting, and again at claim, turns that unknown into a number.',

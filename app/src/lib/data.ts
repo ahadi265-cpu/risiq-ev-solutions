@@ -77,18 +77,28 @@ export const PILOT: PilotRow[] = [
 ]
 
 export type Flag = { level: 'notice' | 'warning'; text: string }
+export type Benchmark = 'below' | 'average' | 'above'
 export const CERTIFICATES: Record<string, {
-  vehicle: string; testType: string; testDate: string; stateOfHealth: number
-  grade: Grade; usableCapacityKwh: number; estimatedRangeKm: number; location: string; status: string
-  flags: Flag[]
+  vehicle: string; year: number; testType: string; testDate: string; stateOfHealth: number
+  grade: Grade; usableCapacityKwh: number; nominalKwh: number; estimatedRangeKm: number; location: string; status: string
+  benchmark: Benchmark; flags: Flag[]
 }> = {
-  'RISIQ-0001': { vehicle: 'BYD Atto 3', testType: 'Reference Test', testDate: '2026-06-18', stateOfHealth: 94, grade: 'A', usableCapacityKwh: 57.8, estimatedRangeKm: 402, location: 'Addis Ababa, Ethiopia', status: 'Valid', flags: [] },
-  'RISIQ-0002': { vehicle: 'Changan Lumin', testType: 'Rapid Check', testDate: '2026-07-02', stateOfHealth: 86, grade: 'B', usableCapacityKwh: 25.6, estimatedRangeKm: 251, location: 'Addis Ababa, Ethiopia', status: 'Valid',
+  /* All three samples are BYD — the fleet Ethiopia actually has. */
+  'RISIQ-0001': { vehicle: 'BYD Atto 3', year: 2024, testType: 'Reference Test', testDate: '2026-06-18', stateOfHealth: 94, grade: 'A', usableCapacityKwh: 57.8, nominalKwh: 60.5, estimatedRangeKm: 402, location: 'Addis Ababa, Ethiopia', status: 'Valid', benchmark: 'above', flags: [] },
+  'RISIQ-0002': { vehicle: 'BYD Dolphin', year: 2023, testType: 'Rapid Check', testDate: '2026-07-02', stateOfHealth: 86, grade: 'B', usableCapacityKwh: 38.6, nominalKwh: 44.9, estimatedRangeKm: 348, location: 'Addis Ababa, Ethiopia', status: 'Valid', benchmark: 'average',
     flags: [{ level: 'notice', text: 'Rapid Check on a partial charge window — confidence band ±6% rather than ±3%' }] },
-  'RISIQ-0003': { vehicle: 'Jetour Ice Cream EV', testType: 'Reference Test', testDate: '2026-07-14', stateOfHealth: 71, grade: 'C', usableCapacityKwh: 20.4, estimatedRangeKm: 165, location: 'Addis Ababa, Ethiopia', status: 'Valid',
+  'RISIQ-0003': { vehicle: 'BYD Yuan Plus', year: 2022, testType: 'Reference Test', testDate: '2026-07-14', stateOfHealth: 71, grade: 'C', usableCapacityKwh: 43.0, nominalKwh: 60.5, estimatedRangeKm: 305, location: 'Addis Ababa, Ethiopia', status: 'Valid', benchmark: 'below',
     flags: [{ level: 'warning', text: 'Capacity below the 80% manufacturer warranty floor' },
             { level: 'warning', text: 'Cell spread above 4 pp between weakest and strongest module' }] },
 }
+
+/** What each grade means in plain language — the same scale on every certificate. */
+export const GRADES: { g: Grade; range: string; title: string; meaning: string }[] = [
+  { g: 'A', range: '92–100%', title: 'Like new', meaning: 'Full value. Nothing to price in.' },
+  { g: 'B', range: '85–92%', title: 'Healthy', meaning: 'Normal wear for its age and mileage.' },
+  { g: 'C', range: '78–85%', title: 'Watch', meaning: 'Price the battery in, and re-test at 12 months.' },
+  { g: 'D', range: 'below 78%', title: 'Below the floor', meaning: 'Under the manufacturer warranty floor. Repair or replace before lending or insuring.' },
+]
 
 export const fmt = (n: number, d = 0) =>
   n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })

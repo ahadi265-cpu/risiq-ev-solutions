@@ -33,7 +33,7 @@ const SERVICES: Service[] = [
     kicker: 'Signed · QR-verified · public',
     title: 'One document anyone can check in two seconds.',
     body: 'Each certificate is cryptographically signed at issue and published to the RISIQ registry. The QR code on the printed copy resolves to the original record, so nobody has to take a PDF at face value.',
-    points: ['Health score, grade, usable capacity and estimated range', 'Any edit to the document breaks verification', 'A permanent link you can embed in a listing or a loan file', 'Anomaly flags carried on the record, not hidden in a footnote'],
+    points: ['Health score, grade, usable capacity and estimated range', 'A benchmark against comparable BYDs in our calibrated database', 'Any edit to the document breaks verification', 'A badge and permanent link you can embed in a listing or a loan file', 'Anomaly flags carried on the record, not hidden in a footnote'],
     facts: [['Verify in', '< 2 s'], ['Tamper', 'Evident'], ['Access', 'Public']],
     cta: { to: '/verify', label: 'Try the live verification' } },
   { id: 'fleet', tab: 'Fleet Programme', icon: Repeat,
@@ -73,17 +73,23 @@ function Visual({ id }: { id: Service['id'] }) {
   }
   if (id === 'registry') {
     return (
-      <div className="grid justify-items-center gap-5">
-        <div className="relative rounded-2xl border bg-card p-5 shadow-xl">
-          <span className="block size-36 text-ink dark:text-foreground"><QrMark seed="RISIQ-0001" /></span>
-          <span className="absolute -top-3 -right-3 grid size-10 place-items-center rounded-full border-2 border-grade-a bg-card text-grade-a shadow" title="Signed">
-            <ShieldCheck className="size-5" />
-          </span>
+      <div className="grid w-full justify-items-center gap-4">
+        {/* how the certificate shows up inside a used-car listing */}
+        <div className="w-full max-w-[400px] rounded-2xl border bg-card p-4 shadow-xl">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>Used car listing · Bole, Addis Ababa</span><span className="font-mono">2024 · 18,400 km</span>
+          </div>
+          <b className="mt-1 block text-base">BYD Atto 3 — Extended Range</b>
+          <div className="mt-3 flex items-center gap-3 rounded-xl border border-grade-a/30 bg-grade-a/8 p-3">
+            <span className="size-14 shrink-0 text-ink dark:text-foreground"><QrMark seed="RISIQ-0001" /></span>
+            <div className="min-w-0 leading-tight">
+              <span className="flex items-center gap-1.5 font-mono text-[0.62rem] tracking-wider text-grade-a uppercase"><ShieldCheck className="size-3.5" />RISIQ certified</span>
+              <b className="mt-0.5 block text-lg">94% · Grade A</b>
+              <span className="block text-xs text-muted-foreground">Above average for Atto 3 · scan to verify</span>
+            </div>
+          </div>
         </div>
-        <div className="text-center leading-tight">
-          <span className="block font-mono text-xs text-teal">risiqevsolutions.com/v/RISIQ-0001</span>
-          <span className="mt-1 block text-xs text-muted-foreground">Scan · verify · done</span>
-        </div>
+        <span className="font-mono text-xs text-teal">risiqevsolutions.com/v/RISIQ-0001</span>
       </div>
     )
   }

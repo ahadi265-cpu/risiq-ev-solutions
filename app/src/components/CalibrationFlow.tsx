@@ -27,7 +27,7 @@ export function CalibrationFlow({ className }: { className?: string }) {
           {/* inputs */}
           <g transform="translate(28 48)">
             <rect width="196" height="86" rx="12" fill="var(--card)" stroke="var(--border)" />
-            <text x="16" y="24" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--muted-foreground)" letterSpacing="1.4">CAR BMS READING</text>
+            <text x="16" y="24" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--muted-foreground)" letterSpacing="1.4">CAR BMS READING · BYD ATTO 3</text>
             <text x="16" y="56" fontFamily="var(--font-mono)" fontSize="24" fontWeight="600" fill="var(--amber)">91%</text>
             <text x="16" y="74" fontFamily="var(--font-mono)" fontSize="8" fill="var(--muted-foreground)">self-reported · uncalibrated</text>
           </g>

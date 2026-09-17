@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import {
   Plug, Crosshair, Timer, ShieldCheck, ArrowRight, QrCode, ScanLine, Cpu, FileCheck2, Lock,
-  Building2, Landmark, Ship, Scale,
+  Building2, Landmark, Ship, Scale, CarFront, BadgeCheck,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -20,6 +20,7 @@ import { SocketSimulator } from '@/components/SocketSimulator'
 import { AudienceSwitcher } from '@/components/AudienceSwitcher'
 import { ServiceTabs } from '@/components/ServiceTabs'
 import { CalibrationFlow } from '@/components/CalibrationFlow'
+import { BydFocus, GradeLegend } from '@/components/BydFocus'
 import { cn } from '@/lib/utils'
 
 const CAPS = [
@@ -61,6 +62,7 @@ const STEPS = [
 
 /* The hero's audience rail — the same four seats the switcher below offers. */
 const QUICK = [
+  { id: 'buyers', label: 'Buyers & sellers', sub: 'Ask for the certificate', icon: CarFront },
   { id: 'insurers', label: 'Insurers', sub: 'Price the risk you carry', icon: Building2 },
   { id: 'banks', label: 'Banks & MFIs', sub: 'Collateral you can model', icon: Landmark },
   { id: 'importers', label: 'Importers', sub: 'Prove the pack on arrival', icon: Ship },
@@ -105,8 +107,15 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-8 max-w-[52ch] text-xl text-white/85 md:text-2xl md:leading-snug">
-              On an electric car, the battery is half the value — and the odometer tells you nothing about it. RISIQ gives you an independent, verifiable battery report in fifteen minutes, so you can buy, lend and insure with confidence.
+              On an electric car, the battery is half the value — and the odometer tells you nothing about it. RISIQ certifies the batteries of BYD and other Chinese EVs on Ethiopian roads: an independent, verifiable report in fifteen minutes, so you can buy, lend and insure with confidence.
             </p>
+            <ul className="mt-7 flex flex-wrap gap-2" aria-label="Why RISIQ">
+              {['Independent — no OEM tool needed', 'Built for BYD & Chinese imports', 'QR-verified in under 2 s', 'Made in Addis Ababa'].map((t) => (
+                <li key={t} className="flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90">
+                  <BadgeCheck className="size-3.5" />{t}
+                </li>
+              ))}
+            </ul>
             <div className="mt-11 flex flex-wrap gap-4">
               <BriefingModal trigger={
                 <Button size="lg" className="h-14 rounded-lg bg-white px-9 text-base text-brand shadow-xl hover:bg-white hover:text-brand-dark">Book a pilot briefing</Button>} />
@@ -136,14 +145,14 @@ export default function Home() {
 
         {/* audience rail — eniris puts its four segments here; ours are the four seats */}
         <div className="relative border-t border-white/15 bg-black/10">
-          <ul className="mx-auto grid max-w-[1440px] grid-cols-2 divide-white/10 px-6 md:grid-cols-4 md:divide-x">
+          <ul className="mx-auto grid max-w-[1440px] grid-cols-2 divide-white/10 px-6 md:grid-cols-5 md:divide-x">
             {QUICK.map(({ id, label, sub, icon: Icon }) => (
               <li key={id}>
                 <a href="#audience" onClick={pickAudience(id)}
                   className="group flex items-center gap-4 rounded-lg py-5 pr-4 outline-none transition-colors hover:text-white focus-visible:ring-[3px] focus-visible:ring-white/60 md:justify-center md:py-6">
                   <Icon className="size-7 shrink-0 text-white/80 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:text-white" strokeWidth={1.6} />
                   <span className="leading-tight">
-                    <b className="block text-base font-semibold md:text-lg">{label}</b>
+                    <b className="block text-base font-semibold md:text-[1.05rem]">{label}</b>
                     <small className="block text-xs text-white/65">{sub}</small>
                   </span>
                   <ArrowRight className="ml-auto size-4 -translate-x-2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:ml-2" />
@@ -175,8 +184,16 @@ export default function Home() {
         </RevealGroup>
       </Section>
 
-      {/* ----------------------------------------------------- what we offer */}
+      {/* ------------------------------------------- the fleet Ethiopia has */}
       <Section className="pt-4">
+        <SectionHead eyebrow="Built For Ethiopia’s Fleet" title="Made for the cars on Ethiopian roads. BYD first.">
+          Most electric cars in Addis are BYDs, locked to the manufacturer’s tools. RISIQ was designed around them — and works on every other EV that charges.
+        </SectionHead>
+        <Reveal><BydFocus /></Reveal>
+      </Section>
+
+      {/* ----------------------------------------------------- what we offer */}
+      <Section muted>
         <SectionHead eyebrow="What We Offer" title="Two tests, one certificate, a registry behind it.">
           Pick the test that fits the decision. Both end in the same signed document, and both work on cars the manufacturer has locked.
         </SectionHead>
@@ -184,7 +201,7 @@ export default function Home() {
       </Section>
 
       {/* ------------------------------------------------- the blind spot */}
-      <Section muted>
+      <Section>
         <SectionHead eyebrow="The Blind Spot" title="Two cars. Same mileage. Very different value.">
           Electric motors barely wear out. Batteries do — and they are roughly half what the car is worth. Two cars can show the same number on the dash and be thousands of dollars apart.
         </SectionHead>
@@ -192,7 +209,7 @@ export default function Home() {
       </Section>
 
       {/* ------------------------------------------- socket vs OBD simulator */}
-      <Section>
+      <Section muted>
         <SectionHead eyebrow="Why The Socket" title="Locked cars can refuse a question. They cannot refuse electricity.">
           Most EVs arriving in Ethiopia encrypt the diagnostic port a normal reader depends on. RISIQ measures at the plug — and where the car does share its own battery data, every reading is cross-checked against our calibrated database. Switch between the two methods to see the difference.
         </SectionHead>
@@ -324,6 +341,10 @@ export default function Home() {
                 </li>
               ))}
             </ul>
+            <div className="mt-8">
+              <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted-foreground uppercase">What the grade means</span>
+              <GradeLegend className="mt-3" />
+            </div>
             <Button asChild className="mt-8"><Link to="/verify"><QrCode />Try the live verification demo</Link></Button>
           </Reveal>
           <Reveal delay={0.1}>
