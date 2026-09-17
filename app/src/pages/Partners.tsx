@@ -84,7 +84,7 @@ export default function Partners() {
                       <CardContent>
                         <Badge variant="outline" className="border-teal/30 text-teal">Why it changes things</Badge>
                         <p className="mt-4 text-sm text-muted-foreground">
-                          A signed, independently measured state-of-health figure — not a self-reported BMS number — gives your team a real variable to work with, on the exact locked, imported EVs already on Ethiopian roads.
+                          A signed, independently measured and calibrated state-of-health figure — not a raw self-reported BMS number — gives your team a real variable to work with, on the exact locked, imported EVs already on Ethiopian roads.
                         </p>
                       </CardContent>
                     </Card>

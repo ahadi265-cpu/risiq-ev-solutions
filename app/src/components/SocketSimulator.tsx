@@ -7,15 +7,15 @@ type Mode = 'obd' | 'socket'
 
 const MODES: Record<Mode, { label: string; tag: string; ok: boolean; headline: string; body: string; readout: string }> = {
   obd: {
-    label: 'Standard OBD reader', tag: 'Blocked / encrypted on BYD, Changan', ok: false,
-    headline: 'The dongle asks the car for a number. The car says no.',
-    body: 'An OBD reader requests the battery computer’s own estimate over a diagnostic port. Most Chinese imports encrypt that channel — without the manufacturer’s tool, the reader gets nothing. Where it does answer, the figure is the car’s opinion of itself.',
+    label: 'Standard OBD reader', tag: 'Often blocked · never taken at face value', ok: false,
+    headline: 'The dongle asks the car for a number. We never take that number as the verdict.',
+    body: 'An OBD reader requests the battery computer’s own estimate over a diagnostic port. Many Chinese imports encrypt that channel, so a reader alone gets nothing. Where the car does answer, RISIQ records the BMS figure — then cross-checks it against our own calibrated database of measured packs before it can influence a certificate.',
     readout: '— — . —',
   },
   socket: {
     label: 'RISIQ socket measurement', tag: 'Works on every EV that charges', ok: true,
     headline: 'We measure the electricity itself. Every car has to accept it.',
-    body: 'RISIQ sits in line at the charging socket and meters the energy actually crossing into the pack with a Class 0.5S revenue-grade meter, sampled once a second. Nothing is asked of the car, so nothing can be encrypted, locked or optimistic.',
+    body: 'RISIQ sits in line at the charging socket and meters the energy actually crossing into the pack with a Class 0.5S revenue-grade meter, sampled once a second. Nothing is asked of the car, so nothing can be encrypted, locked or optimistic — and this is the reference every BMS reading is calibrated against.',
     readout: '',
   },
 }

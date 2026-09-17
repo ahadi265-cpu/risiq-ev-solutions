@@ -60,7 +60,7 @@ export function AudienceSwitcher() {
           const on = x.id === id
           return (
             <button key={x.id} role="tab" type="button" aria-selected={on} onClick={() => setId(x.id)}
-              className={cn('relative cursor-pointer rounded-full px-4 py-2 text-sm font-medium transition-colors',
+              className={cn('relative cursor-pointer rounded-full px-4 py-2 text-sm font-medium outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50',
                 on ? 'text-foreground' : 'text-muted-foreground hover:text-foreground')}>
               {/* transform-only shared-layout pill; text stays visible regardless */}
               {on && <motion.span layoutId="aud-pill" aria-hidden

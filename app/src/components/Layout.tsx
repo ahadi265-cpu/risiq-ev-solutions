@@ -72,7 +72,7 @@ function NavDropdown({ group }: { group: Group }) {
               const Icon = i.icon!
               return (
                 <NavLink key={i.to} to={i.to}
-                  className={({ isActive }) => cn('group flex gap-3 rounded-xl p-3.5 transition-colors hover:bg-accent', isActive && 'bg-accent')}>
+                  className={({ isActive }) => cn('group flex gap-3 rounded-xl p-3.5 outline-none transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50', isActive && 'bg-accent')}>
                   <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
                     <Icon className="size-5" />
                   </span>
@@ -163,6 +163,7 @@ function VerifyBox() {
 export function Layout() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const progress = useRef<HTMLDivElement>(null)
   const { pathname, hash } = useLocation()
   useGsapReveal()
   usePageMeta()
@@ -174,7 +175,12 @@ export function Layout() {
   }, [pathname, hash])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    const onScroll = () => {
+      setScrolled(window.scrollY > 24)
+      // reading progress, painted into the brand rule (transform-only)
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      if (progress.current) progress.current.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`
+    }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -182,6 +188,7 @@ export function Layout() {
 
   return (
     <div className="min-h-dvh flex flex-col">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-brand focus:px-4 focus:py-2 focus:font-semibold focus:text-white">Skip to content</a>
       <AmbientOrbs />
       <header className={cn('glass sticky top-0 z-40 transition-shadow duration-300 print:static', scrolled ? 'shadow-md' : 'shadow-sm')}>
         <nav aria-label="Primary" className={cn('mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-6 transition-[padding] duration-300', scrolled ? 'py-2' : 'py-3 md:py-4')}>
@@ -207,12 +214,17 @@ export function Layout() {
             </Button>
           </div>
         </nav>
-        <div aria-hidden className="brand-rule h-[5px]" />
+        <div aria-hidden className="brand-rule relative h-[5px] overflow-hidden">
+          <div ref={progress} className="absolute inset-y-0 left-0 w-full origin-left bg-white/40 will-change-transform" style={{ transform: 'scaleX(0)' }} />
+        </div>
         {open && <MobileMenu onPick={() => setOpen(false)} />}
       </header>
 
-      <main className="flex-1">
-        <Suspense fallback={<PageFallback />}><Outlet /></Suspense>
+      <main id="main" className="flex-1">
+        {/* keyed remount + CSS entrance: a soft page transition between routes */}
+        <div key={pathname} className="animate-rise">
+          <Suspense fallback={<PageFallback />}><Outlet /></Suspense>
+        </div>
       </main>
 
       <footer className="dark relative mt-28 overflow-hidden bg-background text-foreground">

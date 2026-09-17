@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { Plug, ScanLine, Cpu, FileCheck2, CircuitBoard, WifiOff, Check, X, QrCode } from 'lucide-react'
+import { Plug, ScanLine, Cpu, FileCheck2, CircuitBoard, WifiOff, Check, Minus, QrCode, Database } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -13,8 +13,8 @@ import { cn } from '@/lib/utils'
 
 const STEPS = [
   { icon: Plug, n: '01', t: 'Plug in', d: 'An operator connects the rig at a workshop, importer yard or fleet depot — in line between the charge source and the vehicle socket. Nothing is installed on the car.' },
-  { icon: ScanLine, n: '02', t: 'Measure', d: 'A Class 0.5S revenue-grade meter samples voltage and current at 1 Hz on the charge path, while an opportunistic OBD logger reads whatever standard PIDs the vehicle happens to expose.' },
-  { icon: Cpu, n: '03', t: 'Compute', d: 'The cloud integrates delivered power over true elapsed time, corrects for charger conversion losses, and extrapolates usable capacity from the measured state-of-charge window.' },
+  { icon: ScanLine, n: '02', t: 'Measure', d: 'A Class 0.5S revenue-grade meter samples voltage and current at 1 Hz on the charge path, while the vehicle’s own battery-computer (BMS) data is collected wherever the car allows it.' },
+  { icon: Cpu, n: '03', t: 'Calibrate', d: 'The energy that actually went in is counted and set against the car’s own reading. Every BMS figure is cross-checked against RISIQ’s calibrated database of measured packs and corrected before a state of health is computed.' },
   { icon: FileCheck2, n: '04', t: 'Certify', d: 'Once the result clears every quality gate, a signed, QR-verifiable certificate is issued on the spot — capacity, range, grade and confidence band included.' },
 ]
 
@@ -23,6 +23,7 @@ const GATES = [
   'No unexplained gaps greater than 5 seconds in the integrated series.',
   'Pack and ambient temperature inside a defined valid band, or flagged.',
   'Computed state of health within a plausible 40–105%, else routed to manual review.',
+  'BMS reading within the calibrated band for that pack family, or the deviation is flagged on the certificate.',
 ]
 
 export default function HowItWorks() {
@@ -70,20 +71,20 @@ export default function HowItWorks() {
       </Section>
 
       <Section>
-        <SectionHead eyebrow="Why Socket-Side, Not BMS-Reported" title="Many locked imports report a number no one can check.">
-          A BMS-reported figure is opaque, vendor-defined and frequently optimistic. Measuring real delivered energy at the connector gives an independent, physically grounded number — the one a bank or insurer can actually underwrite.
+        <SectionHead eyebrow="BMS Reading, Calibrated" title="The car’s own number is an input, not the verdict.">
+          A BMS figure is a software estimate — vendor-defined, seldom recalibrated and often optimistic. RISIQ still collects it, then cross-checks it against our own calibrated database and against the energy we actually measured at the socket. Only the calibrated result reaches the certificate.
         </SectionHead>
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-3">
           <Reveal>
-            <Card className="h-full border-destructive/25 bg-destructive/5">
+            <Card className="h-full border-amber/30 bg-amber/6">
               <CardContent>
-                <span className="grid size-10 place-items-center rounded-xl bg-destructive/10 text-destructive"><CircuitBoard className="size-5" /></span>
+                <span className="grid size-10 place-items-center rounded-xl bg-amber/10 text-amber"><CircuitBoard className="size-5" /></span>
                 <h3 className="mt-4 text-lg font-semibold">Reading the car's computer</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  The common method asks the battery's own computer over the OBD port. That computer can read optimistically — or be reset to hide damage — and Chinese EVs encrypt it. No password, no reading.
+                  We read the battery's own computer wherever the car allows it. But that computer can read optimistically — or be reset to hide damage — and many Chinese imports encrypt it. On its own, it is not a number a bank can underwrite.
                 </p>
-                <span className="mt-4 flex items-center gap-2 text-sm font-semibold text-destructive">
-                  <X className="size-4" strokeWidth={3} />Blind on Ethiopia's locked imports
+                <span className="mt-4 flex items-center gap-2 text-sm font-semibold text-amber">
+                  <Minus className="size-4" strokeWidth={3} />Collected — never trusted on its own
                 </span>
               </CardContent>
             </Card>
@@ -94,10 +95,24 @@ export default function HowItWorks() {
                 <span className="grid size-10 place-items-center rounded-xl bg-teal/10 text-teal"><ScanLine className="size-5" /></span>
                 <h3 className="mt-4 text-lg font-semibold">Measuring the electricity</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  RISIQ runs a controlled charge at the socket and measures the real energy flowing in with a precision meter. Electricity behaves the same in every car — so the test works on any locked, imported EV.
+                  RISIQ runs a controlled charge at the socket and counts the real energy flowing in with a precision meter. Electricity behaves the same in every car — so the test works on any locked, imported EV, and it is the reference the car's own reading is calibrated against.
                 </p>
                 <span className="mt-4 flex items-center gap-2 text-sm font-semibold text-teal">
                   <Check className="size-4" strokeWidth={3} />Works on every EV — no OEM access
+                </span>
+              </CardContent>
+            </Card>
+          </Reveal>
+          <Reveal delay={0.16}>
+            <Card className="h-full border-brand/25 bg-brand-soft/60">
+              <CardContent>
+                <span className="grid size-10 place-items-center rounded-xl bg-brand/10 text-brand"><Database className="size-5" /></span>
+                <h3 className="mt-4 text-lg font-semibold">Cross-checked against our database</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Every BMS reading is compared with RISIQ's own calibrated database of measured packs and corrected. What we measured at the socket is the reference; the database is the memory that makes each new reading sharper.
+                </p>
+                <span className="mt-4 flex items-center gap-2 text-sm font-semibold text-brand">
+                  <Check className="size-4" strokeWidth={3} />Calibrated before it reaches the certificate
                 </span>
               </CardContent>
             </Card>

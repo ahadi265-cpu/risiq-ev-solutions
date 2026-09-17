@@ -312,3 +312,16 @@
     .draw-line { animation: none; stroke-dashoffset: 0; }
   }
 }
+
+/* ---------- polish pass: smooth anchors, hero depth */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@layer utilities {
+  .hero-orb {
+    background: radial-gradient(circle at 50% 50%, oklch(1 0 0 / 0.16), transparent 65%);
+    filter: blur(70px); will-change: transform;
+    animation: drift 24s ease-in-out infinite alternate;
+  }
+  .hero-orb-b { background: radial-gradient(circle at 50% 50%, oklch(0.3 0.12 29 / 0.35), transparent 65%); animation-duration: 30s; animation-delay: -9s; }
+  @media (prefers-reduced-motion: reduce) { .hero-orb { animation: none; } }
+}

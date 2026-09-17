@@ -19,14 +19,14 @@ const SERVICES: Service[] = [
     kicker: '15 minutes · at your site',
     title: 'A certificate in the time it takes to charge a phone.',
     body: 'The Rapid Check runs a short, controlled charge window at the socket and issues a signed certificate on the spot. It is the everyday test for showrooms, depots and loan origination.',
-    points: ['Around 15 minutes on a partial charge window', 'Same A–D grade scale as the Reference Test', 'Confidence band of ±6%, stated on the certificate', 'Works on locked imports — no OEM tool, password or unlock'],
+    points: ['Around 15 minutes on a partial charge window', 'Same A–D grade scale as the Reference Test', 'Confidence band of ±6%, stated on the certificate', 'BMS reading cross-checked against our calibrated database', 'Works on locked imports — no OEM tool, password or unlock'],
     facts: [['Duration', '≈ 15 min'], ['Confidence', '± 6%'], ['Source', 'DC 60 kW charger']],
     cta: { to: '/how-it-works', label: 'Watch a Rapid Check run' } },
   { id: 'reference', tab: 'Reference Test', icon: Gauge,
     kicker: 'Full charge window · ±3%',
     title: 'The accuracy benchmark, for decisions that end up in a dispute.',
     body: 'A full controlled charge session measured end to end. This is the ground truth behind the grade scale, and the test for repossession valuations, claims and anything a credit committee or a court may look at later.',
-    points: ['Full state-of-charge window on an AC wall box', '±3% confidence band — the tightest we issue', 'Every quality gate must pass, or no certificate is issued', 'Anomaly flags for cell spread and the 80% warranty floor'],
+    points: ['Full state-of-charge window on an AC wall box', '±3% confidence band — the tightest we issue', 'BMS reading cross-checked against our calibrated database', 'Every quality gate must pass, or no certificate is issued', 'Anomaly flags for cell spread and the 80% warranty floor'],
     facts: [['Duration', '≈ 4 h'], ['Confidence', '± 3%'], ['Source', 'AC 7.2 kW wall box']],
     cta: { to: '/tools', label: 'Compare both tests' } },
   { id: 'registry', tab: 'Certificate & Registry', icon: QrCode,
@@ -123,7 +123,7 @@ export function ServiceTabs() {
           const TabIcon = x.icon
           return (
             <button key={x.id} role="tab" type="button" aria-selected={on} onClick={() => setId(x.id)}
-              className={cn('relative flex cursor-pointer items-center justify-center gap-2.5 px-3 py-4 text-sm font-semibold transition-colors md:text-base',
+              className={cn('relative flex cursor-pointer items-center justify-center gap-2.5 rounded-lg px-3 py-4 text-sm font-semibold outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-base',
                 on ? 'text-foreground' : 'text-muted-foreground hover:text-foreground')}>
               <TabIcon className={cn('size-4.5 transition-colors', on ? 'text-brand' : 'text-muted-foreground')} />
               {x.tab}

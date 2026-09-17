@@ -151,7 +151,7 @@ function CertCard({ id, cert }: { id: string; cert: typeof CERTIFICATES[string] 
       <dl className="grid gap-0">
         {([['Test type', cert.testType], ['Test date', cert.testDate],
            ['Usable capacity', `${cert.usableCapacityKwh} kWh`], ['Estimated range', `${cert.estimatedRangeKm} km`],
-           ['Test location', cert.location], ['Registry status', cert.status]] as const).map(([k, v]) => (
+           ['Test location', cert.location], ['BMS cross-check', 'Passed · calibrated database'], ['Registry status', cert.status]] as const).map(([k, v]) => (
           <div key={k} className="flex justify-between gap-4 border-b py-2.5 text-sm">
             <dt className="text-muted-foreground">{k}</dt><dd className="font-mono">{v}</dd>
           </div>

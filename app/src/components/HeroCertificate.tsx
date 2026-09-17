@@ -80,6 +80,7 @@ const ROWS: [string, string][] = [
   ['Test type', 'Reference — full-window controlled charge'],
   ['Test date · location', '18 Jun 2026 · Addis Ababa'],
   ['Confidence band', '± 3% (reference test)'],
+  ['BMS cross-check', 'Passed · calibrated database'],
   ['Anomaly flags', 'None detected'],
 ]
 

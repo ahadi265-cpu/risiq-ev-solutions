@@ -19,6 +19,7 @@ import { CertificateInspector } from '@/components/CertificateInspector'
 import { SocketSimulator } from '@/components/SocketSimulator'
 import { AudienceSwitcher } from '@/components/AudienceSwitcher'
 import { ServiceTabs } from '@/components/ServiceTabs'
+import { CalibrationFlow } from '@/components/CalibrationFlow'
 import { cn } from '@/lib/utils'
 
 const CAPS = [
@@ -78,6 +79,8 @@ export default function Home() {
       {/* ------------------------------------------ hero: full-bleed brand band */}
       <section className="hero-band relative isolate overflow-hidden text-white">
         <div aria-hidden className="hero-grid absolute inset-0 -z-10" />
+        <div aria-hidden className="hero-orb absolute -top-48 right-[28%] -z-10 size-[36rem] rounded-full" />
+        <div aria-hidden className="hero-orb hero-orb-b absolute -bottom-56 left-[14%] -z-10 size-[32rem] rounded-full" />
         {/* watermark emblem, the way eniris fades its mark behind the headline */}
         <svg aria-hidden viewBox="0 0 100 100"
           className="pointer-events-none absolute top-1/2 -left-[16%] -z-10 size-[min(120vw,1100px)] -translate-y-1/2 text-white/[0.07]">
@@ -137,7 +140,7 @@ export default function Home() {
             {QUICK.map(({ id, label, sub, icon: Icon }) => (
               <li key={id}>
                 <a href="#audience" onClick={pickAudience(id)}
-                  className="group flex items-center gap-4 py-5 pr-4 transition-colors hover:text-white md:justify-center md:py-6">
+                  className="group flex items-center gap-4 rounded-lg py-5 pr-4 outline-none transition-colors hover:text-white focus-visible:ring-[3px] focus-visible:ring-white/60 md:justify-center md:py-6">
                   <Icon className="size-7 shrink-0 text-white/80 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:text-white" strokeWidth={1.6} />
                   <span className="leading-tight">
                     <b className="block text-base font-semibold md:text-lg">{label}</b>
@@ -191,13 +194,26 @@ export default function Home() {
       {/* ------------------------------------------- socket vs OBD simulator */}
       <Section>
         <SectionHead eyebrow="Why The Socket" title="Locked cars can refuse a question. They cannot refuse electricity.">
-          Most EVs arriving in Ethiopia encrypt the diagnostic port a normal reader depends on. Switch between the two methods to see why RISIQ measures at the plug instead.
+          Most EVs arriving in Ethiopia encrypt the diagnostic port a normal reader depends on. RISIQ measures at the plug — and where the car does share its own battery data, every reading is cross-checked against our calibrated database. Switch between the two methods to see the difference.
         </SectionHead>
         <Reveal><SocketSimulator /></Reveal>
       </Section>
 
+      {/* ------------------------------------------- calibration: two sources, one number */}
+      <Section muted>
+        <SectionHead eyebrow="Calibrated, Not Assumed" title="Two sources. One calibrated number.">
+          A battery’s own computer can be optimistic. Our meter cannot. RISIQ collects both, then checks every BMS reading against its own calibrated database of measured packs before a grade is issued.
+        </SectionHead>
+        <Reveal><CalibrationFlow /></Reveal>
+        <Reveal delay={0.1}>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button asChild variant="outline"><Link to="/how-it-works">How the calibration works</Link></Button>
+          </div>
+        </Reveal>
+      </Section>
+
       {/* ------------------------------------------------ audience router */}
-      <Section id="audience" muted>
+      <Section id="audience">
         <SectionHead eyebrow="You Are" title="Who this is for.">
           Every electric car in Addis sits on somebody's books. Pick your seat at the table — the certificate is the same, what it unlocks is not.
         </SectionHead>
@@ -297,7 +313,7 @@ export default function Home() {
             </SectionHead>
             <ul className="grid gap-4">
               {[
-                ['A real health score', 'Measured from the car itself — not a number the car claims about its own battery.'],
+                ['A real health score', 'Measured from the car itself and cross-checked against our calibrated database — never just a number the car claims about its own battery.'],
                 ['Impossible to fake', 'Change one detail on the document and the check stops working.'],
                 ['Anyone can check it', 'Scan the code with a phone and see the original record in seconds.'],
                 ['Holds up in a dispute', 'An independent, dated record if a loan defaults or a sale goes wrong.'],
@@ -327,6 +343,7 @@ export default function Home() {
           <Accordion type="single" collapsible defaultValue="q0" className="max-w-[56rem]">
             {[
               { q: 'Do you need the manufacturer’s cooperation, or access to the car’s software?', a: 'No. RISIQ measures the real energy flowing through the charging socket with its own calibrated meter, so the test works on locked imports — BYD, Changan, Jetour and others — without any OEM tool, password or unlock.' },
+              { q: 'Do you use the car’s own battery data?', a: 'Yes, wherever the car allows it — but never on its own. Every BMS reading we collect is cross-checked against RISIQ’s own calibrated database of measured packs and corrected against the energy we actually measured at the socket. The car’s opinion is an input; the certificate carries the calibrated result.' },
               { q: 'How long does a test take?', a: 'The Rapid Check targets about 15 minutes on a partial charge window. The Reference Test runs a full charge session and is the accuracy benchmark, used for ground truth and high-stakes decisions like repossession valuations.' },
               { q: 'Can a certificate be forged or edited?', a: 'No. Every certificate is cryptographically signed at issue. Any edit breaks verification, and the QR code always resolves to the original signed record — so a bank never has to take a PDF at face value.' },
               { q: 'Which vehicles can you test?', a: 'Any battery-electric vehicle that accepts a standard AC or DC charge, regardless of brand, country of origin, or whether its onboard systems are locked.' },

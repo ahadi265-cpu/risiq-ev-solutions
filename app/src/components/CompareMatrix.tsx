@@ -14,7 +14,7 @@ type Row = {
 
 const ROWS: Row[] = [
   { capability: 'Measurement source', note: 'Where the number actually comes from.',
-    risiq: { v: 'yes', t: 'Independent precision meter at the charging socket' },
+    risiq: { v: 'yes', t: 'Own meter at the charging socket; BMS reading cross-checked against a calibrated database' },
     obd:   { v: 'partial', t: "The vehicle's own battery computer, read over OBD" },
     fleet: { v: 'partial', t: 'OEM / telematics data feeds from the vehicle' } },
   { capability: 'Works on locked Chinese imports', note: 'BYD, Changan, Jetour — the fleet Ethiopia actually has.',
@@ -22,7 +22,7 @@ const ROWS: Row[] = [
     obd:   { v: 'no',  t: 'Frequently blocked by encrypted BMS protocols' },
     fleet: { v: 'no',  t: 'Requires manufacturer data cooperation' } },
   { capability: "Independent of the car's self-report", note: 'Can the vehicle overstate its own health?',
-    risiq: { v: 'yes', t: 'Fully — energy is measured, not asked for' },
+    risiq: { v: 'yes', t: 'Fully — the BMS figure is calibrated against what we measure, never used raw' },
     obd:   { v: 'partial', t: 'Depends on BMS honesty and per-model decoding' },
     fleet: { v: 'no',  t: 'Built on vehicle-reported telemetry' } },
   { capability: 'Presence in East Africa', note: 'Someone on the ground who can actually run the test.',
