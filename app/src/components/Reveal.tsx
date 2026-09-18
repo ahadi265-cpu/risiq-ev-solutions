@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
  * stylesheet or a tall headless viewport can never strand content invisible.
  * Reduced motion and print are handled in CSS (see `.reveal` in index.css).
  */
-function useInViewOnce<T extends HTMLElement>() {
+export function useInViewOnce<T extends HTMLElement>() {
   const ref = useRef<T>(null)
   useEffect(() => {
     const el = ref.current

@@ -25,10 +25,10 @@ export function FloatingDock() {
       visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-6 opacity-0')}>
       <BriefingModal trigger={
         <button type="button" aria-label="Book a pilot briefing"
-          className="group flex cursor-pointer items-center gap-3 rounded-full border border-white/15 bg-ink py-2 pr-2 pl-2 text-white shadow-[0_18px_50px_-12px_rgba(0,0,0,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_60px_-12px_rgba(0,0,0,0.6)] md:pr-5">
+          className="group flex cursor-pointer items-center gap-3 rounded-full border border-white/15 bg-slate-900 py-2 pr-2 pl-2 text-white shadow-[0_18px_50px_-12px_rgba(0,0,0,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_60px_-12px_rgba(0,0,0,0.6)] dark:border-teal/25 dark:bg-card md:pr-5">
           <span className="relative grid size-11 place-items-center rounded-full bg-brand transition-colors group-hover:bg-brand-dark">
             <CalendarCheck className="size-5" />
-            <span aria-hidden className="absolute -top-0.5 -right-0.5 size-3 rounded-full bg-grade-a ring-2 ring-ink">
+            <span aria-hidden className="absolute -top-0.5 -right-0.5 size-3 rounded-full bg-grade-a ring-2 ring-slate-900 dark:ring-card">
               <span className="absolute inset-0 animate-ping rounded-full bg-grade-a/70" />
             </span>
           </span>

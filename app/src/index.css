@@ -70,44 +70,47 @@
 }
 
 .dark {
-  --background: oklch(0.178 0.022 258);
-  --foreground: oklch(0.968 0.005 250);
-  --card: oklch(0.222 0.026 258);
-  --card-foreground: oklch(0.968 0.005 250);
-  --popover: oklch(0.222 0.026 258);
-  --popover-foreground: oklch(0.968 0.005 250);
+  /* Obsidian theme (owner brief 2026-09-18): #0B0F17 ground, electric cyan #00F2FE for measured
+     data, emerald #10B981 for grade A, cyan-tinted glass. Brand red stays the action colour so the
+     dark theme is still RISIQ. Light remains the red-and-white default. */
+  --background: oklch(0.155 0.02 265);
+  --foreground: oklch(0.965 0.005 250);
+  --card: oklch(0.205 0.022 262);
+  --card-foreground: oklch(0.965 0.005 250);
+  --popover: oklch(0.205 0.022 262);
+  --popover-foreground: oklch(0.965 0.005 250);
 
-  --primary: oklch(0.63 0.215 27.2);
+  --primary: oklch(0.65 0.215 27.2);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.275 0.028 258);
-  --secondary-foreground: oklch(0.968 0.005 250);
-  --muted: oklch(0.262 0.027 258);
-  --muted-foreground: oklch(0.712 0.022 256);
-  --accent: oklch(0.285 0.035 26);
-  --accent-foreground: oklch(0.968 0.005 250);
+  --secondary: oklch(0.25 0.022 262);
+  --secondary-foreground: oklch(0.965 0.005 250);
+  --muted: oklch(0.225 0.02 262);
+  --muted-foreground: oklch(0.73 0.02 250);
+  --accent: oklch(0.27 0.035 215);
+  --accent-foreground: oklch(0.965 0.005 250);
   --destructive: oklch(0.665 0.196 24);
 
-  --border: oklch(1 0 0 / 0.11);
-  --input: oklch(1 0 0 / 0.15);
-  --ring: oklch(0.63 0.215 27.2);
+  --border: oklch(1 0 0 / 0.10);
+  --input: oklch(1 0 0 / 0.14);
+  --ring: oklch(0.87 0.14 200);
 
   --brand: oklch(0.64 0.222 27.9);
   --brand-soft: oklch(0.30 0.06 27);
-  --teal: oklch(0.75 0.12 178);
-  --amber: oklch(0.79 0.13 74);
-  --ink: oklch(0.968 0.005 250);
+  --teal: oklch(0.87 0.14 200);
+  --amber: oklch(0.80 0.13 74);
+  --ink: oklch(0.965 0.005 250);
 
-  --grade-a: oklch(0.75 0.15 152);
-  --grade-b: oklch(0.75 0.12 178);
-  --grade-c: oklch(0.79 0.13 74);
+  --grade-a: oklch(0.70 0.15 163);
+  --grade-b: oklch(0.82 0.12 195);
+  --grade-c: oklch(0.80 0.13 74);
   --grade-d: oklch(0.68 0.19 24);
 
-  --glass: oklch(0.222 0.026 258 / 0.62);
-  --glass-border: oklch(1 0 0 / 0.10);
+  --glass: oklch(0.205 0.022 262 / 0.55);
+  --glass-border: oklch(0.87 0.14 200 / 0.16);
 
-  --sidebar: oklch(0.222 0.026 258);
-  --sidebar-foreground: oklch(0.968 0.005 250);
-  --sidebar-border: oklch(1 0 0 / 0.11);
+  --sidebar: oklch(0.205 0.022 262);
+  --sidebar-foreground: oklch(0.965 0.005 250);
+  --sidebar-border: oklch(1 0 0 / 0.10);
 }
 
 @theme inline {
@@ -222,8 +225,8 @@
   .orb-b { background: radial-gradient(circle at 50% 50%, oklch(0.75 0.14 60 / 0.26), transparent 65%); animation-duration: 24s; animation-delay: -6s; }
   .orb-c { background: radial-gradient(circle at 50% 50%, oklch(0.62 0.21 29 / 0.18), transparent 65%); animation-duration: 21s; animation-delay: -12s; }
   .dark .orb { opacity: 0.5; }
-  .dark .orb-a { background: radial-gradient(circle at 40% 40%, oklch(0.6 0.2 29 / 0.32), transparent 65%); }
-  .dark .orb-b { background: radial-gradient(circle at 50% 50%, oklch(0.72 0.14 60 / 0.22), transparent 65%); }
+  .dark .orb-a { background: radial-gradient(circle at 40% 40%, oklch(0.87 0.14 200 / 0.20), transparent 65%); }
+  .dark .orb-b { background: radial-gradient(circle at 50% 50%, oklch(0.70 0.15 163 / 0.18), transparent 65%); }
   @keyframes drift {
     from { transform: translate3d(0, 0, 0) scale(1); }
     to   { transform: translate3d(6%, 8%, 0) scale(1.12); }

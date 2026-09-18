@@ -1,3 +1,4 @@
+import { lazy, Suspense, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import {
@@ -11,7 +12,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/
 import { Section, SectionHead } from '@/components/Layout'
 import { Reveal, RevealGroup, revealItem } from '@/components/Reveal'
 import { LogoMarquee } from '@/components/LogoMarquee'
-import { OdometerProof } from '@/components/OdometerProof'
+import { BlindSpotExplorer } from '@/components/BlindSpotExplorer'
 import { BriefingModal } from '@/components/BriefingModal'
 import { CountUp } from '@/components/CountUp'
 import { HeroCertificate } from '@/components/HeroCertificate'
@@ -21,6 +22,9 @@ import { AudienceSwitcher } from '@/components/AudienceSwitcher'
 import { ServiceTabs } from '@/components/ServiceTabs'
 import { CalibrationFlow } from '@/components/CalibrationFlow'
 import { BydFocus, GradeLegend } from '@/components/BydFocus'
+
+/* the playable test run is its own chunk; it mounts below the fold */
+const TestVisualizer = lazy(() => import('@/components/TestVisualizer').then((m) => ({ default: m.TestVisualizer })))
 import { cn } from '@/lib/utils'
 
 const CAPS = [
@@ -68,14 +72,31 @@ const QUICK = [
   { id: 'importers', label: 'Importers', sub: 'Prove the pack on arrival', icon: Ship },
   { id: 'regulators', label: 'Regulators', sub: 'One national standard', icon: Scale },
 ]
-const pickAudience = (id: string) => (e: React.MouseEvent) => {
-  e.preventDefault()
-  window.dispatchEvent(new CustomEvent('risiq:audience', { detail: id }))
-  document.getElementById('audience')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+/* Audience impact switcher: the rail rewrites the hero message and preselects the switcher below. */
+const HERO_COPY: Record<string, { eyebrow: string; body: string }> = {
+  default: { eyebrow: 'EV Battery Intelligence & Certification',
+    body: 'On an electric car, the battery is half the value — and the odometer tells you nothing about it. RISIQ certifies the batteries of BYD and other Chinese EVs on Ethiopian roads: an independent, verifiable report in fifteen minutes, so you can buy, lend and insure with confidence.' },
+  buyers: { eyebrow: 'For buyers & sellers',
+    body: 'A used Atto 3 is priced on mileage and paintwork — the battery, half its value, stays invisible. Ask for the RISIQ certificate: one scan shows the measured, calibrated health, and a certified car sells faster at a fair price.' },
+  insurers: { eyebrow: 'For insurers',
+    body: 'Every EV policy in Addis is underwritten blind to the battery, the most expensive part to replace. RISIQ gives you a measured state of health at underwriting and again at claim, so risk is priced and disputes settle on a number.' },
+  banks: { eyebrow: 'For banks & MFIs',
+    body: 'On a five-year EV loan the battery is roughly a third of the collateral — and the only part nobody checks. RISIQ gives your credit committee a measured, calibrated state of health at origination and at every re-test.' },
+  importers: { eyebrow: 'For importers',
+    body: 'BYD, Changan, Jetour — locked to the manufacturer’s tools. RISIQ certifies each import at the charging socket on arrival, so you price and warrant every car by its measured grade, no OEM unlock required.' },
+  regulators: { eyebrow: 'For regulators',
+    body: 'Ethiopia went electric faster than any country in Africa. One independent grade scale across every brand — publicly verifiable in seconds — lets lenders, insurers and the resale market grow with the fleet.' },
 }
 
 export default function Home() {
   const reduce = useReducedMotion()
+  const [aud, setAud] = useState<string>('default')
+  const copy = HERO_COPY[aud]
+  const pickAudience = (id: string) => (e: React.MouseEvent) => {
+    e.preventDefault()
+    setAud(id)
+    window.dispatchEvent(new CustomEvent('risiq:audience', { detail: id }))
+  }
   return (
     <>
       {/* ------------------------------------------ hero: full-bleed brand band */}
@@ -92,8 +113,8 @@ export default function Home() {
 
         <div className="mx-auto grid max-w-[1440px] items-center gap-14 px-6 pt-20 pb-16 md:pt-24 lg:grid-cols-[1.05fr_0.95fr] lg:pt-28 lg:pb-20">
           <div className="animate-rise">
-            <span className="flex items-center gap-3 font-mono text-sm font-semibold tracking-[0.18em] text-white/85 uppercase">
-              <span className="size-2 rounded-full bg-white ring-4 ring-white/25" />EV Battery Intelligence &amp; Certification
+            <span key={aud} className="animate-rise flex items-center gap-3 font-mono text-sm font-semibold tracking-[0.18em] text-white/85 uppercase">
+              <span className="size-2 rounded-full bg-white ring-4 ring-white/25" />{copy.eyebrow}
             </span>
             <h1 className="mt-7 text-[2.9rem] leading-[1.02] font-bold tracking-tight sm:text-[3.6rem] md:text-[5rem] lg:text-[5.8rem]">
               Know what the car is<br className="hidden md:block" />{' '}
@@ -106,8 +127,14 @@ export default function Home() {
                 </svg>
               </span>
             </h1>
-            <p className="mt-8 max-w-[52ch] text-xl text-white/85 md:text-2xl md:leading-snug">
-              On an electric car, the battery is half the value — and the odometer tells you nothing about it. RISIQ certifies the batteries of BYD and other Chinese EVs on Ethiopian roads: an independent, verifiable report in fifteen minutes, so you can buy, lend and insure with confidence.
+            <p key={`p-${aud}`} className="animate-rise mt-8 max-w-[52ch] text-xl text-white/85 md:text-2xl md:leading-snug">
+              {copy.body}
+              {aud !== 'default' && (
+                <a href="#audience" onClick={(e) => { e.preventDefault(); document.getElementById('audience')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }}
+                  className="mt-3 block text-base font-semibold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white">
+                  See what the certificate unlocks for you ↓
+                </a>
+              )}
             </p>
             <ul className="mt-7 flex flex-wrap gap-2" aria-label="Why RISIQ">
               {['Independent — no OEM tool needed', 'Built for BYD & Chinese imports', 'QR-verified in under 2 s', 'Made in Addis Ababa'].map((t) => (
@@ -149,11 +176,11 @@ export default function Home() {
               <motion.div key={f.k} aria-hidden
                 animate={reduce ? undefined : { y: [0, -8, 0] }}
                 transition={{ duration: f.dur, repeat: Infinity, ease: 'easeInOut', delay: i * 0.6 }}
-                className={cn('animate-rise absolute z-20 hidden rounded-2xl border border-white/30 bg-white/90 px-4 py-3 text-ink shadow-xl backdrop-blur md:block', f.cls)}
+                className={cn('animate-rise absolute z-20 hidden rounded-2xl border border-white/30 bg-white/90 px-4 py-3 text-slate-900 shadow-xl backdrop-blur md:block', f.cls)}
                 style={{ animationDelay: `${0.5 + i * 0.15}s` }}>
-                <span className="block font-mono text-[0.6rem] tracking-[0.16em] text-muted-foreground uppercase">{f.k}</span>
-                <span className="mt-0.5 flex items-baseline gap-1 font-mono text-2xl font-semibold text-brand">
-                  <CountUp to={f.n} prefix={'prefix' in f ? f.prefix : ''} duration={1200} /><span className="text-sm text-muted-foreground">{f.u}</span>
+                <span className="block font-mono text-[0.6rem] tracking-[0.16em] text-slate-500 uppercase">{f.k}</span>
+                <span className="mt-0.5 flex items-baseline gap-1 font-mono text-2xl font-semibold text-[#e2231a]">
+                  <CountUp to={f.n} prefix={'prefix' in f ? f.prefix : ''} duration={1200} /><span className="text-sm text-slate-500">{f.u}</span>
                 </span>
               </motion.div>
             ))}
@@ -165,8 +192,9 @@ export default function Home() {
           <ul className="mx-auto grid max-w-[1440px] grid-cols-2 divide-white/10 px-6 md:grid-cols-5 md:divide-x">
             {QUICK.map(({ id, label, sub, icon: Icon }) => (
               <li key={id}>
-                <a href="#audience" onClick={pickAudience(id)}
-                  className="group flex items-center gap-4 rounded-lg py-5 pr-4 outline-none transition-colors hover:text-white focus-visible:ring-[3px] focus-visible:ring-white/60 md:justify-center md:py-6">
+                <a href="#audience" onClick={pickAudience(id)} aria-pressed={aud === id}
+                  className={cn('group flex items-center gap-4 rounded-lg py-5 pr-4 outline-none transition-colors hover:text-white focus-visible:ring-[3px] focus-visible:ring-white/60 md:justify-center md:py-6',
+                    aud === id && 'bg-white/10')}>
                   <Icon className="size-7 shrink-0 text-white/80 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:text-white" strokeWidth={1.6} />
                   <span className="leading-tight">
                     <b className="block text-base font-semibold md:text-[1.05rem]">{label}</b>
@@ -220,9 +248,9 @@ export default function Home() {
       {/* ------------------------------------------------- the blind spot */}
       <Section>
         <SectionHead eyebrow="The Blind Spot" title="Two cars. Same mileage. Very different value.">
-          Electric motors barely wear out. Batteries do — and they are roughly half what the car is worth. Two cars can show the same number on the dash and be thousands of dollars apart.
+          Electric motors barely wear out. Batteries do — and they are roughly half what the car is worth. Move the odometer and switch the life the car has lived: the dash reads the same, the battery does not.
         </SectionHead>
-        <Reveal><OdometerProof /></Reveal>
+        <Reveal><BlindSpotExplorer /></Reveal>
       </Section>
 
       {/* ------------------------------------------- socket vs OBD simulator */}
@@ -326,6 +354,13 @@ export default function Home() {
             </motion.div>
           ))}
         </RevealGroup>
+        <Reveal className="mt-12">
+          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+            <h3 className="text-xl font-semibold">Watch a fifteen-minute run</h3>
+            <span className="text-sm text-muted-foreground">Play it — or switch to the network-drop tab to see store-and-forward.</span>
+          </div>
+          <Suspense fallback={<div className="h-72 animate-pulse rounded-2xl border bg-muted" />}><TestVisualizer /></Suspense>
+        </Reveal>
         <Reveal delay={0.1}>
           <p className="mt-8 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
             <Lock className="size-4 shrink-0 text-teal" />
@@ -365,11 +400,31 @@ export default function Home() {
             <Button asChild className="mt-8"><Link to="/verify"><QrCode />Try the live verification demo</Link></Button>
           </Reveal>
           <Reveal delay={0.1}>
-            <div className="rounded-2xl border bg-card p-4 shadow-xl" data-parallax="-4">
-              <img src="img/certificate-risiq.png" width={2000} height={2540}
-                alt="Sample RISIQ battery-health certificate showing 94% state of health and Grade A"
-                className="w-full rounded-xl" loading="lazy" />
+            {/* the live certificate with hotspot callouts — hover to tilt, numbers explain the fields */}
+            <div className="relative mx-auto w-full max-w-[460px] pt-4">
+              <HeroCertificate className="max-w-[460px]" />
+              {([
+                { x: 50, y: 22 }, { x: 50, y: 37 }, { x: 88, y: 51 }, { x: 10, y: 93 },
+              ] as const).map((m, i) => (
+                <span key={i} aria-hidden className="pointer-events-none absolute z-20 hidden size-7 -translate-x-1/2 -translate-y-1/2 place-items-center md:grid" style={{ left: `${m.x}%`, top: `${m.y}%` }}>
+                  <span className="absolute inset-0 rounded-full bg-brand opacity-50 motion-safe:animate-ping" />
+                  <span className="relative grid size-6 place-items-center rounded-full border-2 border-white bg-brand font-mono text-[0.7rem] font-bold text-white shadow">{i + 1}</span>
+                </span>
+              ))}
             </div>
+            <ol className="mt-6 grid gap-2.5 sm:grid-cols-2">
+              {[
+                ['State of health', 'Measured at the socket and calibrated — the share of the original capacity the pack still holds.'],
+                ['Grade A–D', 'One plain-language scale, the same for every brand and every institution.'],
+                ['Usable capacity & range', 'What the battery can still hold, and how far the car will really go.'],
+                ['QR verification', 'Scan it: the code resolves to the signed record in the RISIQ registry in under two seconds.'],
+              ].map(([t, d], i) => (
+                <li key={t} className="flex gap-3 rounded-xl border bg-card/80 p-3">
+                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-brand font-mono text-[0.7rem] font-bold text-white">{i + 1}</span>
+                  <span className="text-xs leading-snug"><b className="block text-[0.8rem]">{t}</b><span className="text-muted-foreground">{d}</span></span>
+                </li>
+              ))}
+            </ol>
           </Reveal>
         </div>
       </Section>

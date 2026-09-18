@@ -108,11 +108,14 @@ export function CompareMatrix() {
                 <tr key={r.capability}
                   onMouseEnter={() => setActive(r.capability)} onMouseLeave={() => setActive(null)}
                   className={cn('animate-rise transition-colors', active === r.capability && 'bg-muted/50')}>
-                  <th scope="row" className="border-b p-3 text-left align-top font-medium">
+                  <th scope="row" className="border-b p-3 text-left align-top font-medium" title={r.note}>
                     {r.capability}
                     <span className="mt-1 flex items-start gap-1.5 text-xs font-normal text-muted-foreground">
                       <Info className="mt-0.5 size-3 shrink-0" />{r.note}
                     </span>
+                    {r.risiq.v === 'yes' && r.obd.v !== 'yes' && r.fleet.v !== 'yes' && (
+                      <span className="mt-2 inline-flex rounded-full border border-teal/30 bg-teal/10 px-2 py-0.5 font-mono text-[0.6rem] tracking-wider text-teal uppercase">Only RISIQ</span>
+                    )}
                   </th>
                   {(['risiq', 'obd', 'fleet'] as const).map((k) => {
                     const cell = r[k]
@@ -120,7 +123,8 @@ export function CompareMatrix() {
                     const hero = k === 'risiq'
                     return (
                       <td key={k} className={cn('border-b p-3 align-top', hero && 'bg-teal/5 border-x border-teal/25')}>
-                        <span className={cn('mb-1.5 inline-flex size-5 items-center justify-center rounded-full border', TONE[cell.v])}>
+                        <span title={`${cell.v === 'yes' ? 'Fully supported' : cell.v === 'partial' ? 'Partial / conditional' : 'Not supported'} — ${cell.t}`}
+                          className={cn('mb-1.5 inline-flex size-5 cursor-help items-center justify-center rounded-full border', TONE[cell.v])}>
                           <Icon className="size-3" strokeWidth={3} />
                         </span>
                         <span className={cn('block text-[0.82rem] leading-snug', hero ? 'font-medium text-foreground' : 'text-muted-foreground')}>
