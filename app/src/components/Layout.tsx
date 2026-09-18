@@ -190,7 +190,8 @@ export function Layout() {
     <div className="min-h-dvh flex flex-col">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-brand focus:px-4 focus:py-2 focus:font-semibold focus:text-white">Skip to content</a>
       <AmbientOrbs />
-      <header className={cn('glass sticky top-0 z-40 transition-shadow duration-300 print:static', scrolled ? 'shadow-md' : 'shadow-sm')}>
+      {/* glass at the top of the page; near-solid once content scrolls beneath it, so the red hero never bleeds through */}
+      <header className={cn('sticky top-0 z-40 transition-[box-shadow,background-color] duration-300 print:static', scrolled ? 'glass-solid shadow-md' : 'glass shadow-sm')}>
         <nav aria-label="Primary" className={cn('mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-6 transition-[padding] duration-300', scrolled ? 'py-2' : 'py-3 md:py-4')}>
           <Link to="/" className="flex items-center gap-3.5" aria-label="RISIQ EV Solutions — home">
             <img src={LOGO} alt="RISIQ" width={1600} height={614}

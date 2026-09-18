@@ -199,6 +199,13 @@
     -webkit-backdrop-filter: blur(14px) saturate(150%);
     border: 1px solid var(--glass-border);
   }
+  /* header once scrolled: same frosted look, but opaque enough that nothing shows through */
+  .glass-solid {
+    background: color-mix(in oklch, var(--background) 96%, transparent);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    border-bottom: 1px solid var(--glass-border);
+  }
   .ring-glow { box-shadow: 0 0 0 1px oklch(0.532 0.213 26.5 / 0.22), 0 10px 34px -10px oklch(0.532 0.213 26.5 / 0.30); }
 }
 
