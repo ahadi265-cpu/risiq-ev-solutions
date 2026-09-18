@@ -35,6 +35,7 @@ export function BriefingModal({ trigger }: { trigger?: React.ReactNode }) {
   const [org, setOrg] = useState('')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState(ROLES[0])
+  const [fleet, setFleet] = useState('')
   const [day, setDay] = useState<Date | null>(null)
   const [slot, setSlot] = useState<string | null>(null)
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
@@ -54,7 +55,7 @@ export function BriefingModal({ trigger }: { trigger?: React.ReactNode }) {
         body: JSON.stringify({
           name, org, email, role,
           _subject: `Pilot briefing request — ${org}`,
-          message: `Briefing requested for ${day?.toDateString()} at ${slot} (EAT).\nRole: ${role}`,
+          message: `Briefing requested for ${day?.toDateString()} at ${slot} (EAT).\nRole: ${role}\nVehicles in scope: ${fleet || 'not stated'}`,
         }),
       })
       const j = await res.json().catch(() => ({}))
@@ -125,6 +126,11 @@ export function BriefingModal({ trigger }: { trigger?: React.ReactNode }) {
                   <Label htmlFor="bm-email">Work email</Label>
                   <Input id="bm-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                     aria-invalid={email.length > 0 && !emailOk} placeholder="you@bank.et" />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="bm-fleet">Vehicles you would certify <span className="font-normal text-muted-foreground">(optional)</span></Label>
+                  <Input id="bm-fleet" type="number" inputMode="numeric" min={1} max={100000} value={fleet}
+                    onChange={(e) => setFleet(e.target.value.replace(/[^0-9]/g, ''))} placeholder="e.g. 40" />
                 </div>
                 <div className="grid gap-2">
                   <Label>You are a…</Label>

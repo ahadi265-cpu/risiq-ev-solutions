@@ -113,12 +113,12 @@ export function BydFocus() {
         <div key={mode} className={cn('animate-rise mt-3 rounded-2xl border p-5', mode === 'obd' ? 'border-amber/30 bg-amber/6' : 'border-teal/30 bg-teal/6')}>
           {mode === 'obd' ? (
             <>
-              <span className="font-mono text-[0.66rem] tracking-[0.14em] text-amber uppercase">Blocked / encrypted · collected where it answers</span>
+              <span className="font-mono text-[0.66rem] tracking-[0.14em] text-amber uppercase">Access denied · BMS encrypted</span>
               <p className="mt-2 text-sm"><b>{car.obd}.</b> A plain reader gets nothing or the car’s own estimate. Where the BMS does answer, RISIQ records it and cross-checks it against our calibrated database — it never becomes the verdict on its own.</p>
             </>
           ) : (
             <>
-              <span className="font-mono text-[0.66rem] tracking-[0.14em] text-teal uppercase">Works on this car · 100% of locked imports</span>
+              <span className="font-mono text-[0.66rem] tracking-[0.14em] text-teal uppercase">100% direct electrical energy signal captured</span>
               <p className="mt-2 text-sm"><b>We meter the energy the {car.model} actually accepts at its charging socket.</b> Nothing is asked of the car, so nothing can be locked, encrypted or optimistic — and that measurement calibrates the BMS reading.</p>
             </>
           )}

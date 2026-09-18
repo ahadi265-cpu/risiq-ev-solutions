@@ -2,6 +2,9 @@
 @import "tw-animate-css";
 
 @custom-variant light (&:is(.light *));
+/* dark: utilities follow the site's .dark class (header toggle), never the OS media query —
+   otherwise a visitor with a dark OS setting saw light-mode pages with dark-only colours applied */
+@custom-variant dark (&:is(.dark *));
 
 /* ==========================================================================
    RISIQ palette — bright white ground, brand red as the action colour.
