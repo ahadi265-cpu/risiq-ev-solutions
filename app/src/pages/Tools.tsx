@@ -13,7 +13,7 @@ import { Reveal } from '@/components/Reveal'
 import { TestVisualizer } from '@/components/TestVisualizer'
 import { cn } from '@/lib/utils'
 import {
-  FLEET, CLIMATES, modelSoH, decayCurve, gradeOf, bookFactor, batteryFactor, fmt, etb, type Grade,
+  FLEET, CLIMATES, modelSoH, decayCurve, gradeOf, bookFactor, batteryFactor, fmt, etb, usd, ETB_PER_USD, type Grade,
 } from '@/lib/data'
 
 const GRADE_FILL: Record<Grade, string> = {
@@ -36,13 +36,13 @@ export default function Tools() {
   const [years, setYears] = useState(4)
   const [km, setKm] = useState(72_000)
   const [cycles, setCycles] = useState(620)
-  const [cli, setCli] = useState<string>('addis')
+  const [temp, setTemp] = useState<number>(16)
   const [fast, setFast] = useState(30)
 
   const car = FLEET.find((f) => f.id === vid)!
-  const climate = CLIMATES.find((c) => c.id === cli)!
-  const m = useMemo(() => modelSoH(years, cycles, climate.temp, fast / 100), [years, cycles, climate.temp, fast])
-  const curve = useMemo(() => decayCurve(years, cycles, climate.temp, fast / 100), [years, cycles, climate.temp, fast])
+  const climate = CLIMATES.find((c) => c.temp === temp)
+  const m = useMemo(() => modelSoH(years, cycles, temp, fast / 100), [years, cycles, temp, fast])
+  const curve = useMemo(() => decayCurve(years, cycles, temp, fast / 100), [years, cycles, temp, fast])
   const grade = gradeOf(m.soh)
 
   const book = car.price * bookFactor(years, km)
@@ -74,9 +74,10 @@ export default function Tools() {
 
             {[
               { label: 'Age', value: years, set: setYears, min: 0, max: 10, step: 0.5, disp: `${years} ${years === 1 ? 'year' : 'years'}`, hint: 'Calendar fade grows with the square root of time.' },
-              { label: 'Odometer', value: km, set: setKm, min: 0, max: 200_000, step: 1000, disp: `${fmt(km)} km`, hint: 'Drives market depreciation — not battery health.' },
+              { label: 'Odometer', value: km, set: setKm, min: 0, max: 150_000, step: 1000, disp: `${fmt(km)} km`, hint: 'Drives market depreciation — not battery health.' },
               { label: 'Charge cycles', value: cycles, set: setCycles, min: 0, max: 2000, step: 10, disp: `${fmt(cycles)} cycles`, hint: 'Equivalent full cycles. A commuter adds ~150/year; a taxi, ~600.' },
               { label: 'Fast charging', value: fast, set: setFast, min: 0, max: 100, step: 5, disp: `${fast}% fast`, hint: 'Share of charging done on a DC fast charger rather than overnight.' },
+              { label: 'Daily temperature', value: temp, set: setTemp, min: 5, max: 40, step: 1, disp: `${temp} °C`, hint: 'Calendar fade roughly doubles for every +10 °C.' },
             ].map((s) => (
               <div key={s.label} className="grid gap-2.5">
                 <div className="flex items-baseline justify-between gap-4">
@@ -90,17 +91,17 @@ export default function Tools() {
             ))}
 
             <div>
-              <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">Climate</span>
-              <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Climate">
+              <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">Climate presets</span>
+              <div className="mt-3 flex flex-wrap gap-2">
                 {CLIMATES.map((c) => (
-                  <button key={c.id} role="radio" aria-checked={c.id === cli} onClick={() => setCli(c.id)}
+                  <button key={c.id} type="button" aria-pressed={c.temp === temp} onClick={() => setTemp(c.temp)}
                     className={cn('flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all',
-                      c.id === cli ? 'border-primary bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:border-primary hover:text-foreground')}>
+                      c.temp === temp ? 'border-primary bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:border-primary hover:text-foreground')}>
                     {c.label}<small className="font-mono text-xs opacity-70">{c.temp}°C</small>
                   </button>
                 ))}
               </div>
-              <p className="mt-3 text-xs text-muted-foreground">{climate.note}</p>
+              <p className="mt-3 text-xs text-muted-foreground">{climate ? climate.note : `Custom · ${temp} °C daily average`}</p>
             </div>
           </div>
 
@@ -125,7 +126,7 @@ export default function Tools() {
             <div className="grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-2">
               <Stat k="Usable capacity" v={`${(car.kwh * m.soh / 100).toFixed(1)} kWh`} s={`of ${car.kwh} kWh new`} />
               <Stat k="Estimated range" v={`${Math.round(car.range * m.soh / 100)} km`} s={`of ${car.range} km rated`} />
-              <Stat k="Calendar fade" v={`−${m.calendar.toFixed(1)} pp`} s={`${years} yr at ${climate.temp}°C`} />
+              <Stat k="Calendar fade" v={`−${m.calendar.toFixed(1)} pp`} s={`${years} yr at ${temp}°C`} />
               <Stat k="Cycle fade" v={`−${m.cyclic.toFixed(1)} pp`} s={`${fmt(cycles)} full cycles`} />
             </div>
 
@@ -137,15 +138,15 @@ export default function Tools() {
               </div>
               <div className="flex items-baseline justify-between gap-4 text-sm">
                 <span className="text-muted-foreground">Battery-adjusted residual</span>
-                <b className="font-mono text-lg text-teal tabular">{etb(adjusted)}</b>
+                <span className="text-right"><b className="block font-mono text-lg text-teal tabular">{etb(adjusted)}</b><small className="font-mono text-xs text-muted-foreground">≈ {usd(adjusted)}</small></span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-muted" role="img"
                 aria-label={`Battery-adjusted residual is ${Math.round(bf * 100)}% of book residual.`}>
                 <motion.i className="block h-full bg-teal" animate={{ width: `${bf * 100}%` }} transition={{ duration: 0.5 }} />
               </div>
               <div className="flex items-baseline justify-between gap-4 border-t border-dashed pt-3 text-sm">
-                <span className="text-muted-foreground">Unpriced exposure</span>
-                <b className="font-mono text-lg text-primary tabular">{etb(gap)}</b>
+                <span className="text-muted-foreground">Unpriced exposure <small className="block text-xs">estimated battery value loss</small></span>
+                <span className="text-right"><b className="block font-mono text-lg text-primary tabular">{etb(gap)}</b><small className="font-mono text-xs text-muted-foreground">≈ {usd(gap)}</small></span>
               </div>
             </div>
 
@@ -203,7 +204,7 @@ export default function Tools() {
             </div>
 
             <p className="text-xs leading-relaxed text-muted-foreground">
-              Indicative model using RISIQ's published method. Vehicle prices are indicative Addis retail. A certificate replaces this estimate with a measurement.
+              Indicative model using RISIQ's published method. Vehicle prices are indicative Addis retail; dollar figures use an indicative {ETB_PER_USD} Br/$ rate. A certificate replaces this estimate with a measurement.
             </p>
             <Button asChild variant="outline" className="w-fit"><a href="/verify">Verify a real certificate</a></Button>
           </div>

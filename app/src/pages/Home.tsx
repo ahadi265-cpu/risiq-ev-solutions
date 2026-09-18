@@ -121,7 +121,7 @@ export default function Home() {
                 <Button size="lg" className="h-14 rounded-lg bg-white px-9 text-base text-brand shadow-xl hover:bg-white hover:text-brand-dark">Book a pilot briefing</Button>} />
               <CertificateInspector trigger={
                 <Button size="lg" variant="outline" className="h-14 rounded-lg border-white/35 bg-white/10 px-9 text-base text-white hover:border-white hover:bg-white hover:text-brand">
-                  <ShieldCheck />Sample certificate demo
+                  <ShieldCheck />Live verification demo
                 </Button>} />
             </div>
             <p className="mt-8 font-mono text-sm tracking-wide text-white/65">
@@ -140,6 +140,23 @@ export default function Home() {
             <span className="absolute -bottom-4 -left-4 flex items-center gap-2 rounded-full border bg-card px-4 py-2.5 font-mono text-xs text-primary shadow-xl">
               <QrCode className="size-3.5" />Scan to verify · &lt; 2 s
             </span>
+            {/* floating statistics — transform-only float, CSS entrance, desktop only (the metric row serves phones) */}
+            {([
+              { k: 'Rapid Check', n: 15, u: 'min', cls: '-top-6 -left-10 lg:-left-16', dur: 6.5 },
+              { k: 'Accuracy', n: 3, prefix: '±', u: '%', cls: 'top-[38%] -right-8 lg:-right-14', dur: 7.5 },
+              { k: 'Verification', n: 2, prefix: '< ', u: 's', cls: '-bottom-2 right-6 lg:-right-4', dur: 8 },
+            ] as const).map((f, i) => (
+              <motion.div key={f.k} aria-hidden
+                animate={reduce ? undefined : { y: [0, -8, 0] }}
+                transition={{ duration: f.dur, repeat: Infinity, ease: 'easeInOut', delay: i * 0.6 }}
+                className={cn('animate-rise absolute z-20 hidden rounded-2xl border border-white/30 bg-white/90 px-4 py-3 text-ink shadow-xl backdrop-blur md:block', f.cls)}
+                style={{ animationDelay: `${0.5 + i * 0.15}s` }}>
+                <span className="block font-mono text-[0.6rem] tracking-[0.16em] text-muted-foreground uppercase">{f.k}</span>
+                <span className="mt-0.5 flex items-baseline gap-1 font-mono text-2xl font-semibold text-brand">
+                  <CountUp to={f.n} prefix={'prefix' in f ? f.prefix : ''} duration={1200} /><span className="text-sm text-muted-foreground">{f.u}</span>
+                </span>
+              </motion.div>
+            ))}
           </div>
         </div>
 
@@ -187,7 +204,7 @@ export default function Home() {
       {/* ------------------------------------------- the fleet Ethiopia has */}
       <Section className="pt-4">
         <SectionHead eyebrow="Built For Ethiopia’s Fleet" title="Made for the cars on Ethiopian roads. BYD first.">
-          Most electric cars in Addis are BYDs, locked to the manufacturer’s tools. RISIQ was designed around them — and works on every other EV that charges.
+          Most electric cars in Addis are BYDs, locked to the manufacturer’s tools. Pick a model to see what a plain OBD reader gets — and what RISIQ meters at the socket.
         </SectionHead>
         <Reveal><BydFocus /></Reveal>
       </Section>

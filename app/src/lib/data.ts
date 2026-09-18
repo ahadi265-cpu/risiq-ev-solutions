@@ -103,6 +103,9 @@ export const GRADES: { g: Grade; range: string; title: string; meaning: string }
 export const fmt = (n: number, d = 0) =>
   n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })
 export const etb = (n: number) => `${fmt(Math.round(n))} Br`
+/* Indicative mid-market rate, September 2026 — update when it moves. Birr stays the primary figure. */
+export const ETB_PER_USD = 162
+export const usd = (birr: number) => `$${fmt(Math.round(birr / ETB_PER_USD))}`
 
 /* deterministic PRNG so a certificate's cell map is identical on every visit */
 export function hashStr(s: string) {

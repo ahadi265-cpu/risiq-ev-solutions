@@ -67,7 +67,7 @@ export function BriefingModal({ trigger }: { trigger?: React.ReactNode }) {
       <DialogTrigger asChild>
         {trigger ?? <Button size="lg">Book a pilot briefing</Button>}
       </DialogTrigger>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="glass max-w-xl">
         <DialogHeader>
           <DialogTitle>Book a pilot briefing</DialogTitle>
           <DialogDescription>
