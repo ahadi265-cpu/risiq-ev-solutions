@@ -122,3 +122,26 @@ export function mulberry32(seed: number) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
 }
+
+/* Vehicle compatibility list for the searchable checker. Pack sizes are
+   manufacturer-published figures for the trims common in East Africa. `obd`
+   is what a plain reader gets from the diagnostic port; socket measurement
+   works on all of them, and any BMS reading is cross-checked regardless. */
+export type ObdStatus = 'locked' | 'partial' | 'readable'
+export type Compat = { make: string; model: string; seg: string; kwh: string; obd: ObdStatus; common: boolean }
+export const COMPAT: Compat[] = [
+  { make: 'BYD', model: 'Atto 3', seg: 'Compact SUV', kwh: '49.9 / 60.5 kWh', obd: 'locked', common: true },
+  { make: 'BYD', model: 'Dolphin', seg: 'Hatchback', kwh: '44.9 / 60.5 kWh', obd: 'locked', common: true },
+  { make: 'BYD', model: 'Seal', seg: 'Saloon', kwh: '61.4 / 82.5 kWh', obd: 'locked', common: false },
+  { make: 'BYD', model: 'Song Plus EV', seg: 'Mid-size SUV', kwh: '71.8 / 87 kWh', obd: 'locked', common: true },
+  { make: 'BYD', model: 'Yuan Plus', seg: 'Compact SUV', kwh: '49.9 / 60.5 kWh', obd: 'locked', common: true },
+  { make: 'BYD', model: 'e2', seg: 'Hatchback', kwh: '43.2 kWh', obd: 'locked', common: true },
+  { make: 'Changan', model: 'Deepal S07', seg: 'Mid-size SUV', kwh: '68.8 / 80 kWh', obd: 'locked', common: false },
+  { make: 'Changan', model: 'Lumin', seg: 'City car', kwh: '12.9 / 27.9 kWh', obd: 'locked', common: true },
+  { make: 'Jetour', model: 'Ice Cream EV', seg: 'City car', kwh: '9.6 / 13.9 kWh', obd: 'locked', common: true },
+  { make: 'Geely', model: 'Geometry C', seg: 'Crossover', kwh: '53 / 70 kWh', obd: 'partial', common: false },
+  { make: 'Geely', model: 'Geometry E', seg: 'City SUV', kwh: '39.4 kWh', obd: 'partial', common: false },
+  { make: 'Nissan', model: 'Leaf', seg: 'Hatchback', kwh: '40 / 62 kWh', obd: 'readable', common: false },
+  { make: 'Hyundai', model: 'Kona Electric', seg: 'Compact SUV', kwh: '39.2 / 64 kWh', obd: 'partial', common: false },
+  { make: 'Toyota', model: 'bZ4X', seg: 'Mid-size SUV', kwh: '71.4 kWh', obd: 'partial', common: false },
+]

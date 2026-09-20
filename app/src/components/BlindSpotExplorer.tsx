@@ -96,7 +96,7 @@ export function BlindSpotExplorer() {
                 <b className="font-mono text-3xl font-semibold tabular">{soh.toFixed(1)}%</b>
                 <Badge variant={g.toLowerCase() as 'a'}>Grade {g}</Badge>
               </div>
-              <small className="text-xs text-muted-foreground">{(CAR.kwh * soh / 100).toFixed(1)} kWh usable</small>
+              <small className="text-xs text-muted-foreground">{(CAR.kwh * soh / 100).toFixed(1)} kWh usable · true range ≈ {Math.round(CAR.range * soh / 100)} km</small>
             </div>
           ))}
           <div className="col-span-2 bg-card p-4">

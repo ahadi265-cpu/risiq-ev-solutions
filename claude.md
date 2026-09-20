@@ -91,3 +91,10 @@ Gaps built: hero **audience impact switcher** (the rail rewrites eyebrow + parag
 - **Declined (stated to owner):** React Hook Form + Zod. The two forms are small, already typed and validated with plain state; the libraries would add weight for no user-visible change. Add them only if the forms grow.
 - **Test-script gotcha:** `html { scroll-behavior: smooth }` means `scrollIntoView` animates in headless Chrome; a second scroll call right after cancels it. Use `window.scrollTo({ top, behavior: 'instant' })` in verification scripts.
 - **Bug fixed 2026-09-18:** `dark:` utilities followed the OS media query (no `@custom-variant dark` was declared), so visitors with a dark OS setting saw light-mode pages with dark-only colours (white-on-white booking dock). `@custom-variant dark (&:is(.dark *));` now binds them to the header toggle's `.dark` class. Verify theme work under `Emulation.setEmulatedMedia prefers-color-scheme: dark` as well as the toggle.
+
+# Status (2026-09-20) — compatibility search, persona CTA/stat
+- New `CompatibilitySearch` (Home, under the EV selector): real-time filter over `COMPAT` in `lib/data.ts` (BYD Atto 3/Dolphin/Seal/Song Plus/Yuan Plus/e2, Changan Deepal S07/Lumin, Jetour Ice Cream EV, Geely Geometry C/E, Nissan Leaf, Hyundai Kona, Toyota bZ4X). Three badges per car: socket measurement 100 % supported; OBD BMS status (locked / partial / readable — Leaf is readable and says "still cross-checked"); test time. Unknown query → "if it charges, we can test it". Pack sizes are manufacturer-rated; keep `obd` honest per model.
+- Hero persona switcher now also morphs a per-audience stat chip and the primary CTA label (`HERO_COPY.stat` / `.cta`).
+- Blind Spot cards show true range (km) alongside usable kWh.
+- The brief's "Jetour Dashing" is a petrol car; the electric Jetour on Ethiopian roads is the Ice Cream EV, which is what the list carries.
+

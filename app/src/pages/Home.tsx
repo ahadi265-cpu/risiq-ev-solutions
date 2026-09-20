@@ -22,6 +22,7 @@ import { AudienceSwitcher } from '@/components/AudienceSwitcher'
 import { ServiceTabs } from '@/components/ServiceTabs'
 import { CalibrationFlow } from '@/components/CalibrationFlow'
 import { BydFocus, GradeLegend } from '@/components/BydFocus'
+import { CompatibilitySearch } from '@/components/CompatibilitySearch'
 
 /* the playable test run is its own chunk; it mounts below the fold */
 const TestVisualizer = lazy(() => import('@/components/TestVisualizer').then((m) => ({ default: m.TestVisualizer })))
@@ -73,18 +74,18 @@ const QUICK = [
   { id: 'regulators', label: 'Regulators', sub: 'One national standard', icon: Scale },
 ]
 /* Audience impact switcher: the rail rewrites the hero message and preselects the switcher below. */
-const HERO_COPY: Record<string, { eyebrow: string; body: string }> = {
+const HERO_COPY: Record<string, { eyebrow: string; body: string; stat?: [string, string]; cta?: string }> = {
   default: { eyebrow: 'EV Battery Intelligence & Certification',
     body: 'On an electric car, the battery is half the value — and the odometer tells you nothing about it. RISIQ certifies the batteries of BYD and other Chinese EVs on Ethiopian roads: an independent, verifiable report in fifteen minutes, so you can buy, lend and insure with confidence.' },
-  buyers: { eyebrow: 'For buyers & sellers',
+  buyers: { eyebrow: 'For buyers & sellers', stat: ['50%', 'of a used EV’s value is the battery'], cta: 'Book a buyer briefing',
     body: 'A used Atto 3 is priced on mileage and paintwork — the battery, half its value, stays invisible. Ask for the RISIQ certificate: one scan shows the measured, calibrated health, and a certified car sells faster at a fair price.' },
-  insurers: { eyebrow: 'For insurers',
+  insurers: { eyebrow: 'For insurers', stat: ['A–D', 'one grade per policy'], cta: 'Book an insurer briefing',
     body: 'Every EV policy in Addis is underwritten blind to the battery, the most expensive part to replace. RISIQ gives you a measured state of health at underwriting and again at claim, so risk is priced and disputes settle on a number.' },
-  banks: { eyebrow: 'For banks & MFIs',
+  banks: { eyebrow: 'For banks & MFIs', stat: ['35%', 'of collateral value sits in the pack'], cta: 'Book a lender briefing',
     body: 'On a five-year EV loan the battery is roughly a third of the collateral — and the only part nobody checks. RISIQ gives your credit committee a measured, calibrated state of health at origination and at every re-test.' },
-  importers: { eyebrow: 'For importers',
+  importers: { eyebrow: 'For importers', stat: ['Any EV', 'certified on arrival, no OEM unlock'], cta: 'Book an importer briefing',
     body: 'BYD, Changan, Jetour — locked to the manufacturer’s tools. RISIQ certifies each import at the charging socket on arrival, so you price and warrant every car by its measured grade, no OEM unlock required.' },
-  regulators: { eyebrow: 'For regulators',
+  regulators: { eyebrow: 'For regulators', stat: ['< 2 s', 'public verification of any certificate'], cta: 'Talk to us about a standard',
     body: 'Ethiopia went electric faster than any country in Africa. One independent grade scale across every brand — publicly verifiable in seconds — lets lenders, insurers and the resale market grow with the fleet.' },
 }
 
@@ -129,6 +130,12 @@ export default function Home() {
             </h1>
             <p key={`p-${aud}`} className="animate-rise mt-8 max-w-[52ch] text-xl text-white/85 md:text-2xl md:leading-snug">
               {copy.body}
+              {copy.stat && (
+                <span className="mt-4 flex items-baseline gap-2.5 rounded-xl border border-white/25 bg-white/10 px-4 py-2.5 backdrop-blur">
+                  <b className="font-mono text-2xl font-semibold text-white">{copy.stat[0]}</b>
+                  <span className="text-sm text-white/80">{copy.stat[1]}</span>
+                </span>
+              )}
               {aud !== 'default' && (
                 <a href="#audience" onClick={(e) => { e.preventDefault(); document.getElementById('audience')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }}
                   className="mt-3 block text-base font-semibold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white">
@@ -145,7 +152,7 @@ export default function Home() {
             </ul>
             <div className="mt-11 flex flex-wrap gap-4">
               <BriefingModal trigger={
-                <Button size="lg" className="h-14 rounded-lg bg-white px-9 text-base text-brand shadow-xl hover:bg-white hover:text-brand-dark">Book a pilot briefing</Button>} />
+                <Button key={aud} size="lg" className="animate-rise h-14 rounded-lg bg-white px-9 text-base text-brand shadow-xl hover:bg-white hover:text-brand-dark">{copy.cta ?? 'Book a pilot briefing'}</Button>} />
               <CertificateInspector trigger={
                 <Button size="lg" variant="outline" className="h-14 rounded-lg border-white/35 bg-white/10 px-9 text-base text-white hover:border-white hover:bg-white hover:text-brand">
                   <ShieldCheck />Live verification demo
@@ -235,6 +242,7 @@ export default function Home() {
           Most electric cars in Addis are BYDs, locked to the manufacturer’s tools. Pick a model to see what a plain OBD reader gets — and what RISIQ meters at the socket.
         </SectionHead>
         <Reveal><BydFocus /></Reveal>
+        <Reveal className="mt-10"><CompatibilitySearch /></Reveal>
       </Section>
 
       {/* ----------------------------------------------------- what we offer */}
