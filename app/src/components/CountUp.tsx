@@ -40,9 +40,12 @@ export function CountUp({ to, decimals = 0, prefix = '', suffix = '', duration =
     return () => { io.disconnect(); cancelAnimationFrame(raf); clearTimeout(settle) }
   }, [to, duration, reduce])
 
+  const fmtN = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+  const final = `${prefix}${fmtN(to)}${suffix}`
   return (
-    <span ref={ref} className="tabular">
-      {prefix}{val.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}{suffix}
+    // inline-block with the final string's width reserved: the number grows in place, nothing beside it moves
+    <span ref={ref} className="tabular inline-block text-right" style={{ minWidth: `${final.length}ch` }}>
+      {prefix}{fmtN(val)}{suffix}
     </span>
   )
 }

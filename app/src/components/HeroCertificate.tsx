@@ -87,8 +87,12 @@ const ROWS: [string, string][] = [
 
 /** The hero certificate: a real HTML card (not a PNG) with a counting gauge and
  *  spring-physics 3D tilt on hover. */
-export function HeroCertificate({ className }: { className?: string }) {
+const coarse = () => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
+export function HeroCertificate({ className, onTap }: { className?: string; onTap?: () => void }) {
   const reduce = useReducedMotion()
+  const [touch] = useState(coarse)
+  const tilt = !reduce && !touch
   const ref = useRef<HTMLDivElement>(null)
   const rx = useMotionValue(0), ry = useMotionValue(0)
   const gx = useMotionValue(50), gy = useMotionValue(50)
@@ -97,7 +101,7 @@ export function HeroCertificate({ className }: { className?: string }) {
   const glare = useMotionTemplate`radial-gradient(60% 60% at ${gx}% ${gy}%, oklch(1 0 0 / 0.28), transparent 70%)`
 
   const onMove = (e: React.PointerEvent) => {
-    if (reduce || !ref.current) return
+    if (!tilt || !ref.current) return
     const b = ref.current.getBoundingClientRect()
     const px = (e.clientX - b.left) / b.width, py = (e.clientY - b.top) / b.height
     ry.set((px - 0.5) * 22); rx.set((0.5 - py) * 18)
@@ -107,9 +111,16 @@ export function HeroCertificate({ className }: { className?: string }) {
 
   return (
     <motion.div ref={ref} onPointerMove={onMove} onPointerLeave={onLeave}
-      style={{ rotateX: srx, rotateY: sry, transformPerspective: 1100 }}
-      className={cn('relative w-full max-w-[440px] cursor-default rounded-2xl border bg-card text-card-foreground shadow-[0_30px_70px_rgba(0,0,0,0.35)] [transform-style:preserve-3d]', className)}>
-      <motion.div aria-hidden style={{ background: glare }} className="pointer-events-none absolute inset-0 z-10 rounded-2xl mix-blend-overlay" />
+      onClick={onTap} role={onTap ? 'button' : undefined} tabIndex={onTap ? 0 : undefined}
+      onKeyDown={onTap ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTap() } } : undefined}
+      aria-label={onTap ? 'Open the certificate inspector' : undefined}
+      style={tilt ? { rotateX: srx, rotateY: sry, transformPerspective: 1100 } : undefined}
+      className={cn('relative w-full max-w-[440px] rounded-2xl border bg-card text-card-foreground shadow-[0_30px_70px_rgba(0,0,0,0.35)]',
+        tilt && '[transform-style:preserve-3d]', onTap ? 'cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50' : 'cursor-default', className)}>
+      {onTap && touch && (
+        <span className="absolute top-3 left-1/2 z-20 -translate-x-1/2 rounded-full bg-ink/85 px-3 py-1 font-mono text-[0.6rem] tracking-wider text-white uppercase">Tap to inspect</span>
+      )}
+      {tilt && <motion.div aria-hidden style={{ background: glare }} className="pointer-events-none absolute inset-0 z-10 rounded-2xl mix-blend-overlay" />}
 
       <div className="grid gap-5 p-6 [transform:translateZ(1px)]">
         <header className="flex items-start justify-between gap-4">

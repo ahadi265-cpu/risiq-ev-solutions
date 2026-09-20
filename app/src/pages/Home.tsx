@@ -92,6 +92,7 @@ const HERO_COPY: Record<string, { eyebrow: string; body: string; stat?: [string,
 export default function Home() {
   const reduce = useReducedMotion()
   const [aud, setAud] = useState<string>('default')
+  const [inspect, setInspect] = useState(false)
   const copy = HERO_COPY[aud]
   const pickAudience = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault()
@@ -169,7 +170,7 @@ export default function Home() {
             <motion.div data-parallax="-6"
               animate={reduce ? undefined : { y: [0, -10, 0] }}
               transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}>
-              <HeroCertificate className="max-w-[520px]" />
+              <HeroCertificate className="max-w-[520px]" onTap={() => setInspect(true)} />
             </motion.div>
             <span className="absolute -bottom-4 -left-4 flex items-center gap-2 rounded-full border bg-card px-4 py-2.5 font-mono text-xs text-primary shadow-xl">
               <QrCode className="size-3.5" />Scan to verify · &lt; 2 s
@@ -410,7 +411,7 @@ export default function Home() {
           <Reveal delay={0.1}>
             {/* the live certificate with hotspot callouts — hover to tilt, numbers explain the fields */}
             <div className="relative mx-auto w-full max-w-[460px] pt-4">
-              <HeroCertificate className="max-w-[460px]" />
+              <HeroCertificate className="max-w-[460px]" onTap={() => setInspect(true)} />
               {([
                 { x: 50, y: 22 }, { x: 50, y: 37 }, { x: 88, y: 51 }, { x: 10, y: 93 },
               ] as const).map((m, i) => (
@@ -458,6 +459,8 @@ export default function Home() {
           </Accordion>
         </Reveal>
       </Section>
+
+      <CertificateInspector open={inspect} onOpenChange={setInspect} />
 
       {/* ------------------------------------------------------------ CTA */}
       <Section>

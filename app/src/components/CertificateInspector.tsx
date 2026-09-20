@@ -14,13 +14,15 @@ const IDS = Object.keys(CERTIFICATES)
 
 /** Full-screen certificate inspector: switch between the three sample
  *  certificates and hover the cell map. Opened from the hero CTA. */
-export function CertificateInspector({ trigger }: { trigger: ReactNode }) {
+export function CertificateInspector({ trigger, open, onOpenChange }: {
+  trigger?: ReactNode; open?: boolean; onOpenChange?: (o: boolean) => void
+}) {
   const [id, setId] = useState(IDS[0])
   const cert = CERTIFICATES[id]
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="h-[min(92dvh,900px)] w-[min(96vw,1240px)] max-w-none overflow-y-auto p-0 md:p-0">
         <div className="grid gap-8 p-6 md:p-10">
           <div className="flex flex-wrap items-start justify-between gap-4 pr-10">

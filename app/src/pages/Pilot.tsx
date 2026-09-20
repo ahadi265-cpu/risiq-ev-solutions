@@ -189,9 +189,10 @@ export default function Pilot() {
         </Reveal>
 
         <Reveal className="mt-8">
-          <details className="rounded-xl border bg-card">
+          <details className="max-w-full overflow-hidden rounded-xl border bg-card">
             <summary className="cursor-pointer px-6 py-4 text-sm font-semibold">View the underlying data</summary>
-            <div className="overflow-x-auto px-6 pb-6">
+            {/* the scroller must not widen the page on phones: cap it to the card and scroll inside */}
+            <div className="max-w-full overflow-x-auto px-6 pb-6 [scrollbar-width:thin]">
               <table className="w-full min-w-[640px] text-sm">
                 <thead className="text-left font-mono text-[0.68rem] tracking-wider text-muted-foreground uppercase">
                   <tr>{['Vehicle', 'Model', 'Odometer', 'SoH', 'Grade', 'Rated', 'Measured'].map((th) => <th key={th} className="border-b py-3 pr-4 font-medium">{th}</th>)}</tr>

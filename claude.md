@@ -98,3 +98,9 @@ Gaps built: hero **audience impact switcher** (the rail rewrites eyebrow + parag
 - Blind Spot cards show true range (km) alongside usable kWh.
 - The brief's "Jetour Dashing" is a petrol car; the electric Jetour on Ethiopian roads is the Ice Cream EV, which is what the list carries.
 
+# Mobile & performance guardrails (2026-09-20)
+- Every route holds `scrollWidth === 390` at phone width with all `<details>` open (audited via CDP at 390×844, touch + `pointer: coarse` emulated). `TabsList` wraps (`max-w-full flex-wrap`); table scrollers are capped with `max-w-full overflow-x-auto`.
+- `DialogContent` is `max-h-[calc(100dvh-1.5rem)] overflow-y-auto`, so the booking wizard scrolls inside itself on short phones.
+- `HeroCertificate`: no 3D tilt or glare when `(pointer: coarse)`; with `onTap` the card is a keyboard-reachable button that opens `CertificateInspector` (now supports controlled `open`/`onOpenChange`), with a "Tap to inspect" hint on touch devices.
+- `CountUp` reserves the final value's width (`min-width: <n>ch`, inline-block, tabular) so units beside a counting number never shift.
+
