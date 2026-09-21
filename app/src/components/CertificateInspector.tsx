@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
 import { ShieldCheck, ExternalLink, AlertTriangle, Info, Check } from 'lucide-react'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '@/components/ui/dialog'
@@ -9,6 +10,7 @@ import { SohGauge } from '@/components/HeroCertificate'
 import { CERTIFICATES } from '@/lib/data'
 import { Benchmark } from '@/components/Benchmark'
 import { cn } from '@/lib/utils'
+import { useTilt } from '@/lib/useTilt'
 
 const IDS = Object.keys(CERTIFICATES)
 
@@ -19,6 +21,7 @@ export function CertificateInspector({ trigger, open, onOpenChange }: {
 }) {
   const [id, setId] = useState(IDS[0])
   const cert = CERTIFICATES[id]
+  const tilt = useTilt({ max: 7 })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -33,7 +36,20 @@ export function CertificateInspector({ trigger, open, onOpenChange }: {
                 Three sample records from the registry. Hover the cell map to read individual cells; click to pin one.
               </DialogDescription>
             </div>
-            <div role="tablist" aria-label="Sample certificate" className="flex gap-1 rounded-full border bg-muted p-1">
+            <div className="grid gap-3">
+              {/* live diagnostic rail — the chrome a bench instrument would show */}
+              <ul className="flex flex-wrap items-center gap-2">
+                {([['Registry online', 'grade-a'], ['Signature valid', 'grade-a'], ['Calibrated', 'teal']] as const).map(([t, tone]) => (
+                  <li key={t} className={cn('flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[0.6rem] tracking-wider uppercase',
+                    tone === 'teal' ? 'border-teal/30 bg-teal/10 text-teal' : 'border-grade-a/30 bg-grade-a/10 text-grade-a')}>
+                    <span className="relative grid size-1.5 place-items-center">
+                      <span className={cn('absolute inset-0 rounded-full motion-safe:animate-ping', tone === 'teal' ? 'bg-teal/70' : 'bg-grade-a/70')} />
+                      <span className={cn('size-1.5 rounded-full', tone === 'teal' ? 'bg-teal' : 'bg-grade-a')} />
+                    </span>{t}
+                  </li>
+                ))}
+              </ul>
+              <div role="tablist" aria-label="Sample certificate" className="flex gap-1 rounded-full border bg-muted p-1 justify-self-end">
               {IDS.map((x) => (
                 <button key={x} role="tab" type="button" aria-selected={x === id} onClick={() => setId(x)}
                   className={cn('cursor-pointer rounded-full px-3.5 py-1.5 font-mono text-xs transition-all',
@@ -41,12 +57,16 @@ export function CertificateInspector({ trigger, open, onOpenChange }: {
                   Grade {CERTIFICATES[x].grade}
                 </button>
               ))}
+              </div>
             </div>
           </div>
 
           {/* keyed so the gauge re-counts and the map re-pops for each sample */}
           <div key={id} className="animate-rise grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="grid content-start gap-6 rounded-2xl border bg-gradient-to-br from-card to-muted/40 p-6">
+            <motion.div {...tilt.bind}
+              className={cn('relative grid content-start gap-6 rounded-2xl border bg-gradient-to-br from-card to-muted/40 p-6 shadow-xl',
+                tilt.active && '[transform-style:preserve-3d]')}>
+              {tilt.glare && <motion.span aria-hidden style={{ background: tilt.glare }} className="pointer-events-none absolute inset-0 z-10 rounded-2xl mix-blend-overlay" />}
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <span className="inline-flex items-center gap-2 rounded-full border border-grade-a/30 bg-grade-a/10 px-3 py-1 font-mono text-[0.68rem] tracking-wider text-grade-a uppercase">
@@ -79,7 +99,7 @@ export function CertificateInspector({ trigger, open, onOpenChange }: {
                     </p>
                   ))}
               </div>
-            </div>
+            </motion.div>
 
             <div className="grid content-start gap-6">
               <CellHeatmap id={id} soh={cert.stateOfHealth} />

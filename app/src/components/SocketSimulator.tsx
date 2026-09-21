@@ -7,27 +7,37 @@ type Mode = 'obd' | 'socket'
 
 const MODES: Record<Mode, { label: string; tag: string; ok: boolean; headline: string; body: string; readout: string }> = {
   obd: {
-    label: 'Standard OBD reader', tag: 'Often blocked · never taken at face value', ok: false,
+    label: 'Standard OBD reader', tag: 'Access denied · BMS encrypted', ok: false,
     headline: 'The dongle asks the car for a number. We never take that number as the verdict.',
     body: 'An OBD reader requests the battery computer’s own estimate over a diagnostic port. Many Chinese imports encrypt that channel, so a reader alone gets nothing. Where the car does answer, RISIQ records the BMS figure — then cross-checks it against our own calibrated database of measured packs before it can influence a certificate.',
     readout: '— — . —',
   },
   socket: {
-    label: 'RISIQ socket measurement', tag: 'Works on every EV that charges', ok: true,
+    label: 'RISIQ socket measurement', tag: '100% direct electrical energy signal captured', ok: true,
     headline: 'We measure the electricity itself. Every car has to accept it.',
     body: 'RISIQ sits in line at the charging socket and meters the energy actually crossing into the pack with a Class 0.5S revenue-grade meter, sampled once a second. Nothing is asked of the car, so nothing can be encrypted, locked or optimistic — and this is the reference every BMS reading is calibrated against.',
     readout: '',
   },
 }
 
-const PARTICLES = 9
-const FLOW = 'M 90 150 C 190 150, 220 150, 300 150 L 430 150 C 520 150, 560 150, 660 150'
+/* Main bus: charger → RISIQ meter → charge port. Orthogonal, PCB-style. */
+const BUS_IN = 'M 96 168 H 302'
+const BUS_OUT = 'M 430 168 H 496 C 528 168, 532 145, 564 145 H 570'
+const UPLINK = 'M 366 110 V 62 Q 366 48 380 48 H 596'
+/* OBD request: dongle → up behind the dash → ECU in the cabin, where it is refused. */
+const OBD_OUT = 'M 408 262 H 462 Q 478 262 478 246 V 128 Q 478 112 492 112 H 649'
+
+const PARTICLES = 7
+/* The car sits at translate(540 56): body x 560–740, charge port 570–588 × 136–154. */
+const ECU: [number, number] = [665, 112]
+const NODES: [number, number][] = [[96, 168], [302, 168], [430, 168], [496, 168], [570, 145]]
 
 export function SocketSimulator({ className }: { className?: string }) {
   const reduce = useReducedMotion()
   const [mode, setMode] = useState<Mode>('socket')
   const [kwh, setKwh] = useState(0)
   const m = MODES[mode]
+  const live = mode === 'socket'
 
   // meter readout climbs while energy flows, resets when the mode changes
   useEffect(() => {
@@ -37,6 +47,17 @@ export function SocketSimulator({ className }: { className?: string }) {
     return () => clearInterval(id)
   }, [mode])
 
+  /** A glowing charge carrier riding one of the traces. */
+  const carrier = (i: number, href: string, colour: string, dur: number, bounce = false) => (
+    <circle key={`${href}-${i}`} r={bounce ? 5 : 4} fill={colour} style={{ filter: `drop-shadow(0 0 6px ${colour})` }}>
+      <animateMotion dur={`${dur}s`} repeatCount="indefinite" begin={`${-(i * dur) / PARTICLES}s`}
+        {...(bounce ? { keyPoints: '0;1;0', keyTimes: '0;0.5;1', calcMode: 'linear' as const } : {})}>
+        <mpath href={href} />
+      </animateMotion>
+      {bounce && <animate attributeName="opacity" values="1;1;0.2;1" dur={`${dur}s`} repeatCount="indefinite" />}
+    </circle>
+  )
+
   return (
     <div className={cn('grid gap-6 rounded-3xl border bg-card p-6 shadow-sm md:p-8', className)}>
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -44,7 +65,7 @@ export function SocketSimulator({ className }: { className?: string }) {
         <div role="tablist" aria-label="Measurement method" className="flex flex-wrap gap-1 rounded-full border bg-muted p-1">
           {(Object.keys(MODES) as Mode[]).map((k) => (
             <button key={k} role="tab" type="button" aria-selected={k === mode} onClick={() => setMode(k)}
-              className={cn('flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all',
+              className={cn('flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-medium outline-none transition-all focus-visible:ring-[3px] focus-visible:ring-ring/50',
                 k === mode ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}>
               {MODES[k].ok ? <Check className="size-3.5 text-teal" strokeWidth={3} /> : <Lock className="size-3.5 text-destructive" />}
               {MODES[k].label}
@@ -53,81 +74,128 @@ export function SocketSimulator({ className }: { className?: string }) {
         </div>
       </div>
 
-      <div className="bg-grid overflow-hidden rounded-2xl border">
-        <svg viewBox="0 0 760 300" className="block w-full" role="img"
-          aria-label={mode === 'socket' ? 'Energy flows from the charger through the RISIQ meter into the car; the meter reads it.' : 'An OBD dongle asks the car for data and is refused by an encrypted protocol.'}>
+      <div className="bg-grid relative overflow-hidden rounded-2xl border bg-[radial-gradient(70%_80%_at_50%_50%,color-mix(in_oklch,var(--teal)_8%,transparent),transparent_75%)]">
+        <svg viewBox="0 0 760 320" className="block w-full" role="img"
+          aria-label={live
+            ? 'Energy flows from the charger along a circuit trace, through the RISIQ meter and into the car, while a signed record travels up to the registry.'
+            : 'An OBD dongle sends a request toward the car’s ECU; the request is refused and bounces back, and an access-denied lock flashes.'}>
           <defs>
-            <linearGradient id="cable" x1="0" x2="1">
-              <stop offset="0" stopColor="var(--teal)" stopOpacity="0.35" /><stop offset="1" stopColor="var(--teal)" stopOpacity="0.9" />
+            <path id="bus-in" d={BUS_IN} /><path id="bus-out" d={BUS_OUT} />
+            <path id="uplink" d={UPLINK} /><path id="obd-out" d={OBD_OUT} />
+            <linearGradient id="trace" x1="0" x2="1">
+              <stop offset="0" stopColor="var(--teal)" stopOpacity="0.25" />
+              <stop offset="1" stopColor="var(--teal)" stopOpacity="0.95" />
             </linearGradient>
-            <path id="flow" d={FLOW} />
+            <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#0b0f17" /><stop offset="1" stopColor="#111826" />
+            </linearGradient>
           </defs>
 
-          {/* charger */}
-          <g transform="translate(30 90)">
-            <rect width="64" height="120" rx="10" fill="var(--card)" stroke="var(--border)" />
-            <rect x="12" y="14" width="40" height="26" rx="4" fill="var(--muted)" />
-            <text x="32" y="31" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="9" fill="var(--muted-foreground)">60 kW</text>
-            <text x="32" y="100" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--muted-foreground)" letterSpacing="1">DC CHARGER</text>
+          {/* decorative PCB traces behind everything */}
+          <g stroke="var(--border)" strokeWidth="1" fill="none" opacity="0.5">
+            <path d="M 40 46 H 150 Q 164 46 164 60 V 96" /><path d="M 700 250 H 600 Q 586 250 586 264 V 292" />
+            <path d="M 40 292 H 240" /><path d="M 720 60 H 660" />
           </g>
 
-          {/* cable and flow */}
-          <path d={FLOW} fill="none" stroke={mode === 'socket' ? 'url(#cable)' : 'var(--border)'} strokeWidth="6" strokeLinecap="round" />
-          {mode === 'socket' && !reduce && Array.from({ length: PARTICLES }, (_, i) => (
-            <circle key={i} r="4.5" fill="var(--teal)" style={{ filter: 'drop-shadow(0 0 5px var(--teal))' }}>
-              <animateMotion dur="2.4s" repeatCount="indefinite" begin={`${-(i * 2.4) / PARTICLES}s`}><mpath href="#flow" /></animateMotion>
-            </circle>
+          {/* ---------------------------------------------------- charger */}
+          <g transform="translate(30 108)">
+            <rect width="66" height="124" rx="12" fill="var(--card)" stroke="var(--border)" />
+            <rect x="12" y="14" width="42" height="28" rx="5" fill="url(#screen)" />
+            <text x="33" y="32" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="9" fill={live ? 'var(--teal)' : '#64748b'}>60 kW</text>
+            <circle cx="33" cy="60" r="4" fill={live ? 'var(--teal)' : 'var(--border)'} className={live && !reduce ? 'node-pulse' : undefined} />
+            <text x="33" y="104" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--muted-foreground)" letterSpacing="1">DC CHARGER</text>
+          </g>
+
+          {/* ------------------------------------------- the main bus traces */}
+          <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <path d={BUS_IN} stroke={live ? 'url(#trace)' : 'var(--border)'} strokeWidth="6" className={live ? 'trace-glow text-teal' : undefined} />
+            <path d={BUS_OUT} stroke={live ? 'url(#trace)' : 'var(--border)'} strokeWidth="6" className={live ? 'trace-glow text-teal' : undefined} />
+          </g>
+          {NODES.map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r="3.5" fill={live ? 'var(--teal)' : 'var(--border)'} />
           ))}
-          {mode === 'socket' && reduce && <path d={FLOW} fill="none" stroke="var(--teal)" strokeWidth="6" strokeLinecap="round" strokeDasharray="10 14" />}
 
-          {/* RISIQ meter, in line */}
-          <g transform="translate(300 96)">
-            <rect width="130" height="108" rx="12" fill="var(--card)" stroke={mode === 'socket' ? 'var(--teal)' : 'var(--border)'} strokeWidth={mode === 'socket' ? 1.5 : 1} />
-            <text x="65" y="20" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--primary)" letterSpacing="1.4" fontWeight="600">RISIQ METER</text>
-            <rect x="14" y="30" width="102" height="40" rx="6" fill="var(--ink)" />
-            <text x="65" y="56" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="17" fill={mode === 'socket' ? '#3cc4ae' : '#7b8494'} fontWeight="600">
-              {mode === 'socket' ? kwh.toFixed(2) : m.readout}
+          {/* charge carriers riding the bus */}
+          {live && !reduce && Array.from({ length: PARTICLES }, (_, i) => carrier(i, '#bus-in', 'var(--teal)', 2.2))}
+          {live && !reduce && Array.from({ length: PARTICLES }, (_, i) => carrier(i, '#bus-out', 'var(--teal)', 2.2))}
+          {live && reduce && <path d={`${BUS_IN} ${BUS_OUT}`} fill="none" stroke="var(--teal)" strokeWidth="6" strokeDasharray="10 14" strokeLinecap="round" />}
+
+          {/* ------------------------------------------- RISIQ precision rig */}
+          <g transform="translate(302 110)">
+            <rect width="128" height="116" rx="14" fill="var(--card)" stroke={live ? 'var(--teal)' : 'var(--border)'} strokeWidth={live ? 2 : 1}
+              className={live ? 'trace-glow text-teal' : undefined} />
+            <text x="64" y="20" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--primary)" letterSpacing="1.4" fontWeight="600">RISIQ METER</text>
+            <rect x="13" y="30" width="102" height="42" rx="6" fill="url(#screen)" />
+            {/* scan line inside the display */}
+            {live && !reduce && (
+              <rect x="13" y="30" width="18" height="42" fill="var(--teal)" opacity="0.14">
+                <animate attributeName="x" values="13;97;13" dur="3.4s" repeatCount="indefinite" />
+              </rect>
+            )}
+            <text x="64" y="58" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="18" fontWeight="600"
+              fill={live ? '#5eead4' : '#64748b'} style={live ? { filter: 'drop-shadow(0 0 7px #2dd4bf)' } : undefined}>
+              {live ? kwh.toFixed(2) : m.readout}
             </text>
-            <text x="65" y="88" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8" fill="var(--muted-foreground)" letterSpacing="1">
-              {mode === 'socket' ? 'kWh DELIVERED · 1 Hz' : 'NO MEASUREMENT PATH'}
+            <text x="64" y="88" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8" fill="var(--muted-foreground)" letterSpacing="1">
+              {live ? 'kWh DELIVERED · 1 Hz' : 'NO MEASUREMENT PATH'}
             </text>
-            <text x="65" y="100" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="7.5" fill="var(--muted-foreground)">Class 0.5S</text>
+            <text x="64" y="102" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="7.5" fill="var(--muted-foreground)">Class 0.5S</text>
           </g>
 
-          {/* car */}
-          <g transform="translate(560 70)">
+          {/* ------------------------------------------------------------ car */}
+          <g transform="translate(540 56)">
             <path d="M20 120 C 20 90, 40 70, 70 60 L 110 40 C 130 32, 160 32, 175 44 L 190 60 C 200 70, 200 100, 196 120 Z"
-              fill="var(--card)" stroke="var(--border)" strokeWidth="1.5" />
+              fill="var(--card)" stroke="var(--muted-foreground)" strokeWidth="1.5" strokeOpacity="0.55" />
             <path d="M78 62 L 112 46 C 128 40, 150 40, 162 50 L 170 62 Z" fill="var(--muted)" />
             <circle cx="60" cy="122" r="16" fill="var(--card)" stroke="var(--foreground)" strokeWidth="3" />
             <circle cx="160" cy="122" r="16" fill="var(--card)" stroke="var(--foreground)" strokeWidth="3" />
-            {/* charge port */}
-            <rect x="94" y="72" width="16" height="16" rx="3" fill={mode === 'socket' ? 'var(--teal)' : 'var(--muted)'} stroke="var(--border)" />
-            <text x="102" y="106" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="7.5" fill="var(--muted-foreground)" letterSpacing="1">CHARGE PORT</text>
-            <text x="102" y="160" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--muted-foreground)" letterSpacing="1">BYD ATTO 3 · DOLPHIN · SONG PLUS</text>
+            {/* charge port on the front wing — where the bus terminates */}
+            <rect x="30" y="80" width="18" height="18" rx="4" fill={live ? 'var(--teal)' : 'var(--muted)'} stroke="var(--border)"
+              className={live ? 'trace-glow text-teal' : undefined} />
           </g>
+          <text x="579" y="212" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="7.5" fill="var(--muted-foreground)" letterSpacing="1">CHARGE PORT</text>
+          <text x="650" y="236" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--muted-foreground)" letterSpacing="1">BYD ATTO 3 · DOLPHIN · SONG PLUS</text>
 
-          {/* OBD path: dongle under the dash, request refused */}
-          {mode === 'obd' && (
+          {/* --------------------------------------------- socket mode extras */}
+          {live && (
             <g>
-              <path d="M 430 236 L 560 236 L 600 180" fill="none" stroke="var(--destructive)" strokeWidth="2.5" strokeDasharray="6 6" className="dash-run" />
-              <g transform="translate(360 220)">
-                <rect width="70" height="32" rx="6" fill="var(--card)" stroke="var(--destructive)" />
-                <text x="35" y="20" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--destructive)" fontWeight="600" letterSpacing="1">OBD DONGLE</text>
-              </g>
-              <g transform="translate(590 168)">
-                <circle r="15" fill="var(--card)" stroke="var(--destructive)" strokeWidth="1.5" />
-                <path d="M-5 -1 v-3 a5 5 0 0 1 10 0 v3 M-7 -1 h14 v9 h-14 z" fill="none" stroke="var(--destructive)" strokeWidth="1.8" />
-              </g>
-              <text x="495" y="266" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="9" fill="var(--destructive)" letterSpacing="1">ENCRYPTED · REQUEST REFUSED</text>
+              <path d={UPLINK} fill="none" stroke="var(--teal)" strokeWidth="1.5" strokeDasharray="4 8" className={reduce ? undefined : 'dash-run'} />
+              {!reduce && Array.from({ length: 3 }, (_, i) => carrier(i, '#uplink', 'var(--teal)', 3.2))}
+              <text x="470" y="40" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--muted-foreground)" letterSpacing="1">SIGNED RECORD → REGISTRY</text>
+              <text x="380" y="300" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="9" fill="var(--teal)" letterSpacing="1" fontWeight="600">
+                100% DIRECT ELECTRICAL ENERGY SIGNAL CAPTURED
+              </text>
             </g>
           )}
 
-          {/* cloud link from the meter */}
-          {mode === 'socket' && (
+          {/* ------------------------------------------------ OBD mode extras */}
+          {!live && (
             <g>
-              <path d="M 365 96 L 365 40 L 600 40" fill="none" stroke="var(--teal)" strokeWidth="1.5" strokeDasharray="4 8" className="dash-run" />
-              <text x="480" y="32" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--muted-foreground)" letterSpacing="1">SIGNED RECORD → REGISTRY</text>
+              <path d={OBD_OUT} fill="none" stroke="var(--destructive)" strokeWidth="2" strokeDasharray="6 6" opacity="0.65" className={reduce ? undefined : 'dash-run'} />
+              <g transform="translate(332 245)">
+                <rect width="76" height="34" rx="7" fill="var(--card)" stroke="var(--destructive)" />
+                <text x="38" y="21" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--destructive)" fontWeight="600" letterSpacing="1">OBD DONGLE</text>
+              </g>
+              {/* the request runs at the ECU and is thrown straight back */}
+              {!reduce && carrier(0, '#obd-out', 'var(--destructive)', 2, true)}
+              {reduce && <circle cx={ECU[0] - 16} cy={ECU[1]} r="5" fill="var(--destructive)" />}
+              {/* refusal shockwave at the ECU */}
+              {!reduce && [0, 0.35].map((d) => (
+                <circle key={d} cx={ECU[0]} cy={ECU[1]} r="6" fill="none" stroke="var(--destructive)" strokeWidth="2">
+                  <animate attributeName="r" values="6;30" dur="2s" begin={`${0.95 + d}s`} repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.85;0" dur="2s" begin={`${0.95 + d}s`} repeatCount="indefinite" />
+                </circle>
+              ))}
+              {/* the ECU itself, with its lock */}
+              <g transform={`translate(${ECU[0]} ${ECU[1]})`} className={reduce ? undefined : 'deny-flash'}>
+                <circle r="17" fill="var(--card)" stroke="var(--destructive)" strokeWidth="1.8" />
+                <path d="M-5 -1 v-3.5 a5 5 0 0 1 10 0 v3.5 M-7.5 -1 h15 v10 h-15 z" fill="none" stroke="var(--destructive)" strokeWidth="1.8" />
+              </g>
+              <text x="690" y="115" textAnchor="start" fontFamily="var(--font-mono)" fontSize="7.5" fill="var(--destructive)" letterSpacing="1">VEHICLE ECU</text>
+              <text x="380" y="300" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="9" fill="var(--destructive)" letterSpacing="1" fontWeight="600"
+                className={reduce ? undefined : 'deny-flash'}>
+                ACCESS DENIED · BMS ENCRYPTED · REQUEST REFUSED
+              </text>
             </g>
           )}
         </svg>

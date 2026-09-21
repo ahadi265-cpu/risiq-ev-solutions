@@ -101,7 +101,7 @@ export function BydFocus() {
         </dl>
 
         {/* OBD vs socket — what each method gets on this car */}
-        <div role="tablist" aria-label="Measurement method" className="mt-6 grid grid-cols-2 gap-1 rounded-full border bg-muted p-1">
+        <div role="tablist" aria-label="Port access on this model" className="mt-6 grid grid-cols-2 gap-1 rounded-full border bg-muted p-1">
           {([['obd', 'OBD port'], ['socket', 'RISIQ socket metering']] as [Mode, string][]).map(([k, label]) => (
             <button key={k} role="tab" type="button" aria-selected={mode === k} onClick={() => setMode(k)}
               className={cn('flex cursor-pointer items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-medium outline-none transition-all focus-visible:ring-[3px] focus-visible:ring-ring/50',

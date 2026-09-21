@@ -103,7 +103,11 @@ export default function Home() {
     <>
       {/* ------------------------------------------ hero: full-bleed brand band */}
       <section className="hero-band relative isolate overflow-hidden text-white">
+        <div aria-hidden className="hero-aurora absolute inset-0 -z-10" />
         <div aria-hidden className="hero-grid absolute inset-0 -z-10" />
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="hero-scan absolute inset-y-0 -left-1/3 w-1/3" />
+        </div>
         <div aria-hidden className="hero-orb absolute -top-48 right-[28%] -z-10 size-[36rem] rounded-full" />
         <div aria-hidden className="hero-orb hero-orb-b absolute -bottom-56 left-[14%] -z-10 size-[32rem] rounded-full" />
         {/* watermark emblem, the way eniris fades its mark behind the headline */}
@@ -223,7 +227,7 @@ export default function Home() {
         <RevealGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {METRICS.map((m) => (
             <motion.div key={m.k} variants={revealItem}
-              className="glow-card group rounded-2xl border bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8">
+              className="glow-metric group rounded-2xl border bg-card p-7 transition-transform duration-300 hover:-translate-y-1.5 md:p-8">
               <span className="font-mono text-xs tracking-[0.16em] text-muted-foreground uppercase">{m.k}</span>
               <div className="mt-4 flex items-baseline gap-2">
                 <span className="font-mono text-4xl font-semibold text-gradient md:text-5xl">

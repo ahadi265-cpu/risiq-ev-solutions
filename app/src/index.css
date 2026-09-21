@@ -284,14 +284,16 @@
 .reveal:not([data-in]),
 .reveal-group:not([data-in]) > .reveal-item {
   opacity: 0;
-  transform: translateY(var(--reveal-y, 22px));
+  transform: translateY(var(--reveal-y, 22px)) scale(0.985);
 }
 .reveal[data-in],
 .reveal-group[data-in] > .reveal-item {
-  animation: reveal-rise 0.65s var(--reveal-delay, 0s) cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: reveal-rise 0.72s var(--reveal-delay, 0s) cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 @keyframes reveal-rise {
-  from { opacity: 0; transform: translateY(var(--reveal-y, 22px)); }
+  from { opacity: 0; transform: translateY(var(--reveal-y, 22px)) scale(0.985); }
+  60%  { opacity: 1; }
+  to   { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce), print {
   .reveal:not([data-in]),
@@ -337,4 +339,100 @@ html { scroll-behavior: smooth; }
   }
   .hero-orb-b { background: radial-gradient(circle at 50% 50%, oklch(0.3 0.12 29 / 0.35), transparent 65%); animation-duration: 30s; animation-delay: -9s; }
   @media (prefers-reduced-motion: reduce) { .hero-orb { animation: none; } }
+}
+
+/* ==========================================================================
+   Motion-graphics layer (2026-09-21 visual polish pass).
+   Everything here is transform/opacity/filter only, sits behind content, and
+   collapses under `prefers-reduced-motion` — no keyframe may hide copy.
+   ========================================================================== */
+@layer utilities {
+  /* ---------- hero: obsidian ground in dark, live grid + aurora in both ---- */
+  .dark .hero-band {
+    background:
+      radial-gradient(90% 70% at 78% 18%, oklch(0.87 0.14 200 / 0.20), transparent 62%),
+      radial-gradient(70% 60% at 12% 92%, oklch(0.70 0.15 163 / 0.16), transparent 66%),
+      radial-gradient(60% 55% at 46% 42%, oklch(0.55 0.21 29 / 0.22), transparent 70%),
+      #0b0f17;
+  }
+  /* aurora sheet: two huge soft gradients breathing at different rates */
+  .hero-aurora {
+    background:
+      radial-gradient(45% 55% at 20% 28%, oklch(1 0 0 / 0.14), transparent 70%),
+      radial-gradient(40% 50% at 82% 72%, oklch(1 0 0 / 0.10), transparent 72%);
+    animation: aurora 16s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+  }
+  .dark .hero-aurora {
+    background:
+      radial-gradient(45% 55% at 20% 28%, oklch(0.87 0.14 200 / 0.18), transparent 70%),
+      radial-gradient(40% 50% at 82% 72%, oklch(0.70 0.15 163 / 0.14), transparent 72%);
+  }
+  @keyframes aurora {
+    from { transform: translate3d(-2%, -1%, 0) scale(1); opacity: 0.75; }
+    to   { transform: translate3d(3%, 2%, 0) scale(1.1); opacity: 1; }
+  }
+  /* the grid itself drifts one cell and fades in and out, so the hero breathes */
+  .hero-grid { animation: grid-drift 24s linear infinite, grid-glow 9s ease-in-out infinite alternate; }
+  @keyframes grid-drift { to { background-position: 56px 56px; } }
+  @keyframes grid-glow { from { opacity: 0.55; } to { opacity: 1; } }
+  /* a single scan line sweeping the hero grid, the way instrument UIs sweep */
+  .hero-scan {
+    background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.16) 45%, oklch(1 0 0 / 0.3) 50%, oklch(1 0 0 / 0.16) 55%, transparent);
+    animation: scan 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    will-change: transform;
+  }
+  .dark .hero-scan { background: linear-gradient(90deg, transparent, oklch(0.87 0.14 200 / 0.22) 48%, oklch(0.87 0.14 200 / 0.4) 50%, oklch(0.87 0.14 200 / 0.22) 52%, transparent); }
+  @keyframes scan { 0% { transform: translateX(-120%); } 60%, 100% { transform: translateX(120%); } }
+
+  /* ---------- animated gradient borders --------------------------------- */
+  /* always-on whisper of a border that spins up to full on hover/focus */
+  .glow-metric { position: relative; isolation: isolate; }
+  .glow-metric::before {
+    content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 1.5px;
+    background: conic-gradient(from var(--angle),
+      transparent 0 48%, var(--brand) 62%, var(--amber) 74%, var(--teal) 84%, transparent 96%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity: 0.35; transition: opacity 0.4s ease;
+    animation: spin-angle 6s linear infinite;
+  }
+  .glow-metric:hover::before, .glow-metric:focus-within::before { opacity: 1; animation-duration: 2.2s; }
+  /* the halo that lifts with the card */
+  .glow-metric::after {
+    content: ''; position: absolute; inset: 0; z-index: -2; border-radius: inherit;
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--brand) 40%, transparent);
+    opacity: 0; transition: opacity 0.4s ease, box-shadow 0.4s ease;
+  }
+  .glow-metric:hover::after { opacity: 1; box-shadow: 0 18px 46px -14px color-mix(in oklch, var(--brand) 55%, transparent); }
+
+  /* ---------- buttons: a sheen that sweeps once per hover ---------------- */
+  .btn-glow { position: relative; overflow: hidden; isolation: isolate; }
+  .btn-glow::after {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: linear-gradient(105deg, transparent 35%, oklch(1 0 0 / 0.32) 50%, transparent 65%);
+    transform: translateX(-130%); transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .btn-glow:hover::after, .btn-glow:focus-visible::after { transform: translateX(130%); }
+  .btn-glow > * { position: relative; z-index: 1; }
+
+  /* ---------- SVG schematics: neon trace + pulsing node ------------------ */
+  .trace-glow { filter: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 8px currentColor); }
+  .node-pulse { animation: node-pulse 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes node-pulse { 0%, 100% { opacity: 0.35; transform: scale(1); } 50% { opacity: 1; transform: scale(1.35); } }
+  .deny-flash { animation: deny-flash 1.8s steps(1, end) infinite; }
+  @keyframes deny-flash { 0%, 44% { opacity: 0.25; } 46%, 72% { opacity: 1; } 74%, 100% { opacity: 0.25; } }
+
+  /* ---------- heatmap cells --------------------------------------------- */
+  .cell-pulse { animation: cell-pulse 2s ease-in-out infinite; }
+  @keyframes cell-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--cell-glow), 0 0 4px 0 var(--cell-glow); }
+    50%      { box-shadow: 0 0 0 3px transparent, 0 0 12px 2px var(--cell-glow); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-aurora, .hero-grid, .hero-scan, .glow-metric::before, .node-pulse, .deny-flash, .cell-pulse { animation: none; }
+    .btn-glow::after { transition: none; }
+  }
 }
