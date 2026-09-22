@@ -73,7 +73,7 @@ export function CompatibilitySearch() {
               </li>
             ) })()}
             <li className="flex items-center gap-2.5 rounded-xl border bg-card px-3.5 py-2.5 text-sm font-medium">
-              <Timer className="size-4 shrink-0 text-brand" />Estimated test time: 15 min Rapid Check · ~4 h Reference Test
+              <Timer className="size-4 shrink-0 text-brand" />Est. Rapid Test: 15 min · Reference Test ≈ 4 h
             </li>
           </ul>
           <p className="flex items-start gap-2 text-xs text-muted-foreground">

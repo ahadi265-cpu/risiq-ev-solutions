@@ -370,7 +370,7 @@ export default function Home() {
         <Reveal className="mt-12">
           <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
             <h3 className="text-xl font-semibold">Watch a fifteen-minute run</h3>
-            <span className="text-sm text-muted-foreground">Play it — or switch to the network-drop tab to see store-and-forward.</span>
+            <span className="text-sm text-muted-foreground">Play it, then simulate a cellular network drop mid-run to watch the rig buffer and re-sync.</span>
           </div>
           <Suspense fallback={<div className="h-72 animate-pulse rounded-2xl border bg-muted" />}><TestVisualizer /></Suspense>
         </Reveal>

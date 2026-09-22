@@ -137,6 +137,7 @@ export const COMPAT: Compat[] = [
   { make: 'BYD', model: 'Yuan Plus', seg: 'Compact SUV', kwh: '49.9 / 60.5 kWh', obd: 'locked', common: true },
   { make: 'BYD', model: 'e2', seg: 'Hatchback', kwh: '43.2 kWh', obd: 'locked', common: true },
   { make: 'Changan', model: 'Deepal S07', seg: 'Mid-size SUV', kwh: '68.8 / 80 kWh', obd: 'locked', common: false },
+  { make: 'Changan', model: 'Deepal E07', seg: 'Crossover pickup', kwh: '80.4 / 90 kWh', obd: 'locked', common: false },
   { make: 'Changan', model: 'Lumin', seg: 'City car', kwh: '12.9 / 27.9 kWh', obd: 'locked', common: true },
   { make: 'Jetour', model: 'Ice Cream EV', seg: 'City car', kwh: '9.6 / 13.9 kWh', obd: 'locked', common: true },
   { make: 'Geely', model: 'Geometry C', seg: 'Crossover', kwh: '53 / 70 kWh', obd: 'partial', common: false },

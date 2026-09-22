@@ -14,8 +14,8 @@ const Chart = lazy(() => import('@/components/BlindSpotChart'))
 type Life = { fast: number; temp: number; years: number }
 type PresetId = 'gentle' | 'taxi'
 const PRESETS: Record<PresetId, Life & { label: string; icon: typeof Zap; blurb: string }> = {
-  gentle: { label: 'Car A · gentle commuting', icon: Home, fast: 5, temp: 18, years: 4, blurb: 'Charged overnight on a wall box, kept in the shade, easy commuting.' },
-  taxi:   { label: 'Car B · taxi, fast-charged in heat', icon: Zap, fast: 100, temp: 32, years: 4, blurb: 'Fast-charged to full every day, parked in the sun, driven hard.' },
+  gentle: { label: '90% overnight slow AC', icon: Home, fast: 10, temp: 18, years: 4, blurb: 'Nine charges in ten on a wall box overnight, kept in the shade, easy commuting.' },
+  taxi:   { label: '80% fast DC · taxi', icon: Zap, fast: 80, temp: 32, years: 4, blurb: 'Four charges in five on a DC fast charger, parked in the sun, driven hard.' },
 }
 const CAR_A: Life = PRESETS.gentle
 
@@ -52,7 +52,7 @@ export function BlindSpotExplorer() {
     { label: 'Odometer (both cars)', value: km, set: setKm, min: 0, max: KM_MAX, step: 1_000, disp: `${fmt(km)} km` },
     { label: 'Car B · fast charging', value: b.fast, set: (v: number) => set({ fast: v }), min: 0, max: 100, step: 5, disp: `${b.fast}% DC` },
     { label: 'Car B · daily temperature', value: b.temp, set: (v: number) => set({ temp: v }), min: 5, max: 40, step: 1, disp: `${b.temp} °C` },
-    { label: 'Car B · vehicle age', value: b.years, set: (v: number) => set({ years: v }), min: 1, max: 10, step: 0.5, disp: `${b.years} yr` },
+    { label: 'Car B · vehicle age', value: b.years, set: (v: number) => set({ years: v }), min: 1, max: 6, step: 0.5, disp: `${b.years} yr` },
   ]
 
   return (
@@ -68,7 +68,7 @@ export function BlindSpotExplorer() {
                   onClick={() => setB({ fast: P.fast, temp: P.temp, years: P.years })}
                   className={cn('flex cursor-pointer items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-medium outline-none transition-all focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:text-sm',
                     preset === k ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}>
-                  <Icon className={cn('size-3.5 shrink-0', k === 'taxi' ? 'text-teal' : 'text-grade-a')} />{k === 'gentle' ? 'Gentle, like Car A' : 'Taxi in heat'}
+                  <Icon className={cn('size-3.5 shrink-0', k === 'taxi' ? 'text-teal' : 'text-grade-a')} />{PRESETS[k].label}
                 </button>
               )
             })}
@@ -89,23 +89,27 @@ export function BlindSpotExplorer() {
         ))}
 
         <div key={`${km}-${b.fast}-${b.temp}-${b.years}`} className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border bg-border">
-          {([['Car A', sohA, gradeA, 'gentle commuting'], ['Car B', sohB, gradeB, 'your settings']] as const).map(([name, soh, g, sub]) => (
+          {([['Car A', sohA, gradeA, 'slow AC'], ['Car B', sohB, gradeB, 'your settings']] as const).map(([name, soh, g, sub]) => (
             <div key={name} className="bg-card p-4">
-              <span className="block text-xs text-muted-foreground">{name} · {sub}</span>
+              <span className="block text-xs text-muted-foreground">Measured SoH · {name} · {sub}</span>
               <div className="mt-1 flex flex-wrap items-baseline gap-2">
                 <b className="font-mono text-3xl font-semibold tabular">{soh.toFixed(1)}%</b>
                 <Badge variant={g.toLowerCase() as 'a'}>Grade {g}</Badge>
               </div>
-              <small className="text-xs text-muted-foreground">{(CAR.kwh * soh / 100).toFixed(1)} kWh usable · true range ≈ {Math.round(CAR.range * soh / 100)} km</small>
             </div>
           ))}
-          <div className="col-span-2 bg-card p-4">
-            <span className="block text-xs text-muted-foreground">Financial risk the odometer hides · same {fmt(km)} km on both dashes</span>
-            <div className="mt-1 flex flex-wrap items-baseline gap-x-3">
-              <b className="font-mono text-2xl text-primary tabular">{etb(Math.max(0, risk))}</b>
-              <span className="font-mono text-sm text-muted-foreground">≈ {usd(Math.max(0, risk))}</span>
-            </div>
-            <small className="text-xs text-muted-foreground">Odometer alone implies {guess(km).toFixed(1)}% for both. {CAR.name}, indicative Addis retail.</small>
+          <div className="bg-card p-4">
+            <span className="block text-xs text-muted-foreground">Estimated battery value loss · Car B vs Car A</span>
+            <b className="mt-1 block font-mono text-2xl text-primary tabular">{usd(Math.max(0, risk))}</b>
+            <small className="text-xs text-muted-foreground">≈ {etb(Math.max(0, risk))} · hidden by the same {fmt(km)} km on both dashes</small>
+          </div>
+          <div className="bg-card p-4">
+            <span className="block text-xs text-muted-foreground">True remaining range · Car B</span>
+            <b className="mt-1 block font-mono text-2xl tabular">{Math.round(CAR.range * sohB / 100)} km</b>
+            <small className="text-xs text-muted-foreground">of {CAR.range} km rated · Car A {Math.round(CAR.range * sohA / 100)} km · {(CAR.kwh * sohB / 100).toFixed(1)} kWh usable</small>
+          </div>
+          <div className="col-span-2 bg-card px-4 py-3">
+            <small className="text-xs text-muted-foreground">Odometer alone implies {guess(km).toFixed(1)}% for both cars. {CAR.name}, indicative Addis retail.</small>
           </div>
         </div>
       </div>

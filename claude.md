@@ -114,3 +114,8 @@ A `@layer utilities` motion-graphics block at the end of `index.css` holds every
 - **Staggered reveals stay on CSS**, per the hard rule above — Motion `initial={{opacity:0}}` variants have stranded copy three times. The keyframe now adds a slight scale settle.
 - Fixed en route: two tablists on Home shared `aria-label="Measurement method"`; the vehicle panel's is now "Port access on this model".
 
+# Conversion tools pass (2026-09-22)
+- **`TestVisualizer`** is now a four-step stepper (01 Plug in → 02 Measure → 03 Compute → 04 Certify; quality gates folded into Compute) with the store-and-forward simulation **inside the run**: a "Simulate cellular network drop" toggle (enabled while playing) freezes the cloud counter while the rig meter keeps sampling into the local buffer; restoring drains the backlog at 4× and the status line reports "after N drops". The separate "Network drop" tab is gone. Step blurbs are written explicitly — deriving them by splitting on "." once produced "A Class 0.".
+- **`BlindSpotExplorer`:** presets are the brief's habits ("90% overnight slow AC" = 10 % fast; "80% fast DC · taxi" = 80 % fast), vehicle age 1–6 yr, and four explicit output tiles: measured SoH + grade per car, estimated battery value loss ($ with birr), true remaining range (km).
+- **`COMPAT`** gained Changan Deepal E07 (80.4 / 90 kWh, locked). "Jetour Dashing" from the brief is a petrol car and stays off the EV list; the electric Jetour is the Ice Cream EV. Test-time badge reads "Est. Rapid Test: 15 min · Reference Test ≈ 4 h".
+
