@@ -1,5 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from 'motion/react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
+
+gsap.registerPlugin(ScrollTrigger, MotionPathPlugin)
 import { Lock, Plug, Check, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -23,6 +28,8 @@ const MODES: Record<Mode, { label: string; tag: string; ok: boolean; headline: s
 /* Main bus: charger → RISIQ meter → charge port. Orthogonal, PCB-style. */
 const BUS_IN = 'M 96 168 H 302'
 const BUS_OUT = 'M 430 168 H 496 C 528 168, 532 145, 564 145 H 570'
+/* one continuous run of the bus for the scroll-scrubbed signal (the meter covers the middle) */
+const BUS_FULL = 'M 96 168 H 496 C 528 168, 532 145, 564 145 H 570'
 const UPLINK = 'M 366 110 V 62 Q 366 48 380 48 H 596'
 /* OBD request: dongle → up behind the dash → ECU in the cabin, where it is refused. */
 const OBD_OUT = 'M 408 262 H 462 Q 478 262 478 246 V 128 Q 478 112 492 112 H 649'
@@ -36,8 +43,25 @@ export function SocketSimulator({ className }: { className?: string }) {
   const reduce = useReducedMotion()
   const [mode, setMode] = useState<Mode>('socket')
   const [kwh, setKwh] = useState(0)
+  const svg = useRef<SVGSVGElement>(null)
   const m = MODES[mode]
   const live = mode === 'socket'
+
+  /* Scroll-scrubbed signal: as the diagram scrolls through the viewport the bright
+     trace draws itself along the bus and a lead carrier physically travels it. */
+  useEffect(() => {
+    if (reduce || !live || !svg.current) return
+    const ctx = gsap.context(() => {
+      const draw = svg.current!.querySelector<SVGPathElement>('.scrub-draw')
+      if (!draw) return
+      const L = draw.getTotalLength()
+      gsap.set(draw, { strokeDasharray: L, strokeDashoffset: L })
+      const tl = gsap.timeline({ scrollTrigger: { trigger: svg.current, start: 'top 88%', end: 'bottom 30%', scrub: 0.5 } })
+      tl.to(draw, { strokeDashoffset: 0, ease: 'none' }, 0)
+      tl.to('.scrub-carrier', { motionPath: { path: '#bus-full', align: '#bus-full', alignOrigin: [0.5, 0.5] }, ease: 'none' }, 0)
+    }, svg)
+    return () => ctx.revert()
+  }, [reduce, live])
 
   // meter readout climbs while energy flows, resets when the mode changes
   useEffect(() => {
@@ -75,12 +99,12 @@ export function SocketSimulator({ className }: { className?: string }) {
       </div>
 
       <div className="bg-grid relative overflow-hidden rounded-2xl border bg-[radial-gradient(70%_80%_at_50%_50%,color-mix(in_oklch,var(--teal)_8%,transparent),transparent_75%)]">
-        <svg viewBox="0 0 760 320" className="block w-full" role="img"
+        <svg ref={svg} viewBox="0 0 760 320" className="block w-full" role="img"
           aria-label={live
             ? 'Energy flows from the charger along a circuit trace, through the RISIQ meter and into the car, while a signed record travels up to the registry.'
             : 'An OBD dongle sends a request toward the car’s ECU; the request is refused and bounces back, and an access-denied lock flashes.'}>
           <defs>
-            <path id="bus-in" d={BUS_IN} /><path id="bus-out" d={BUS_OUT} />
+            <path id="bus-in" d={BUS_IN} /><path id="bus-out" d={BUS_OUT} /><path id="bus-full" d={BUS_FULL} />
             <path id="uplink" d={UPLINK} /><path id="obd-out" d={OBD_OUT} />
             <linearGradient id="trace" x1="0" x2="1">
               <stop offset="0" stopColor="var(--teal)" stopOpacity="0.25" />
@@ -114,6 +138,12 @@ export function SocketSimulator({ className }: { className?: string }) {
           {NODES.map(([x, y], i) => (
             <circle key={i} cx={x} cy={y} r="3.5" fill={live ? 'var(--teal)' : 'var(--border)'} />
           ))}
+          {live && !reduce && (
+            <g aria-hidden>
+              <path className="scrub-draw" d={BUS_FULL} fill="none" stroke="#e6fffd" strokeWidth="2.5" strokeLinecap="round" style={{ filter: 'drop-shadow(0 0 6px var(--teal))' }} />
+              <circle className="scrub-carrier" r="7" fill="#ffffff" style={{ filter: 'drop-shadow(0 0 10px var(--teal)) drop-shadow(0 0 22px var(--teal))' }} />
+            </g>
+          )}
 
           {/* charge carriers riding the bus */}
           {live && !reduce && Array.from({ length: PARTICLES }, (_, i) => carrier(i, '#bus-in', 'var(--teal)', 2.2))}

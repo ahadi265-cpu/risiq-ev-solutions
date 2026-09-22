@@ -5,6 +5,8 @@ import {
   Menu, X, ChevronDown, Plug, Gauge, QrCode, Mail, Phone, MapPin, ArrowRight, Search, ExternalLink,
 } from 'lucide-react'
 import { useGsapReveal } from '@/lib/useGsapReveal'
+import { useLenis, scrollToTop } from '@/lib/useLenis'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { usePageMeta } from '@/lib/usePageMeta'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { AmbientOrbs } from '@/components/AmbientOrbs'
@@ -114,6 +116,20 @@ function MobileMenu({ onPick }: { onPick: () => void }) {
   )
 }
 
+/** Route entrance that leaves no trace: `.animate-rise` fills with an identity
+ *  transform after it ends, and any transform on an ancestor turns a pinned
+ *  section's `position: fixed` into page-relative positioning. The class is
+ *  dropped on animationend and ScrollTrigger re-measures. */
+function RouteEnter({ children }: { children: React.ReactNode }) {
+  const [entering, setEntering] = useState(true)
+  return (
+    <div className={entering ? 'animate-rise' : undefined}
+      onAnimationEnd={(e) => { if (e.target === e.currentTarget) { setEntering(false); ScrollTrigger.refresh() } }}>
+      {children}
+    </div>
+  )
+}
+
 function PageFallback() {
   return (
     <div className="mx-auto max-w-[1440px] px-6 py-24" aria-busy="true" aria-label="Loading">
@@ -165,13 +181,17 @@ export function Layout() {
   const [scrolled, setScrolled] = useState(false)
   const progress = useRef<HTMLDivElement>(null)
   const { pathname, hash } = useLocation()
+  useLenis()
   useGsapReveal()
   usePageMeta()
 
   /* New page, top of page — React Router leaves scroll where it was. */
   useEffect(() => {
     setOpen(false)
-    if (!hash) window.scrollTo({ top: 0, behavior: 'instant' })
+    if (!hash) scrollToTop()
+    // new route, new layout: let pinned sections re-measure once the page has rendered
+    const t = window.setTimeout(() => ScrollTrigger.refresh(), 120)
+    return () => window.clearTimeout(t)
   }, [pathname, hash])
 
   useEffect(() => {
@@ -190,6 +210,7 @@ export function Layout() {
     <div className="min-h-dvh flex flex-col">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-brand focus:px-4 focus:py-2 focus:font-semibold focus:text-white">Skip to content</a>
       <AmbientOrbs />
+      <div aria-hidden className="noise-overlay" />
       {/* glass at the top of the page; near-solid once content scrolls beneath it, so the red hero never bleeds through */}
       <header className={cn('sticky top-0 z-40 transition-[box-shadow,background-color] duration-300 print:static', scrolled ? 'glass-solid shadow-md' : 'glass shadow-sm')}>
         <nav aria-label="Primary" className={cn('mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-6 transition-[padding] duration-300', scrolled ? 'py-2' : 'py-3 md:py-4')}>
@@ -223,9 +244,9 @@ export function Layout() {
 
       <main id="main" className="flex-1">
         {/* keyed remount + CSS entrance: a soft page transition between routes */}
-        <div key={pathname} className="animate-rise">
+        <RouteEnter key={pathname}>
           <Suspense fallback={<PageFallback />}><Outlet /></Suspense>
-        </div>
+        </RouteEnter>
       </main>
 
       <footer className="dark relative mt-28 overflow-hidden bg-background text-foreground">

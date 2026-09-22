@@ -29,6 +29,7 @@ export default defineConfig({
         // and made the first paint preload 444 kB of charts.
         manualChunks(id: string) {
           if (!id.includes('node_modules')) return
+          if (id.includes('/three/') || id.includes('@react-three')) return 'three'
           if (id.includes('motion') || id.includes('framer')) return 'motion'
           if (id.includes('react-router')) return 'router'
           if (id.includes('/react/') || id.includes('/react-dom/')) return 'react'

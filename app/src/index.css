@@ -424,6 +424,16 @@ html { scroll-behavior: smooth; }
   .deny-flash { animation: deny-flash 1.8s steps(1, end) infinite; }
   @keyframes deny-flash { 0%, 44% { opacity: 0.25; } 46%, 72% { opacity: 1; } 74%, 100% { opacity: 0.25; } }
 
+  /* ---------- hardware texture: fixed fractal noise over the obsidian ground */
+  .noise-overlay {
+    position: fixed; inset: 0; z-index: 45; pointer-events: none; opacity: 0;
+    mix-blend-mode: overlay; transition: opacity 0.6s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+  .dark .noise-overlay { opacity: 0.22; }
+  @media print { .noise-overlay { display: none; } }
+
   /* ---------- heatmap cells --------------------------------------------- */
   .cell-pulse { animation: cell-pulse 2s ease-in-out infinite; }
   @keyframes cell-pulse {

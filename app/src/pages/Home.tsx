@@ -2,11 +2,10 @@ import { lazy, Suspense, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import {
-  Plug, Crosshair, Timer, ShieldCheck, ArrowRight, QrCode, ScanLine, Cpu, FileCheck2, Lock,
+  Plug, Crosshair, Timer, ShieldCheck, ArrowRight, QrCode, Lock,
   Building2, Landmark, Ship, Scale, CarFront, BadgeCheck,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
 import { Section, SectionHead } from '@/components/Layout'
@@ -23,9 +22,13 @@ import { ServiceTabs } from '@/components/ServiceTabs'
 import { CalibrationFlow } from '@/components/CalibrationFlow'
 import { BydFocus, GradeLegend } from '@/components/BydFocus'
 import { CompatibilitySearch } from '@/components/CompatibilitySearch'
+import { WorkflowScroller } from '@/components/WorkflowScroller'
+import { scrollToEl } from '@/lib/useLenis'
 
 /* the playable test run is its own chunk; it mounts below the fold */
 const TestVisualizer = lazy(() => import('@/components/TestVisualizer').then((m) => ({ default: m.TestVisualizer })))
+/* three + fiber are heavy; they arrive after first paint and only when motion is allowed */
+const HeroField = lazy(() => import('@/components/HeroField'))
 import { cn } from '@/lib/utils'
 
 const CAPS = [
@@ -58,12 +61,6 @@ const TONES = [
   { box: 'bg-card border', num: 'text-amber', txt: 'text-muted-foreground' },
 ]
 
-const STEPS = [
-  { icon: Plug, n: '01', t: 'Plug in', d: 'We connect our equipment to the car’s normal charging socket. Nothing is fitted to the vehicle itself.' },
-  { icon: ScanLine, n: '02', t: 'Measure', d: 'We charge the car under controlled conditions and measure exactly how much energy the battery actually accepts.' },
-  { icon: Cpu, n: '03', t: 'Compute', d: 'That measurement tells us how much capacity the battery has left, compared with when it was new.' },
-  { icon: FileCheck2, n: '04', t: 'Certify', d: 'You get the certificate on the spot, with a code anyone can scan to confirm it is genuine.' },
-]
 
 /* The hero's audience rail — the same four seats the switcher below offers. */
 const QUICK = [
@@ -108,6 +105,7 @@ export default function Home() {
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="hero-scan absolute inset-y-0 -left-1/3 w-1/3" />
         </div>
+        {!reduce && <Suspense fallback={null}><HeroField /></Suspense>}
         <div aria-hidden className="hero-orb absolute -top-48 right-[28%] -z-10 size-[36rem] rounded-full" />
         <div aria-hidden className="hero-orb hero-orb-b absolute -bottom-56 left-[14%] -z-10 size-[32rem] rounded-full" />
         {/* watermark emblem, the way eniris fades its mark behind the headline */}
@@ -142,7 +140,7 @@ export default function Home() {
                 </span>
               )}
               {aud !== 'default' && (
-                <a href="#audience" onClick={(e) => { e.preventDefault(); document.getElementById('audience')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }}
+                <a href="#audience" onClick={(e) => { e.preventDefault(); scrollToEl(document.getElementById('audience')) }}
                   className="mt-3 block text-base font-semibold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white">
                   See what the certificate unlocks for you ↓
                 </a>
@@ -330,30 +328,15 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* ------------------------------------------------------ how it works */}
+      {/* ------------------------------------------- how it works: pinned sequence */}
+      <WorkflowScroller />
+
+      {/* ------------------------------------------------------ on the day */}
       <Section muted>
-        <SectionHead eyebrow="How It Works" title="How it works, in four steps.">
-          We come to your yard. Fifteen minutes later you have a report you can show a customer, a credit committee, or a court.
+        <SectionHead eyebrow="On The Day" title="What we bring to your yard.">
+          Fifteen minutes later you have a report you can show a customer, a credit committee, or a court.
         </SectionHead>
-        <RevealGroup className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map(({ icon: Icon, n, t, d }) => (
-            <motion.div key={n} variants={revealItem}>
-              <Card className="group h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg">
-                <CardContent className="flex h-full flex-col">
-                  <div className="flex items-center justify-between">
-                    <span className="grid size-10 place-items-center rounded-xl bg-teal/10 text-teal transition-colors group-hover:bg-teal group-hover:text-white">
-                      <Icon className="size-5" />
-                    </span>
-                    <span className="font-mono text-xs text-amber">{n}</span>
-                  </div>
-                  <h3 className="mt-4 font-semibold">{t}</h3>
-                  <p className="mt-2 flex-1 text-sm text-muted-foreground">{d}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </RevealGroup>
-        <RevealGroup className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <RevealGroup className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {CAPS.map(({ icon: Icon, title, note }) => (
             <motion.div key={title} variants={revealItem}
               className="flex items-center gap-3 rounded-xl border bg-card/60 p-4">
