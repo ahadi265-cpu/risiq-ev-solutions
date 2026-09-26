@@ -48,7 +48,7 @@ export default function Contact() {
           <span className="flex items-center gap-2.5 font-mono text-xs tracking-[0.14em] text-amber uppercase">
             <span className="size-1.5 rounded-full bg-amber ring-3 ring-amber/20" />Get In Touch
           </span>
-          <h1 className="mt-5 max-w-[18ch] text-4xl font-bold tracking-tight md:text-6xl">
+          <h1 className="mt-5 max-w-[18ch] text-fluid-h1 font-bold tracking-tight">
             Let's build the standard — together.
           </h1>
           <p className="mt-6 max-w-[58ch] text-lg text-muted-foreground">

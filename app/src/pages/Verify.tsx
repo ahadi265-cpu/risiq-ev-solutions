@@ -57,7 +57,7 @@ export default function Verify() {
     <Section className="pt-14">
       <div className="mb-12 text-center">
         <span className="font-mono text-xs tracking-[0.16em] text-primary uppercase">Cryptographic transparency</span>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
+        <h1 className="text-fluid-h1 mt-3 font-bold tracking-tight">
           Live certificate <span className="text-gradient">verification engine</span>
         </h1>
         <p className="mx-auto mt-4 max-w-[60ch] text-muted-foreground">

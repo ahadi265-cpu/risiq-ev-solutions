@@ -22,13 +22,14 @@ import { ServiceTabs } from '@/components/ServiceTabs'
 import { CalibrationFlow } from '@/components/CalibrationFlow'
 import { BydFocus, GradeLegend } from '@/components/BydFocus'
 import { CompatibilitySearch } from '@/components/CompatibilitySearch'
+import { MagneticButton } from '@/components/MagneticButton'
 import { WorkflowScroller } from '@/components/WorkflowScroller'
 import { scrollToEl } from '@/lib/useLenis'
 
 /* the playable test run is its own chunk; it mounts below the fold */
 const TestVisualizer = lazy(() => import('@/components/TestVisualizer').then((m) => ({ default: m.TestVisualizer })))
 /* three + fiber are heavy; they arrive after first paint and only when motion is allowed */
-const HeroField = lazy(() => import('@/components/HeroField'))
+const HeroCanvas = lazy(() => import('@/components/HeroCanvas'))
 import { cn } from '@/lib/utils'
 
 const CAPS = [
@@ -105,7 +106,7 @@ export default function Home() {
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="hero-scan absolute inset-y-0 -left-1/3 w-1/3" />
         </div>
-        {!reduce && <Suspense fallback={null}><HeroField /></Suspense>}
+        {!reduce && <Suspense fallback={null}><HeroCanvas /></Suspense>}
         <div aria-hidden className="hero-orb absolute -top-48 right-[28%] -z-10 size-[36rem] rounded-full" />
         <div aria-hidden className="hero-orb hero-orb-b absolute -bottom-56 left-[14%] -z-10 size-[32rem] rounded-full" />
         {/* watermark emblem, the way eniris fades its mark behind the headline */}
@@ -120,7 +121,7 @@ export default function Home() {
             <span key={aud} className="animate-rise flex items-center gap-3 font-mono text-sm font-semibold tracking-[0.18em] text-white/85 uppercase">
               <span className="size-2 rounded-full bg-white ring-4 ring-white/25" />{copy.eyebrow}
             </span>
-            <h1 className="mt-7 text-[2.9rem] leading-[1.02] font-bold tracking-tight sm:text-[3.6rem] md:text-[5rem] lg:text-[5.8rem]">
+            <h1 className="text-fluid-hero mt-7 font-bold tracking-tight">
               Know what the car is<br className="hidden md:block" />{' '}
               <span className="relative inline-block">
                 really worth.
@@ -155,11 +156,11 @@ export default function Home() {
             </ul>
             <div className="mt-11 flex flex-wrap gap-4">
               <BriefingModal trigger={
-                <Button key={aud} size="lg" className="animate-rise h-14 rounded-lg bg-white px-9 text-base text-brand shadow-xl hover:bg-white hover:text-brand-dark">{copy.cta ?? 'Book a pilot briefing'}</Button>} />
+                <MagneticButton><Button key={aud} size="lg" className="animate-rise h-14 rounded-lg bg-white px-9 text-base text-brand shadow-xl hover:bg-white hover:text-brand-dark">{copy.cta ?? 'Book a pilot briefing'}</Button></MagneticButton>} />
               <CertificateInspector trigger={
-                <Button size="lg" variant="outline" className="h-14 rounded-lg border-white/35 bg-white/10 px-9 text-base text-white hover:border-white hover:bg-white hover:text-brand">
+                <MagneticButton><Button size="lg" variant="outline" className="h-14 rounded-lg border-white/35 bg-white/10 px-9 text-base text-white hover:border-white hover:bg-white hover:text-brand">
                   <ShieldCheck />Live verification demo
-                </Button>} />
+                </Button></MagneticButton>} />
             </div>
             <p className="mt-8 font-mono text-sm tracking-wide text-white/65">
               Part of RISIQ Group · in technology partnership with Eniris
@@ -464,10 +465,10 @@ export default function Home() {
               Ten BYD vehicles, late October 2026. Founding places are open to banks, micro-finance institutions and insurers — at no cost.
             </p>
             <div className="mt-9 flex flex-wrap justify-center gap-3">
-              <BriefingModal trigger={<Button size="lg">Book a pilot briefing</Button>} />
-              <Button asChild size="lg" variant="outline" className="border-white/25 bg-white/10 text-white hover:bg-white hover:text-ink">
+              <BriefingModal trigger={<MagneticButton><Button size="lg">Book a pilot briefing</Button></MagneticButton>} />
+              <MagneticButton><Button asChild size="lg" variant="outline" className="border-white/25 bg-white/10 text-white hover:bg-white hover:text-ink">
                 <Link to="/pilot">See the pilot <ArrowRight /></Link>
-              </Button>
+              </Button></MagneticButton>
             </div>
           </div>
         </Reveal>

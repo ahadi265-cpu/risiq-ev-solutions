@@ -29,6 +29,11 @@ export default defineConfig({
         // and made the first paint preload 444 kB of charts.
         manualChunks(id: string) {
           if (!id.includes('node_modules')) return
+          // postprocessing (+ maath/n8ao) is only reachable through HeroPostFX's own
+          // dynamic import — leave it out of the 'three' vendor bucket so Rollup keeps
+          // it in that lazy chunk instead of merging it back into a bundle every
+          // HeroCanvas visitor (including the default light theme) has to download.
+          if (id.includes('@react-three/postprocessing') || id.includes('/postprocessing/') || id.includes('/maath/') || id.includes('/n8ao/')) return
           if (id.includes('/three/') || id.includes('@react-three')) return 'three'
           if (id.includes('motion') || id.includes('framer')) return 'motion'
           if (id.includes('react-router')) return 'router'

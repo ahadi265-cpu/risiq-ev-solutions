@@ -59,7 +59,7 @@ export default function Pilot() {
           <span className="flex items-center gap-2.5 font-mono text-xs tracking-[0.14em] text-amber uppercase">
             <span className="size-1.5 rounded-full bg-amber ring-3 ring-amber/20" />Live Pilot · Addis Ababa
           </span>
-          <h1 className="mt-5 max-w-[19ch] text-4xl font-bold tracking-tight md:text-6xl">Ten BYDs. Ninety days. One standard.</h1>
+          <h1 className="mt-5 max-w-[19ch] text-fluid-h1 font-bold tracking-tight">Ten BYDs. Ninety days. One standard.</h1>
           <p className="mt-6 max-w-[56ch] text-lg text-muted-foreground">
             In late October 2026, RISIQ puts ten BYD electric vehicles through a full battery-certification cycle in Addis Ababa — and hands the results to the institutions that carry the risk.
           </p>

@@ -1,5 +1,5 @@
-import { useMemo, useState, type CSSProperties } from 'react'
-import { motion } from 'motion/react'
+import { useMemo, useRef, useState, type CSSProperties } from 'react'
+import { motion, useMotionValue, useSpring, AnimatePresence } from 'motion/react'
 import { AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { clamp, hashStr, mulberry32 } from '@/lib/data'
@@ -28,7 +28,10 @@ export function cellMap(id: string, soh: number) {
 }
 
 /** 96-cell state-of-health map: hover to inspect, click to pin. Degraded cells
- *  and the weakest cell pulse so the eye lands on them first. */
+ *  and the weakest cell pulse so the eye lands on them first. A single
+ *  tooltip springs from cell to cell rather than each of the 96 buttons
+ *  carrying its own — it snaps to wherever the pointer lands, which both
+ *  reads as more alive and is 95 fewer floating DOM nodes at rest. */
 export function CellHeatmap({ id, soh, className }: { id: string; soh: number; className?: string }) {
   const cells = useMemo(() => cellMap(id, soh), [id, soh])
   const lo = Math.min(...cells), hi = Math.max(...cells)
@@ -51,6 +54,24 @@ export function CellHeatmap({ id, soh, className }: { id: string; soh: number; c
     return new Set([...weak, weakest])
   }, [cells, soh, weakest])
 
+  // the floating tooltip's target position, in pixels relative to the grid
+  // container — a snappy spring, so it visibly leaps and settles onto each
+  // cell rather than teleporting or gliding evenly like a plain transition.
+  const gridRef = useRef<HTMLDivElement>(null)
+  const tipX = useMotionValue(0)
+  const tipY = useMotionValue(0)
+  const springX = useSpring(tipX, { stiffness: 520, damping: 30, mass: 0.5 })
+  const springY = useSpring(tipY, { stiffness: 520, damping: 30, mass: 0.5 })
+
+  const trackTooltip = (i: number, el: HTMLButtonElement) => {
+    const grid = gridRef.current
+    if (grid) {
+      tipX.set(el.offsetLeft + el.offsetWidth / 2)
+      tipY.set(el.offsetTop)
+    }
+    setHover(i)
+  }
+
   return (
     <div className={cn('grid gap-3', className)}>
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
@@ -64,7 +85,7 @@ export function CellHeatmap({ id, soh, className }: { id: string; soh: number; c
         </ul>
       </div>
 
-      <div className="grid grid-cols-12 gap-1 rounded-xl border bg-[color-mix(in_oklch,var(--ink)_6%,transparent)] p-2" role="img"
+      <div ref={gridRef} className="relative grid grid-cols-12 gap-1 rounded-xl border bg-[color-mix(in_oklch,var(--ink)_6%,transparent)] p-2" role="img"
         onPointerLeave={() => setHover(null)}
         aria-label={`${CELLS} cells span ${lo.toFixed(1)}% to ${hi.toFixed(1)}% state of health. ${flagged} cells below 85%.`}>
         {cells.map((v, i) => {
@@ -72,22 +93,31 @@ export function CellHeatmap({ id, soh, className }: { id: string; soh: number; c
           const alert = pulsing.has(i)
           return (
             <motion.button key={i} type="button"
-              onClick={() => setSel(sel === i ? null : i)} onPointerEnter={() => setHover(i)} onFocus={() => setHover(i)}
+              onClick={(e) => { setSel(sel === i ? null : i); trackTooltip(i, e.currentTarget) }}
+              onPointerEnter={(e) => trackTooltip(i, e.currentTarget)} onFocus={(e) => trackTooltip(i, e.currentTarget)}
               whileHover={{ scale: 1.35, zIndex: 3 }} whileTap={{ scale: 1.1 }}
               transition={{ type: 'spring', stiffness: 420, damping: 24 }}
               className={cn('group relative aspect-square cursor-pointer rounded-[3px] outline-none',
                 alert && 'cell-pulse', sel === i && 'ring-2 ring-foreground', i === weakest && 'ring-2 ring-offset-1 ring-grade-d ring-offset-transparent',
                 'focus-visible:ring-2 focus-visible:ring-foreground')}
               style={{ background: `color-mix(in oklch, ${t.fill} ${mix(v)}%, var(--card))`, '--cell-glow': t.glow } as CSSProperties}
-              aria-label={`Cell ${i + 1}, ${v.toFixed(1)} percent, ${t.label}`}>
-              {/* tooltip springs open on hover; pointer-events off so it never steals the hover */}
-              <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 grid origin-bottom -translate-x-1/2 scale-90 gap-0.5 rounded-lg border bg-popover px-2.5 py-1.5 whitespace-nowrap text-popover-foreground opacity-0 shadow-xl transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:scale-100 group-focus-visible:opacity-100">
-                <b className="font-mono text-[0.7rem] tabular">{v.toFixed(1)}%</b>
-                <small className="font-mono text-[0.58rem] tracking-wider text-muted-foreground uppercase">Cell {i + 1} · {t.label}</small>
-              </span>
-            </motion.button>
+              aria-label={`Cell ${i + 1}, ${v.toFixed(1)} percent, ${t.label}`} />
           )
         })}
+
+        {/* the single magnetic tooltip — springs to whichever cell is hovered/focused */}
+        <AnimatePresence>
+          {focus !== null && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }}
+              transition={{ duration: 0.15 }}
+              style={{ x: springX, y: springY, translateX: '-50%', translateY: 'calc(-100% - 8px)' }}
+              className="pointer-events-none absolute top-0 left-0 z-10 grid origin-bottom gap-0.5 rounded-lg border bg-popover px-2.5 py-1.5 whitespace-nowrap text-popover-foreground shadow-xl">
+              <b className="font-mono text-[0.7rem] tabular">{cells[focus].toFixed(1)}%</b>
+              <small className="font-mono text-[0.58rem] tracking-wider text-muted-foreground uppercase">Cell {focus + 1} · {toneOf(cells[focus]).label}</small>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <p className="flex items-start gap-2 text-sm text-muted-foreground">

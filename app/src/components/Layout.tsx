@@ -317,7 +317,7 @@ export function SectionHead({ eyebrow, title, children }: {
       <span className="flex items-center gap-2.5 font-mono text-xs tracking-[0.14em] text-amber uppercase">
         <span className="size-1.5 rounded-full bg-amber ring-3 ring-amber/20" />{eyebrow}
       </span>
-      <h2 data-settle className="mt-4 text-3xl font-semibold md:text-[2.6rem] md:leading-[1.1]">{title}</h2>
+      <h2 data-settle className="text-fluid-h2 mt-4 font-semibold">{title}</h2>
       {children && <p className="mt-4 text-lg text-muted-foreground text-pretty">{children}</p>}
     </div>
   )

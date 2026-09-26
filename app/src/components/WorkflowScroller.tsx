@@ -23,14 +23,34 @@ const STEPS = [
 
 /**
  * Pinned horizontal sequence: on desktop the section pins for the height of
- * its track and vertical scroll scrubs the four panels sideways. On phones and
- * under reduced motion it is a plain vertical stack — nothing is hidden or
- * repositioned by JS, so the copy is always reachable.
+ * its track and vertical scroll scrubs the four panels sideways. On phones
+ * and under reduced motion it is a plain vertical stack — nothing is hidden
+ * or repositioned by JS, so the copy is always reachable.
+ *
+ * Layered parallax, on top of the base scrub:
+ *  - the decorative background grid trails at half the track's travel
+ *    (0.5×) — a slow, ambient depth cue behind everything;
+ *  - the text block (title/description/checklist) rides at the track's own
+ *    1× rate — it *is* the base scrub, not a separate tween;
+ *  - each card's icon/number chip gets its own bounded ±12% drift as that
+ *    specific card crosses the viewport, via GSAP's `containerAnimation`
+ *    (the documented pattern for per-panel motion inside a pinned
+ *    horizontal scroller) — a livelier, foreground-reads-faster feel.
+ *  Note on easing: the master scrub tween stays `ease: 'none'`. A scrub
+ *  tween's `ease` reshapes scroll position → visual position, so anything
+ *  but linear there decouples the track from the scrollbar and feels
+ *  laggy/rubber-banded — GSAP's own guidance is to keep scrub eases linear
+ *  and put personality on secondary tweens instead. `power3.out` drives the
+ *  per-card chip drift (an "entrance" as each card arrives) and `expo.inOut`
+ *  drives the discrete highlight pulse when the active step changes.
  */
 export function WorkflowScroller() {
   const section = useRef<HTMLElement>(null)
   const track = useRef<HTMLDivElement>(null)
+  const bgGrid = useRef<HTMLDivElement>(null)
   const bar = useRef<HTMLSpanElement>(null)
+  const cardRefs = useRef<(HTMLElement | null)[]>([])
+  const chipRefs = useRef<(HTMLElement | null)[]>([])
   const [idx, setIdx] = useState(0)
 
   useEffect(() => {
@@ -38,33 +58,64 @@ export function WorkflowScroller() {
     mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
       const sec = section.current!, tr = track.current!
       const dist = () => tr.scrollWidth - sec.clientWidth
-      const tween = gsap.to(tr, {
+
+      // the master scrub: drives the pin and IS the "text, 1×" layer.
+      // Deliberately ease: 'none' — see the note above. The background layer
+      // is driven from this SAME onUpdate (gsap.set, not a second scrubbed
+      // tween) so its 0.5× ratio is exact by construction — one progress
+      // value feeding both, rather than two separately-scrubbed
+      // ScrollTriggers that would need to be trusted to stay in lockstep.
+      const containerTween = gsap.to(tr, {
         x: () => -dist(), ease: 'none',
         scrollTrigger: {
           trigger: sec, start: 'top top', end: () => `+=${dist()}`, pin: true, scrub: 0.6,
           anticipatePin: 1, invalidateOnRefresh: true,
           onUpdate: (self) => {
             if (bar.current) bar.current.style.transform = `scaleX(${self.progress})`
+            if (bgGrid.current) gsap.set(bgGrid.current, { x: -dist() * 0.5 * self.progress })
             setIdx(Math.min(STEPS.length - 1, Math.floor(self.progress * STEPS.length + 0.0001)))
           },
         },
       })
-      return () => { tween.scrollTrigger?.kill(); tween.kill() }
+
+      // foreground cards: each icon/number chip drifts as its own card
+      // crosses the viewport, riding the container's virtual progress.
+      const chipTweens = STEPS.map((_, i) => {
+        const chip = chipRefs.current[i], card = cardRefs.current[i]
+        if (!chip || !card) return null
+        return gsap.fromTo(chip, { xPercent: -12 }, {
+          xPercent: 12, ease: 'power3.out',
+          scrollTrigger: { trigger: card, containerAnimation: containerTween, start: 'left center', end: 'right center', scrub: true },
+        })
+      })
+
+      return () => {
+        containerTween.scrollTrigger?.kill(); containerTween.kill()
+        for (const t of chipTweens) { if (t) { t.scrollTrigger?.kill(); t.kill() } }
+      }
     })
     return () => mm.revert()
   }, [])
 
+  // discrete "modal shift" pulse on the active chip when the step changes —
+  // a timed tween (not scroll-scrubbed), so expo.inOut is exactly the right tool.
+  useEffect(() => {
+    const chip = chipRefs.current[idx]
+    if (!chip || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    gsap.fromTo(chip, { scale: 0.92 }, { scale: 1, duration: 0.6, ease: 'expo.inOut' })
+  }, [idx])
+
   return (
     <section ref={section} aria-labelledby="wf-title"
       className="relative isolate overflow-hidden border-y bg-muted/60 lg:h-dvh lg:flex lg:flex-col lg:justify-center">
-      <div aria-hidden className="bg-grid absolute inset-0 -z-10 opacity-60" />
+      <div ref={bgGrid} aria-hidden className="bg-grid absolute inset-0 -z-10 w-[160%] opacity-60 will-change-transform" />
       <div className="mx-auto w-full max-w-[1440px] px-6 pt-16 lg:pt-0">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-[46rem]">
             <span className="flex items-center gap-2.5 font-mono text-xs tracking-[0.14em] text-amber uppercase">
               <span className="size-1.5 rounded-full bg-amber ring-3 ring-amber/20" />How It Works · 15 minutes
             </span>
-            <h2 id="wf-title" className="mt-4 text-3xl font-semibold md:text-[2.6rem] md:leading-[1.1]">From plug to certificate, in four steps.</h2>
+            <h2 id="wf-title" className="text-fluid-h2 mt-4 font-semibold">From plug to certificate, in four steps.</h2>
           </div>
           <div className="hidden items-center gap-3 font-mono text-xs text-muted-foreground lg:flex">
             <span className="tabular">{STEPS[idx].n} / 04</span>
@@ -83,7 +134,8 @@ export function WorkflowScroller() {
           const Icon = s.icon
           const on = i === idx
           return (
-            <article key={s.n} className={cn('glass relative grid w-[calc(100vw-3rem)] max-w-[44rem] shrink-0 gap-6 rounded-3xl border p-7 transition-colors duration-500 md:p-9 lg:w-[min(64vw,52rem)] lg:grid-cols-[1fr_auto]',
+            <article key={s.n} ref={(el) => { cardRefs.current[i] = el }}
+              className={cn('glass relative grid w-[calc(100vw-3rem)] max-w-[44rem] shrink-0 gap-6 overflow-hidden rounded-3xl border p-7 transition-colors duration-500 md:p-9 lg:w-[min(64vw,52rem)] lg:grid-cols-[1fr_auto]',
               on && 'lg:border-brand/40 lg:shadow-[0_24px_70px_-30px_color-mix(in_oklch,var(--brand)_60%,transparent)]')}>
               <div>
                 <span className="font-mono text-[0.68rem] tracking-[0.16em] text-brand uppercase">Step {s.n} · {s.at}</span>
@@ -98,7 +150,8 @@ export function WorkflowScroller() {
                   ))}
                 </ul>
               </div>
-              <div className="grid content-center justify-items-center gap-4 lg:w-52">
+              <div ref={(el) => { chipRefs.current[i] = el }}
+                className="grid content-center justify-items-center gap-4 will-change-transform lg:w-52">
                 <span className={cn('grid size-28 place-items-center rounded-3xl border transition-all duration-500',
                   on ? 'border-brand/40 bg-brand text-white shadow-[0_0_60px_-10px_color-mix(in_oklch,var(--brand)_70%,transparent)]' : 'bg-card text-brand')}>
                   <Icon className="size-12" strokeWidth={1.6} />
