@@ -7,6 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify": "npm run lint && npm test && npm run build",
+    "verify:e2e": "node scripts/verify-e2e.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -25,6 +29,7 @@
     "lenis": "^1.3.26",
     "lucide-react": "^1.43.0",
     "motion": "^13.2.0",
+    "postprocessing": "^6.39.5",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.3",
@@ -42,6 +47,7 @@
     "@vitejs/plugin-react": "^6.1.0",
     "oxlint": "^1.79.0",
     "typescript": "~6.0.2",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "vitest": "^5.0.2"
   }
 }

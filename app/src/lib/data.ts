@@ -146,3 +146,14 @@ export const COMPAT: Compat[] = [
   { make: 'Hyundai', model: 'Kona Electric', seg: 'Compact SUV', kwh: '39.2 / 64 kWh', obd: 'partial', common: false },
   { make: 'Toyota', model: 'bZ4X', seg: 'Mid-size SUV', kwh: '71.4 kWh', obd: 'partial', common: false },
 ]
+
+/** Real-time compatibility search. No query shows the models most common in
+ *  Addis; a query matches make, model or segment, case-insensitively. */
+export function filterCompat(query: string, limit = 8): Compat[] {
+  const s = query.trim().toLowerCase()
+  const list = s
+    ? COMPAT.filter((c) => `${c.make} ${c.model} ${c.seg}`.toLowerCase().includes(s))
+    : COMPAT.filter((c) => c.common)
+  return list.slice(0, limit)
+}
+

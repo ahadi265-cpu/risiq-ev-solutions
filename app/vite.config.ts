@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -14,6 +15,9 @@ const base = process.env.VITE_BASE ?? '/'
 export default defineConfig({
   base,
   plugins: [react(), tailwindcss()],
+  // `npm test` — pure-logic suites under src/lib run in Node; nothing here
+  // needs a DOM. Component behaviour is covered by scripts/verify-e2e.mjs.
+  test: { include: ['src/**/*.test.ts'], environment: 'node' },
   resolve: {
     alias: { '@': path.resolve(import.meta.dirname, './src') },
   },

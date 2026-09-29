@@ -17,9 +17,12 @@ by GitHub Actions.
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
-npm run build    # type-check + production build to dist/
-npm run preview  # serve the built output
+npm run dev         # http://localhost:5173
+npm test            # Vitest — pure logic under src/lib (model, physics, search, heatmap)
+npm run build       # type-check + production build to dist/
+npm run verify:e2e  # headless-Chrome smoke check of dist/ (WebGL, Lenis, pin, dialogs, phone layout)
+npm run verify      # lint + test + build, what CI runs before deploying
+npm run preview     # serve the built output
 ```
 
 ## ⚠️ Before the first deploy — one manual setting

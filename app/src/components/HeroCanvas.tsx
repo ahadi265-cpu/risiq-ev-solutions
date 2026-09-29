@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { hashStr, mulberry32 } from '@/lib/data'
+import { repelSpringStep, type Cursor } from '@/lib/physics'
 
 /* Its own chunk: postprocessing (plus maath/n8ao) is real weight, and only
    dark-mode desktop visitors ever render it — see HeroPostFX.tsx. */
@@ -20,13 +21,6 @@ const DARK = { points: '#00f2fe', cells: '#10b981', opacity: 0.85, cellOpacity: 
    rather than re-rendering React on every pointer move. */
 const mouse = { x: 0, y: 0 }
 
-/* Cursor repulsion + spring return, shared tuning for both meshes. Values are
-   world units (the scene spans roughly ±11 × ±6 × ±6). */
-const REPEL_RADIUS = 2.4
-const REPEL_STRENGTH = 7
-const SPRING_K = 2.4
-const DAMPING = 3.2 // exponential velocity decay per second — framerate-independent
-
 /** Casts the mouse ray onto the z=0 plane once per frame and returns the world
  *  point every particle repels from. Shared by both meshes via a ref so the
  *  raycaster/plane/vector allocate once, not per particle. */
@@ -36,7 +30,7 @@ function useWorldCursor() {
   const plane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), [])
   const ndc = useMemo(() => new THREE.Vector2(), [])
   const world = useMemo(() => new THREE.Vector3(), [])
-  return () => {
+  return (): Cursor => {
     ndc.set(mouse.x * 2, -mouse.y * 2)
     raycaster.setFromCamera(ndc, camera)
     raycaster.ray.intersectPlane(plane, world)
@@ -76,32 +70,7 @@ function Particles({ count, dark, selRef }: { count: number; dark: boolean; selR
     // React state instead would defeat the reason useFrame exists). Same
     // category this codebase already accepts for set-state-in-effect elsewhere.
     const { base, positions, velocity } = bufs
-    const dt = Math.min(rawDt, 1 / 30)
-    const cursor = getCursor()
-    const damp = Math.exp(-DAMPING * dt)
-
-    for (let i = 0; i < count; i++) {
-      const ix = i * 3, iy = ix + 1, iz = ix + 2
-      const dx = positions[ix] - cursor.x, dy = positions[iy] - cursor.y, dz = positions[iz] - cursor.z
-      const distSq = dx * dx + dy * dy + dz * dz
-      if (distSq < REPEL_RADIUS * REPEL_RADIUS && distSq > 1e-6) {
-        const dist = Math.sqrt(distSq)
-        const falloff = 1 - dist / REPEL_RADIUS
-        const f = falloff * falloff * REPEL_STRENGTH
-        velocity[ix] += (dx / dist) * f * dt
-        velocity[iy] += (dy / dist) * f * dt
-        velocity[iz] += (dz / dist) * f * dt
-      }
-      // spring pulling every particle back toward its resting position
-      velocity[ix] += (base[ix] - positions[ix]) * SPRING_K * dt
-      velocity[iy] += (base[iy] - positions[iy]) * SPRING_K * dt
-      velocity[iz] += (base[iz] - positions[iz]) * SPRING_K * dt
-
-      velocity[ix] *= damp; velocity[iy] *= damp; velocity[iz] *= damp
-      positions[ix] += velocity[ix] * dt
-      positions[iy] += velocity[iy] * dt
-      positions[iz] += velocity[iz] * dt
-    }
+    repelSpringStep(positions, base, velocity, count, getCursor(), rawDt)
     const attr = p.geometry.getAttribute('position') as THREE.BufferAttribute
     attr.needsUpdate = true
 
@@ -122,61 +91,42 @@ function Particles({ count, dark, selRef }: { count: number; dark: boolean; selR
   )
 }
 
-type CellSeed = {
-  x: number; y: number; z: number; vx: number; vy: number; vz: number
-  rx: number; ry: number; spin: number; drift: number
-}
-
 /** A loose array of wireframe battery cells that repel from the cursor with
  *  the same spring physics as the particle field, plus a slow ambient tumble. */
 function Cells({ count, dark, selRef }: { count: number; dark: boolean; selRef: React.RefObject<THREE.InstancedMesh | null> }) {
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const getCursor = useWorldCursor()
-  // Same reasoning as Particles above: seeds/base are mutable animation
-  // state (each seed's x/y/z/velocity is written every frame), computed once
-  // via a lazy useState initializer rather than useMemo.
+  // Same reasoning as Particles above: mutable animation state computed once
+  // via a lazy useState initializer. xyz buffers share the particle step; the
+  // per-cell tumble parameters are read-only after seeding.
   const [cellBufs] = useState(() => {
-    const seeds: CellSeed[] = Array.from({ length: count }, () => ({
-      x: (rnd() - 0.5) * 18, y: (rnd() - 0.5) * 9, z: -1.5 - rnd() * 4, vx: 0, vy: 0, vz: 0,
-      rx: rnd() * Math.PI, ry: rnd() * Math.PI, spin: 0.15 + rnd() * 0.3, drift: rnd() * Math.PI * 2,
-    }))
-    return { seeds, base: seeds.map((s) => ({ x: s.x, y: s.y, z: s.z })) }
+    const base = new Float32Array(count * 3)
+    const rx = new Float32Array(count), ry = new Float32Array(count)
+    const spin = new Float32Array(count), drift = new Float32Array(count)
+    for (let i = 0; i < count; i++) {
+      base[i * 3] = (rnd() - 0.5) * 18
+      base[i * 3 + 1] = (rnd() - 0.5) * 9
+      base[i * 3 + 2] = -1.5 - rnd() * 4
+      rx[i] = rnd() * Math.PI; ry[i] = rnd() * Math.PI
+      spin[i] = 0.15 + rnd() * 0.3; drift[i] = rnd() * Math.PI * 2
+    }
+    return { base, positions: base.slice(), velocity: new Float32Array(count * 3), rx, ry, spin, drift }
   })
 
   useFrame((state, rawDt) => {
     const m = selRef.current
     if (!m) return
     // see the matching note in Particles above — same accepted false positive.
-    const { seeds, base } = cellBufs
-    const dt = Math.min(rawDt, 1 / 30)
-    const cursor = getCursor()
-    const damp = Math.exp(-DAMPING * dt)
+    const { base, positions, velocity, rx, ry, spin, drift } = cellBufs
     const t = state.clock.elapsedTime
-
-    seeds.forEach((s, i) => {
-      const b = base[i]
-      const bob = Math.sin(t * 0.3 + s.drift) * 0.25
-      const dx = s.x - cursor.x, dy = (s.y - bob) - cursor.y, dz = s.z - cursor.z
-      const distSq = dx * dx + dy * dy + dz * dz
-      if (distSq < REPEL_RADIUS * REPEL_RADIUS && distSq > 1e-6) {
-        const dist = Math.sqrt(distSq)
-        const falloff = 1 - dist / REPEL_RADIUS
-        const f = falloff * falloff * REPEL_STRENGTH
-        s.vx += (dx / dist) * f * dt
-        s.vy += (dy / dist) * f * dt
-        s.vz += (dz / dist) * f * dt
-      }
-      s.vx += (b.x - s.x) * SPRING_K * dt
-      s.vy += (b.y - s.y) * SPRING_K * dt
-      s.vz += (b.z - s.z) * SPRING_K * dt
-      s.vx *= damp; s.vy *= damp; s.vz *= damp
-      s.x += s.vx * dt; s.y += s.vy * dt; s.z += s.vz * dt
-
-      dummy.position.set(s.x, s.y + bob, s.z)
-      dummy.rotation.set(s.rx + t * s.spin * 0.4, s.ry + t * s.spin, 0)
+    repelSpringStep(positions, base, velocity, count, getCursor(), rawDt)
+    for (let i = 0; i < count; i++) {
+      const bob = Math.sin(t * 0.3 + drift[i]) * 0.25
+      dummy.position.set(positions[i * 3], positions[i * 3 + 1] + bob, positions[i * 3 + 2])
+      dummy.rotation.set(rx[i] + t * spin[i] * 0.4, ry[i] + t * spin[i], 0)
       dummy.updateMatrix()
       m.setMatrixAt(i, dummy.matrix)
-    })
+    }
     m.instanceMatrix.needsUpdate = true
   })
 

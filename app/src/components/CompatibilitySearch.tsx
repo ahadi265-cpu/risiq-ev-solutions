@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Search, Lock, LockOpen, Unlock, Check, Timer, PlugZap, CarFront } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { COMPAT, type ObdStatus } from '@/lib/data'
+import { COMPAT, filterCompat, type ObdStatus } from '@/lib/data'
 import { cn } from '@/lib/utils'
 
 const OBD: Record<ObdStatus, { icon: typeof Lock; label: string; cls: string }> = {
@@ -17,11 +17,7 @@ const OBD: Record<ObdStatus, { icon: typeof Lock; label: string; cls: string }> 
 export function CompatibilitySearch() {
   const [q, setQ] = useState('')
   const [pick, setPick] = useState<string | null>(null)
-  const hits = useMemo(() => {
-    const s = q.trim().toLowerCase()
-    const list = s ? COMPAT.filter((c) => `${c.make} ${c.model} ${c.seg}`.toLowerCase().includes(s)) : COMPAT.filter((c) => c.common)
-    return list.slice(0, 8)
-  }, [q])
+  const hits = useMemo(() => filterCompat(q), [q])
   const sel = COMPAT.find((c) => `${c.make} ${c.model}` === pick) ?? hits[0]
 
   return (

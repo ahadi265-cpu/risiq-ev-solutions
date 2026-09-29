@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useRef, type ReactElement, type ComponentPropsWithoutRef } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { motion, useMotionValue, useSpring, useReducedMotion } from 'motion/react'
+import { magneticOffset } from '@/lib/magnetic'
 
 /* Motion driving a Radix Slot: Slot clones its single child (a Button, or a
    DialogTrigger's own asChild target) instead of wrapping it in a new
@@ -51,17 +52,8 @@ export const MagneticButton = forwardRef<HTMLElement, MagneticButtonProps>(funct
       const el = innerRef.current
       if (!el) return
       const r = el.getBoundingClientRect()
-      const cx = r.left + r.width / 2, cy = r.top + r.height / 2
-      const dx = e.clientX - cx, dy = e.clientY - cy
-      const dist = Math.hypot(dx, dy)
-      const reach = Math.max(r.width, r.height) / 2 + range
-      if (dist < reach) {
-        const pull = 1 - dist / reach // stronger the closer the cursor is to centre
-        x.set(dx * strength * pull)
-        y.set(dy * strength * pull)
-      } else {
-        x.set(0); y.set(0)
-      }
+      const o = magneticOffset(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2), r.width, r.height, range, strength)
+      x.set(o.x); y.set(o.y)
     }
     window.addEventListener('pointermove', onMove, { passive: true })
     return () => window.removeEventListener('pointermove', onMove)
