@@ -12,6 +12,7 @@ import { Section, SectionHead } from '@/components/Layout'
 import { Reveal, RevealGroup, revealItem } from '@/components/Reveal'
 import { LogoMarquee } from '@/components/LogoMarquee'
 import { BlindSpotExplorer } from '@/components/BlindSpotExplorer'
+import { CanvasBoundary } from '@/components/CanvasBoundary'
 import { BriefingModal } from '@/components/BriefingModal'
 import { CountUp } from '@/components/CountUp'
 import { HeroCertificate } from '@/components/HeroCertificate'
@@ -106,7 +107,7 @@ export default function Home() {
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="hero-scan absolute inset-y-0 -left-1/3 w-1/3" />
         </div>
-        {!reduce && <Suspense fallback={null}><HeroCanvas /></Suspense>}
+        {!reduce && <CanvasBoundary><Suspense fallback={null}><HeroCanvas /></Suspense></CanvasBoundary>}
         <div aria-hidden className="hero-orb absolute -top-48 right-[28%] -z-10 size-[36rem] rounded-full" />
         <div aria-hidden className="hero-orb hero-orb-b absolute -bottom-56 left-[14%] -z-10 size-[32rem] rounded-full" />
         {/* watermark emblem, the way eniris fades its mark behind the headline */}
