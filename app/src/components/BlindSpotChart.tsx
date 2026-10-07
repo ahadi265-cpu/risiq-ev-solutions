@@ -2,6 +2,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot, ReferenceLine, Legend,
 } from 'recharts'
 import { fmt } from '@/lib/data'
+import { useMediaQuery } from '@/lib/useMediaQuery'
 
 export type Pt = { km: number; guess: number; gentle: number; taxi: number }
 
@@ -9,9 +10,10 @@ const tick = { fill: 'var(--muted-foreground)', fontSize: 11, fontFamily: 'var(-
 
 /** Lazy-loaded so Recharts stays off the first paint of Home. */
 export default function BlindSpotChart({ data, km, soh, habit }: { data: Pt[]; km: number; soh: number; habit: 'gentle' | 'taxi' }) {
+  const wide = useMediaQuery('(min-width: 640px)', true)
   return (
     <ResponsiveContainer>
-      <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: -16 }}>
+      <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: -6 }}>
         <CartesianGrid stroke="var(--border)" vertical={false} />
         <XAxis dataKey="km" type="number" domain={[0, 150000]} tickCount={7} tickLine={false} axisLine={{ stroke: 'var(--border)' }}
           tick={tick} tickFormatter={(v: number) => `${v / 1000}k`} />
@@ -19,7 +21,7 @@ export default function BlindSpotChart({ data, km, soh, habit }: { data: Pt[]; k
         <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--card-foreground)', fontSize: 12 }}
           labelFormatter={(v) => `${fmt(Number(v))} km`}
           formatter={(v, n) => [`${Number(v).toFixed(1)}%`, n === 'guess' ? 'Mileage-only guess' : n === 'gentle' ? 'Car A · measured' : 'Car B · measured']} />
-        <Legend verticalAlign="top" height={28} iconType="plainline"
+        <Legend verticalAlign="top" height={wide ? 28 : 84} iconType="plainline"
           formatter={(v) => <span style={{ color: 'var(--muted-foreground)', fontSize: 12 }}>{v === 'guess' ? 'What the odometer implies' : v === 'gentle' ? 'Car A · gentle commuting' : 'Car B · your settings'}</span>} />
         <ReferenceLine y={92} stroke="var(--border)" strokeDasharray="4 4" label={{ value: 'Grade A line', position: 'insideTopRight', fill: 'var(--muted-foreground)', fontSize: 10.5 }} />
         <Line type="monotone" dataKey="guess" stroke="var(--muted-foreground)" strokeWidth={1.5} strokeDasharray="5 4" dot={false} isAnimationActive={false} />

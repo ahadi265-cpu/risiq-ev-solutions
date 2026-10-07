@@ -456,7 +456,49 @@ html { scroll-behavior: smooth; }
   .dark .noise-overlay { opacity: 0.15; }
   @media print { .noise-overlay { display: none; } }
 
-  /* ---------- heatmap cells --------------------------------------------- */
+  /* ---------- socket rig + collateral gauge (2026-10-07) ---------------------
+     Transform / opacity / stroke only. The OBD refusal loop is CSS so it always
+     reaches a defined frame; the plug's snap is Motion (layout + spring). */
+  .rig-probe { animation: probe-attempt 5s cubic-bezier(0.45, 0, 0.2, 1) infinite; will-change: transform; }
+  @keyframes probe-attempt {
+    0%, 12%  { transform: translateX(0); }
+    38%      { transform: translateX(var(--travel)); }
+    43%      { transform: translateX(calc(var(--travel) * 0.84)); }
+    47%      { transform: translateX(var(--travel)); }
+    60%      { transform: translateX(calc(var(--travel) * 0.5)); }
+    86%, 100% { transform: translateX(0); }
+  }
+  .rig-deny { animation: deny-card 5s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+  @keyframes deny-card {
+    0%, 37%  { opacity: 0; transform: translateY(10px) scale(0.94); }
+    43%      { opacity: 1; transform: translateY(0) scale(1.03); }
+    47%, 84% { opacity: 1; transform: translateY(0) scale(1); }
+    93%, 100% { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  }
+  .rig-shock { transform-box: fill-box; transform-origin: center; animation: shock 5s ease-out infinite; opacity: 0; }
+  @keyframes shock {
+    0%, 37% { opacity: 0; transform: scale(0.35); }
+    38%     { opacity: 0.95; }
+    56%, 100% { opacity: 0; transform: scale(2.7); }
+  }
+  .rig-shield { animation: shield-cycle 5s ease-in-out infinite; }
+  @keyframes shield-cycle { 0%, 37% { opacity: 0; } 40%, 86% { opacity: 1; } 94%, 100% { opacity: 0; } }
+  .rig-glow-red { animation: rig-glow-red 1.1s ease-in-out infinite alternate; }
+  @keyframes rig-glow-red { from { opacity: 0.45; } to { opacity: 1; } }
+  .rig-lock-ring { transform-box: fill-box; transform-origin: center; animation: lock-ring 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  @keyframes lock-ring { from { opacity: 0.95; transform: scale(0.55); } to { opacity: 0; transform: scale(2.1); } }
+  /* a wave that flows by sliding a longer sine exactly one wavelength (30 units) */
+  .rig-wave { animation: wave-flow 0.9s linear infinite; }
+  @keyframes wave-flow { from { transform: translateX(-30px); } to { transform: translateX(0); } }
+  .rig-wave-v { animation: wave-flow-v 0.9s linear infinite; }
+  @keyframes wave-flow-v { from { transform: translateY(-30px); } to { transform: translateY(0); } }
+  .rig-pulse { transform-box: fill-box; transform-origin: center; animation: rig-pulse 1s ease-in-out infinite; }
+  @keyframes rig-pulse { 0%, 100% { opacity: 0.35; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
+  /* soft cyan outer glow for primary actions on the dark stage; intensifies on hover */
+  .glow-cyan { box-shadow: 0 0 25px rgba(0, 242, 254, 0.25); transition: box-shadow 0.3s ease, transform 0.3s ease; }
+  .glow-cyan:hover, .glow-cyan:focus-visible { box-shadow: 0 0 40px rgba(0, 242, 254, 0.5); }
+
+/* ---------- heatmap cells --------------------------------------------- */
   .cell-pulse { animation: cell-pulse 2s ease-in-out infinite; }
   @keyframes cell-pulse {
     0%, 100% { box-shadow: 0 0 0 0 var(--cell-glow), 0 0 4px 0 var(--cell-glow); }
@@ -465,6 +507,12 @@ html { scroll-behavior: smooth; }
 
   @media (prefers-reduced-motion: reduce) {
     .hero-aurora, .hero-grid, .hero-scan, .glow-metric::before, .node-pulse, .deny-flash, .cell-pulse { animation: none; }
+    .rig-probe { animation: none; transform: translateX(var(--travel)); }
+    .rig-shield { animation: none; opacity: 1; }
+    .rig-deny, .rig-shock, .rig-wave, .rig-wave-v, .rig-pulse, .rig-glow-red, .rig-lock-ring { animation: none; }
+    .rig-deny { opacity: 1; transform: none; }
+    .rig-shock { opacity: 0.5; transform: scale(1.6); }
+    .rig-lock-ring { opacity: 0; }
     .btn-glow::after { transition: none; }
   }
 }
