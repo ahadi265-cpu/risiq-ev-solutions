@@ -2,13 +2,16 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { Lock, Plug as PlugIcon, Check, X, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Stage, GLASS, PRIMARY_GLOW } from '@/components/Stage'
+import { Stage, GLASS, GLASS_HOVER, PRIMARY_GLOW } from '@/components/Stage'
 import { PortBoard, PortFx } from '@/components/rig/PortBoard'
 import { Plug } from '@/components/rig/Plug'
 import { Probe } from '@/components/rig/Probe'
 import { Meter3D } from '@/components/rig/Meter3D'
 import { WaveLink } from '@/components/rig/WaveLink'
 import { PLUG_TRACK, PROBE_BOX } from '@/components/rig/geometry'
+import { CarPhoto } from '@/components/CarPhoto'
+import { COMPAT } from '@/lib/data'
+import { PHOTO_MODELS, carAssetFor } from '@/lib/cars'
 import { useMediaQuery } from '@/lib/useMediaQuery'
 import { useSeen } from '@/lib/useSeen'
 import { cn } from '@/lib/utils'
@@ -33,6 +36,10 @@ const MODES: Record<Mode, { label: string; tag: string; ok: boolean; headline: s
   },
 }
 
+/** The vehicles the rig can be shown for — those we hold a licensed photo of. */
+const VEHICLES = PHOTO_MODELS.flatMap((k) => COMPAT.filter((c) => `${c.make} ${c.model}` === k))
+const OBD_TEXT = { locked: 'encrypted / locked', partial: 'partial, model-specific', readable: 'readable' } as const
+
 const box = (b: { left: number; width: number; top: number; height: number }): CSSProperties =>
   ({ left: `${b.left}%`, width: `${b.width}%`, top: `${b.top}%`, height: `${b.height}%` })
 
@@ -47,6 +54,8 @@ export function SocketSimulator({ className }: { className?: string }) {
   const wide = useMediaQuery('(min-width: 768px)', true)
 
   const [mode, setMode] = useState<Mode>('socket')
+  const [vehicleKey, setVehicleKey] = useState(`${VEHICLES[0].make} ${VEHICLES[0].model}`)
+  const veh = VEHICLES.find((c) => `${c.make} ${c.model}` === vehicleKey) ?? VEHICLES[0]
   const [phase, setPhase] = useState<Phase>('idle')
   const [run, setRun] = useState(0) // bumped to replay either sequence from the top
   const m = MODES[mode]
@@ -55,6 +64,7 @@ export function SocketSimulator({ className }: { className?: string }) {
 
   const pick = (next: Mode) => { setMode(next); setPhase('idle'); setRun((r) => r + 1) }
   const replay = () => { setPhase('idle'); setRun((r) => r + 1) }
+  const pickVehicle = (k: string) => { setVehicleKey(k); replay() }
 
   // Socket sequence: once the rig is on screen, release the plug from its holster.
   useEffect(() => {
@@ -103,15 +113,39 @@ export function SocketSimulator({ className }: { className?: string }) {
           </div>
         </div>
 
-        <div className={cn(GLASS, 'rounded-2xl p-3 sm:p-5')}>
+        <div className={cn(GLASS, GLASS_HOVER, 'rounded-2xl p-3 sm:p-5')}>
+          {/* the car under test: a real photograph, and the model the port diagram is labelled for */}
+          <div data-rig="vehicle" data-vehicle={`${veh.make} ${veh.model}`}
+            className="mb-4 grid gap-4 border-b border-slate-800/80 pb-4 md:grid-cols-[minmax(0,17rem)_1fr] md:items-center">
+            <CarPhoto asset={carAssetFor(veh.make, veh.model)} make={veh.make} model={veh.model} className="h-28" />
+            <div>
+              <span className="font-mono text-[0.68rem] tracking-[0.14em] text-muted-foreground uppercase">Test vehicle</span>
+              <div role="radiogroup" aria-label="Test vehicle" className="mt-2 flex flex-wrap gap-2">
+                {VEHICLES.map((c) => {
+                  const k = `${c.make} ${c.model}`, on = k === vehicleKey
+                  return (
+                    <button key={k} type="button" role="radio" aria-checked={on} onClick={() => pickVehicle(k)}
+                      className={cn('min-h-11 cursor-pointer rounded-full border px-4 text-sm font-medium outline-none transition-all focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                        on ? 'border-teal/60 bg-teal/10 text-foreground shadow-[0_0_25px_rgba(0,242,254,0.18)]' : 'border-slate-800/80 text-muted-foreground hover:border-teal/40 hover:text-foreground hover:shadow-[0_0_30px_rgba(0,242,254,0.15)]')}>
+                      <span className="font-mono text-[0.62rem] tracking-wider uppercase opacity-70">{c.make}</span> {c.model}
+                    </button>
+                  )
+                })}
+              </div>
+              <p className="mt-2.5 font-mono text-xs text-muted-foreground tabular-nums">
+                Pack {veh.kwh} · OBD protocol: <span className={veh.obd === 'readable' ? 'text-teal' : 'text-amber'}>{OBD_TEXT[veh.obd]}</span>
+              </p>
+            </div>
+          </div>
+
           <div className="grid items-center gap-3 md:grid-cols-[minmax(0,1.55fr)_8.5rem_minmax(0,1fr)] lg:gap-4">
             {/* ------------------------------------------ the sectioned port */}
             <div role="img" data-rig="board" data-mode={mode} data-phase={phase}
               aria-label={socket
-                ? 'A charging plug in side view slides into the inlet of a BYD Atto 3 and locks, and current runs on to the RISIQ meter.'
+                ? 'A charging plug in side view slides into the inlet of the test vehicle and locks, and current runs on to the RISIQ meter.'
                 : 'A red diagnostic probe approaches the OBD port, is refused by an encrypted shield and bounces back.'}
               className="relative aspect-[420/300] w-full overflow-hidden rounded-xl border border-slate-800/60 bg-slate-950/50 shadow-[inset_0_0_40px_rgba(0,0,0,0.5)]">
-              <PortBoard variant={socket ? 'charge' : 'obd'} live={live} />
+              <PortBoard variant={socket ? 'charge' : 'obd'} live={live} vehicle={`${veh.make} ${veh.model}`} />
 
               {socket ? (
                 <div className={cn('absolute flex', seated ? 'justify-end' : 'justify-start')} style={box(PLUG_TRACK)}>

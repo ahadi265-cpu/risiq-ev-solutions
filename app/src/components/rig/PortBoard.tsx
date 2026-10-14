@@ -55,7 +55,7 @@ function ObdFace() {
  * inlet (charge) or the under-dash OBD port. Everything the plug or probe must
  * agree with comes from geometry.ts. Drawn behind the plug; PortFx draws over it.
  */
-export function PortBoard({ variant, live }: { variant: Variant; live: boolean }) {
+export function PortBoard({ variant, live, vehicle }: { variant: Variant; live: boolean; vehicle: string }) {
   const charge = variant === 'charge'
   const mouth = charge ? MOUTH : OBD_MOUTH
   const cav = charge ? CAVITY : OBD_CAVITY
@@ -141,8 +141,8 @@ export function PortBoard({ variant, live }: { variant: Variant; live: boolean }
       {/* ------------------------------------------------------- labels */}
       <g fontFamily={mono} fontSize="9" letterSpacing="1.3">
         <text x={FACE_X + 14} y="22" fill="#e2e8f0" fontWeight="600">{charge ? 'CHARGE INLET' : 'UNDER-DASH PORT'}</text>
-        <text x={FACE_X + 14} y="33" fill="#64748b" fontSize="8">{charge ? 'BYD ATTO 3' : 'OBD-II · 16-PIN'}</text>
-        <text x={FACE_X + 14} y="43" fill="#64748b" fontSize="8">{charge ? 'DC FAST CHARGE' : 'DIAGNOSTIC'}</text>
+        <text x={FACE_X + 14} y="33" fill="#94a3b8" fontSize="7.5" letterSpacing="1">{vehicle.toUpperCase()}</text>
+        <text x={FACE_X + 14} y="43" fill="#64748b" fontSize="8">{charge ? 'DC FAST CHARGE' : 'OBD-II · 16-PIN'}</text>
         {charge && <text x="296" y={CAVITY.y0 - 5} fill="#64748b" fontSize="7.5">LATCH</text>}
         {charge && <text x={SOCKET.x0 + 2} y={CAVITY.y1 + 14} fill="#64748b" fontSize="7.5">DC PIN</text>}
         <text x={BOARD.w - 10} y={BOARD.h - 8} textAnchor="end" fill="#334155" fontSize="7.5">SECTION VIEW</text>

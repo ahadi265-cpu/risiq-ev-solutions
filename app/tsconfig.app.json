@@ -25,5 +25,7 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  /* tests that read the filesystem need Node types; they have their own project (tsconfig.test.json) */
+  "exclude": ["src/**/*.node.test.ts"]
 }

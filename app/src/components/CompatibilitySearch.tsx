@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Search, Lock, LockOpen, Unlock, Check, Timer, PlugZap, CarFront } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { Stage, GLASS, GLASS_HOVER } from '@/components/Stage'
 import { COMPAT, filterCompat, type ObdStatus } from '@/lib/data'
+import { carAssetFor } from '@/lib/cars'
+import { CarPhoto } from '@/components/CarPhoto'
 import { cn } from '@/lib/utils'
 
 const OBD: Record<ObdStatus, { icon: typeof Lock; label: string; cls: string }> = {
@@ -21,63 +24,72 @@ export function CompatibilitySearch() {
   const sel = COMPAT.find((c) => `${c.make} ${c.model}` === pick) ?? hits[0]
 
   return (
-    <div className="grid gap-5 rounded-3xl border bg-card p-6 shadow-sm md:p-8 lg:grid-cols-[0.9fr_1.1fr]">
-      <div>
-        <label htmlFor="compat-q" className="flex items-center gap-2 text-sm font-semibold"><CarFront className="size-4 text-brand" />Is my car supported?</label>
-        <div className="mt-3 flex items-center gap-2 rounded-2xl border bg-background p-1.5 focus-within:border-brand/50 focus-within:ring-glow">
-          <Search className="ml-2 size-4 shrink-0 text-muted-foreground" />
-          <Input id="compat-q" value={q} onChange={(e) => { setQ(e.target.value); setPick(null) }} placeholder="Search a make or model — BYD, Deepal, Leaf…"
-            autoComplete="off" spellCheck={false} className="h-10 flex-1 border-0 bg-transparent focus-visible:ring-0" />
-        </div>
-        <ul className="mt-3 grid gap-1" role="listbox" aria-label="Matching vehicles">
-          {hits.length === 0 && (
-            <li className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
-              Not in our list yet — but if it charges, we can test it. <b className="text-foreground">Socket measurement works on any EV.</b>
-            </li>
-          )}
-          {hits.map((c) => {
-            const key = `${c.make} ${c.model}`, on = sel && `${sel.make} ${sel.model}` === key
-            return (
-              <li key={key}>
-                <button type="button" role="option" aria-selected={!!on} onClick={() => setPick(key)}
-                  className={cn('flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-left text-sm outline-none transition-all focus-visible:ring-[3px] focus-visible:ring-ring/50',
-                    on ? 'border-brand bg-brand/5' : 'hover:border-brand/40 hover:bg-accent/40')}>
-                  <span><span className="font-mono text-[0.66rem] tracking-wider text-muted-foreground uppercase">{c.make}</span> <b>{c.model}</b></span>
-                  <span className="font-mono text-xs text-muted-foreground">{c.seg}</span>
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-        {!q && <p className="mt-2 text-xs text-muted-foreground">Showing the models most common in Addis. Search for others.</p>}
-      </div>
-
-      {sel && (
-        <div key={`${sel.make}${sel.model}`} className="animate-rise grid content-start gap-4 rounded-2xl border bg-muted/40 p-5 md:p-6">
-          <div>
-            <span className="font-mono text-[0.66rem] tracking-[0.14em] text-muted-foreground uppercase">{sel.make} · {sel.seg}</span>
-            <h3 className="mt-1 text-2xl font-semibold tracking-tight">{sel.model}</h3>
-            <span className="mt-1 block font-mono text-sm text-muted-foreground">Pack {sel.kwh} · rated</span>
+    <Stage>
+      <div className="grid gap-5 p-4 sm:p-6 lg:grid-cols-[0.9fr_1.1fr] lg:p-8">
+        <section aria-label="Find your vehicle" className={cn(GLASS, GLASS_HOVER, 'rounded-2xl p-5 md:p-6')}>
+          <label htmlFor="compat-q" className="flex items-center gap-2 text-sm font-semibold"><CarFront className="size-4 text-teal" />Is my car supported?</label>
+          <div className="mt-3 flex items-center gap-2 rounded-2xl border border-slate-800/80 bg-slate-950/60 p-1.5 focus-within:border-teal/50 focus-within:shadow-[0_0_25px_rgba(0,242,254,0.18)]">
+            <Search className="ml-2 size-4 shrink-0 text-muted-foreground" />
+            <Input id="compat-q" value={q} onChange={(e) => { setQ(e.target.value); setPick(null) }} placeholder="Search a make or model — BYD, Deepal, Leaf…"
+              autoComplete="off" spellCheck={false} className="h-10 flex-1 border-0 bg-transparent focus-visible:ring-0" />
           </div>
-          <ul className="grid gap-2">
-            <li className="flex items-center gap-2.5 rounded-xl border border-teal/30 bg-teal/10 px-3.5 py-2.5 text-sm font-medium text-teal">
-              <PlugZap className="size-4 shrink-0" />Socket measurement: 100% supported
-            </li>
-            {(() => { const o = OBD[sel.obd]; const Icon = o.icon; return (
-              <li className={cn('flex items-center gap-2.5 rounded-xl border px-3.5 py-2.5 text-sm font-medium', o.cls)}>
-                <Icon className="size-4 shrink-0" />{o.label}
+          <ul className="mt-3 grid gap-1.5" role="listbox" aria-label="Matching vehicles">
+            {hits.length === 0 && (
+              <li className="rounded-xl border border-dashed border-slate-700 p-4 text-sm text-muted-foreground">
+                Not in our list yet — but if it charges, we can test it. <b className="text-foreground">Socket measurement works on any EV.</b>
               </li>
-            ) })()}
-            <li className="flex items-center gap-2.5 rounded-xl border bg-card px-3.5 py-2.5 text-sm font-medium">
-              <Timer className="size-4 shrink-0 text-brand" />Est. Rapid Test: 15 min · Reference Test ≈ 4 h
-            </li>
+            )}
+            {hits.map((c) => {
+              const key = `${c.make} ${c.model}`, on = sel && `${sel.make} ${sel.model}` === key
+              const asset = carAssetFor(c.make, c.model)
+              return (
+                <li key={key}>
+                  <button type="button" role="option" aria-selected={!!on} onClick={() => setPick(key)}
+                    className={cn('flex min-h-12 w-full cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 text-left text-sm outline-none transition-all focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                      on ? 'border-teal/50 bg-teal/10 shadow-[0_0_25px_rgba(0,242,254,0.12)]' : 'border-slate-800/80 hover:border-teal/40 hover:bg-slate-800/40 hover:shadow-[0_0_30px_rgba(0,242,254,0.15)]')}>
+                    <span className="grid h-8 w-14 shrink-0 place-items-center">
+                      {asset
+                        ? <img src={asset.src} width={asset.w} height={asset.h} alt="" loading="lazy" decoding="async" className="max-h-8 w-auto max-w-full object-contain" />
+                        : <CarFront className="size-5 text-muted-foreground/60" strokeWidth={1.5} />}
+                    </span>
+                    <span className="min-w-0 flex-1"><span className="font-mono text-[0.66rem] tracking-wider text-muted-foreground uppercase">{c.make}</span> <b>{c.model}</b></span>
+                    <span className="font-mono text-xs text-muted-foreground">{c.seg}</span>
+                  </button>
+                </li>
+              )
+            })}
           </ul>
-          <p className="flex items-start gap-2 text-xs text-muted-foreground">
-            <Check className="mt-0.5 size-3.5 shrink-0 text-teal" strokeWidth={3} />
-            Whatever the port allows, every BMS reading is cross-checked against RISIQ’s calibrated database; the certificate carries the calibrated result.
-          </p>
-        </div>
-      )}
-    </div>
+          {!q && <p className="mt-2 text-xs text-muted-foreground">Showing the models most common in Addis. Search for others.</p>}
+        </section>
+
+        {sel && (
+          <section key={`${sel.make}${sel.model}`} aria-label={`${sel.make} ${sel.model} compatibility`} className={cn(GLASS, GLASS_HOVER, 'animate-rise grid content-start gap-4 rounded-2xl p-5 md:p-6')}>
+            <CarPhoto asset={carAssetFor(sel.make, sel.model)} make={sel.make} model={sel.model} />
+            <div>
+              <span className="font-mono text-[0.66rem] tracking-[0.14em] text-muted-foreground uppercase">{sel.make} · {sel.seg}</span>
+              <h3 className="mt-1 text-2xl font-semibold tracking-tight">{sel.model}</h3>
+              <span className="mt-1 block font-mono text-sm text-muted-foreground tabular-nums">Pack {sel.kwh} · rated</span>
+            </div>
+            <ul className="grid gap-2">
+              <li className="flex items-center gap-2.5 rounded-xl border border-teal/30 bg-teal/10 px-3.5 py-2.5 text-sm font-medium text-teal">
+                <PlugZap className="size-4 shrink-0" />Socket measurement: 100% supported
+              </li>
+              {(() => { const o = OBD[sel.obd]; const Icon = o.icon; return (
+                <li className={cn('flex items-center gap-2.5 rounded-xl border px-3.5 py-2.5 text-sm font-medium', o.cls)}>
+                  <Icon className="size-4 shrink-0" />{o.label}
+                </li>
+              ) })()}
+              <li className="flex items-center gap-2.5 rounded-xl border border-slate-800/80 bg-slate-950/50 px-3.5 py-2.5 text-sm font-medium">
+                <Timer className="size-4 shrink-0 text-teal" />Est. Rapid Test: 15 min · Reference Test ≈ 4 h
+              </li>
+            </ul>
+            <p className="flex items-start gap-2 text-xs text-muted-foreground">
+              <Check className="mt-0.5 size-3.5 shrink-0 text-teal" strokeWidth={3} />
+              Whatever the port allows, every BMS reading is cross-checked against RISIQ’s calibrated database; the certificate carries the calibrated result.
+            </p>
+          </section>
+        )}
+      </div>
+    </Stage>
   )
 }

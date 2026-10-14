@@ -15,7 +15,7 @@ const TICKS = Array.from({ length: 21 }, (_, i) => {
   const v = i * 5, major = v % 25 === 0, a = sohToAngle(v)
   return { v, major, p0: polar(C, C, R_TICK, a), p1: polar(C, C, R_TICK - (major ? 9 : 5), a), num: polar(C, C, R_NUM, a) }
 })
-const SPRING = { stiffness: 110, damping: 15, mass: 1 } as const
+const SPRING = { stiffness: 200, damping: 20, mass: 1 } as const
 const f = (n: number) => +n.toFixed(2)
 
 /**

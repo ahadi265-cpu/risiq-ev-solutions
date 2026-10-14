@@ -5,7 +5,7 @@ import { Slider } from '@/components/ui/slider'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Stage, GLASS, PRIMARY_GLOW } from '@/components/Stage'
+import { Stage, GLASS, GLASS_HOVER, PRIMARY_GLOW } from '@/components/Stage'
 import { RiskGauge } from '@/components/RiskGauge'
 import { AnimatedNumber } from '@/components/AnimatedNumber'
 import { etb, usd, fmt } from '@/lib/data'
@@ -57,7 +57,7 @@ export function BlindSpotExplorer() {
     <Stage>
       <div className="grid gap-5 p-4 sm:p-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-6 lg:p-8">
         {/* ------------------------------------------------ the four sliders */}
-        <section aria-label="Car B settings" className={cn(GLASS, 'flex flex-col gap-6 rounded-2xl p-5 md:p-6')}>
+        <section aria-label="Car B settings" className={cn(GLASS, GLASS_HOVER, 'flex flex-col gap-6 rounded-2xl p-5 md:p-6')}>
           <div>
             <Label>Car B lives like…</Label>
             <div role="tablist" aria-label="Car B preset" className="mt-2.5 grid grid-cols-2 gap-1 rounded-full border border-slate-800/60 bg-slate-950/60 p-1">
@@ -139,7 +139,7 @@ export function BlindSpotExplorer() {
 
       {/* ------------------------------------------------------- the chart */}
       <div className="px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8">
-        <section aria-label="State of health against odometer" className={cn(GLASS, 'grid gap-4 rounded-2xl p-5 md:p-6')}>
+        <section aria-label="State of health against odometer" className={cn(GLASS, GLASS_HOVER, 'grid gap-4 rounded-2xl p-5 md:p-6')}>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">State of health vs. odometer</span>
             <span className="text-xs text-muted-foreground">Car A, Car B, and what the odometer implies</span>

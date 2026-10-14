@@ -1,29 +1,26 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 import {
-  RadialBarChart, RadialBar, PolarAngleAxis, ResponsiveContainer,
+  ResponsiveContainer,
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine,
 } from 'recharts'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Label } from '@/components/ui/label'
 import { Section, SectionHead } from '@/components/Layout'
 import { Reveal } from '@/components/Reveal'
 import { TestVisualizer } from '@/components/TestVisualizer'
+import { Stage, GLASS, GLASS_HOVER, PRIMARY_GLOW } from '@/components/Stage'
+import { RiskGauge } from '@/components/RiskGauge'
+import { AnimatedNumber } from '@/components/AnimatedNumber'
 import { cn } from '@/lib/utils'
 import {
-  FLEET, CLIMATES, modelSoH, decayCurve, gradeOf, bookFactor, batteryFactor, fmt, etb, usd, ETB_PER_USD, type Grade,
+  FLEET, CLIMATES, modelSoH, decayCurve, gradeOf, bookFactor, batteryFactor, fmt, etb, usd, ETB_PER_USD,
 } from '@/lib/data'
-
-const GRADE_FILL: Record<Grade, string> = {
-  A: 'oklch(0.517 0.146 149.1)', B: 'oklch(0.511 0.096 186.4)',
-  C: 'oklch(0.523 0.135 62.4)', D: 'oklch(0.487 0.192 27.6)',
-}
 
 function Stat({ k, v, s }: { k: string; v: string; s: string }) {
   return (
-    <div className="bg-card p-4">
+    <div className="bg-slate-950/50 p-4">
       <span className="block text-xs text-muted-foreground">{k}</span>
       <b className="mt-1.5 block font-mono text-lg tabular">{v}</b>
       <small className="mt-0.5 block text-xs text-muted-foreground">{s}</small>
@@ -57,8 +54,9 @@ export default function Tools() {
       </SectionHead>
 
       <Reveal>
-        <div className="grid overflow-hidden rounded-2xl border bg-card shadow-sm lg:grid-cols-[0.86fr_1.14fr]">
-          <div className="grid content-start gap-7 border-b bg-muted/40 p-7 lg:border-r lg:border-b-0">
+        <Stage>
+        <div className="grid gap-5 p-4 sm:p-6 lg:grid-cols-[0.86fr_1.14fr] lg:gap-6 lg:p-8">
+          <section aria-label="Calculator inputs" className={cn(GLASS, GLASS_HOVER, 'grid content-start gap-7 rounded-2xl p-5 md:p-6')}>
             <div>
               <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">Vehicle</span>
               <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Vehicle">
@@ -103,42 +101,28 @@ export default function Tools() {
               </div>
               <p className="mt-3 text-xs text-muted-foreground">{climate ? climate.note : `Custom · ${temp} °C daily average`}</p>
             </div>
-          </div>
+          </section>
 
-          <div className="grid content-start gap-7 p-7">
-            <div className="flex flex-wrap items-center gap-6">
-              <div className="relative size-32 shrink-0">
-                <ResponsiveContainer>
-                  <RadialBarChart innerRadius="72%" outerRadius="100%" data={[{ v: m.soh }]} startAngle={90} endAngle={-270}>
-                    <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-                    <RadialBar dataKey="v" cornerRadius={20} fill={GRADE_FILL[grade]} background={{ fill: 'oklch(0.916 0.011 251)' }} isAnimationActive />
-                  </RadialBarChart>
-                </ResponsiveContainer>
-              </div>
-              <div>
-                <motion.span key={m.soh.toFixed(1)} initial={{ opacity: 0.4 }} animate={{ opacity: 1 }}
-                  className="block font-mono text-4xl font-semibold tabular">{m.soh.toFixed(1)}%</motion.span>
-                <span className="mt-1.5 block text-sm text-muted-foreground">estimated state of health</span>
-                <Badge variant={grade.toLowerCase() as 'a'} className="mt-3">Grade {grade}</Badge>
-              </div>
-            </div>
-
-            <div className="grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-2">
+          <section aria-label="Calculator results" className={cn(GLASS, GLASS_HOVER, 'grid content-start gap-7 rounded-2xl p-5 md:p-6')}>
+            <div className="grid items-center gap-6 md:grid-cols-[minmax(0,17rem)_1fr]">
+              <RiskGauge soh={m.soh} grade={grade} label="Estimated battery state of health" />
+              <div className="grid gap-px overflow-hidden rounded-xl border border-slate-800/80 bg-slate-800/80 sm:grid-cols-2">
               <Stat k="Usable capacity" v={`${(car.kwh * m.soh / 100).toFixed(1)} kWh`} s={`of ${car.kwh} kWh new`} />
               <Stat k="Estimated range" v={`${Math.round(car.range * m.soh / 100)} km`} s={`of ${car.range} km rated`} />
               <Stat k="Calendar fade" v={`−${m.calendar.toFixed(1)} pp`} s={`${years} yr at ${temp}°C`} />
               <Stat k="Cycle fade" v={`−${m.cyclic.toFixed(1)} pp`} s={`${fmt(cycles)} full cycles`} />
+              </div>
             </div>
 
-            <div className="grid gap-3 rounded-xl border p-5">
+            <div className="grid gap-3 rounded-xl border border-slate-800/80 bg-slate-950/40 p-5">
               <span className="font-mono text-[0.68rem] tracking-[0.13em] text-muted-foreground uppercase">Collateral position</span>
               <div className="flex items-baseline justify-between gap-4 text-sm">
                 <span className="text-muted-foreground">Book residual <small className="block text-xs">battery ignored</small></span>
-                <b className="font-mono tabular">{etb(book)}</b>
+                <b className="font-mono tabular-nums"><AnimatedNumber value={book} format={etb} /></b>
               </div>
               <div className="flex items-baseline justify-between gap-4 text-sm">
                 <span className="text-muted-foreground">Battery-adjusted residual</span>
-                <span className="text-right"><b className="block font-mono text-lg text-teal tabular">{etb(adjusted)}</b><small className="font-mono text-xs text-muted-foreground">≈ {usd(adjusted)}</small></span>
+                <span className="text-right"><b className="block font-mono text-lg text-teal tabular-nums"><AnimatedNumber value={adjusted} format={etb} /></b><small className="font-mono text-xs text-muted-foreground tabular-nums">≈ <AnimatedNumber value={adjusted} format={usd} /></small></span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-muted" role="img"
                 aria-label={`Battery-adjusted residual is ${Math.round(bf * 100)}% of book residual.`}>
@@ -146,7 +130,7 @@ export default function Tools() {
               </div>
               <div className="flex items-baseline justify-between gap-4 border-t border-dashed pt-3 text-sm">
                 <span className="text-muted-foreground">Unpriced exposure <small className="block text-xs">estimated battery value loss</small></span>
-                <span className="text-right"><b className="block font-mono text-lg text-primary tabular">{etb(gap)}</b><small className="font-mono text-xs text-muted-foreground">≈ {usd(gap)}</small></span>
+                <span className="text-right"><b className="block font-mono text-lg text-primary tabular-nums"><AnimatedNumber value={gap} format={etb} /></b><small className="font-mono text-xs text-muted-foreground tabular-nums">≈ <AnimatedNumber value={gap} format={usd} /></small></span>
               </div>
             </div>
 
@@ -161,7 +145,7 @@ export default function Tools() {
               </div>
               <div className="mt-3 h-[230px] w-full">
                 <ResponsiveContainer>
-                  <AreaChart data={curve} margin={{ top: 6, right: 8, bottom: 0, left: -18 }}>
+                  <AreaChart data={curve} margin={{ top: 6, right: 8, bottom: 0, left: -6 }}>
                     <defs>
                       <linearGradient id="gActual" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.28} />
@@ -206,9 +190,10 @@ export default function Tools() {
             <p className="text-xs leading-relaxed text-muted-foreground">
               Indicative model using RISIQ's published method. Vehicle prices are indicative Addis retail; dollar figures use an indicative {ETB_PER_USD} Br/$ rate. A certificate replaces this estimate with a measurement.
             </p>
-            <Button asChild variant="outline" className="w-fit"><a href="/verify">Verify a real certificate</a></Button>
-          </div>
+            <Button asChild className={cn(PRIMARY_GLOW, 'w-fit bg-teal text-slate-950 hover:bg-teal/90')}><a href="/verify">Verify a real certificate</a></Button>
+          </section>
         </div>
+        </Stage>
       </Reveal>
 
       <div className="mt-20">

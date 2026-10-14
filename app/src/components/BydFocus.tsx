@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom'
 import { Check, ArrowRight, PlugZap, BatteryCharging, Cpu, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { GRADES } from '@/lib/data'
+import { CAR_ASSETS, type CarAsset } from '@/lib/cars'
 import { cn } from '@/lib/utils'
 
 type Car = {
   id: string; brand: string; model: string; seg: string
   kwh: number; range: number; cycle: string
-  img: string; credit: { author: string; license: string; url: string }
+  asset: CarAsset
   obd: string
   markers?: { x: number; y: number }[]
 }
@@ -18,17 +19,17 @@ type Car = {
    Wikimedia Commons images with the background removed. */
 const CARS: Car[] = [
   { id: 'atto3', brand: 'BYD', model: 'Atto 3', seg: 'Compact SUV · the most common EV in Addis', kwh: 60.5, range: 420, cycle: 'rated',
-    img: 'img/cars/atto3.webp', credit: { author: 'Hubert Berberich (HubiB)', license: 'CC BY 4.0', url: 'https://creativecommons.org/licenses/by/4.0' },
+    asset: CAR_ASSETS.atto3,
     obd: 'Diagnostics locked to the manufacturer’s tool',
     markers: [{ x: 12, y: 46 }, { x: 50, y: 56 }, { x: 33, y: 30 }] },
   { id: 'dolphin', brand: 'BYD', model: 'Dolphin', seg: 'Hatchback · taxi and commuter favourite', kwh: 44.9, range: 405, cycle: 'rated',
-    img: 'img/cars/dolphin.webp', credit: { author: 'MoCars', license: 'CC0', url: 'https://creativecommons.org/publicdomain/zero/1.0' },
+    asset: CAR_ASSETS.dolphin,
     obd: 'Diagnostics locked to the manufacturer’s tool' },
   { id: 'deepal', brand: 'Changan', model: 'Deepal S07', seg: 'Mid-size SUV · newer import', kwh: 68.8, range: 520, cycle: 'CLTC',
-    img: 'img/cars/deepal.webp', credit: { author: 'Sulthan Naufal', license: 'CC BY 4.0', url: 'https://creativecommons.org/licenses/by/4.0' },
+    asset: CAR_ASSETS.deepalS07,
     obd: 'Encrypted BMS channel on most trims' },
   { id: 'jetour', brand: 'Jetour', model: 'Ice Cream EV', seg: 'City car · long-range pack', kwh: 13.9, range: 170, cycle: 'rated',
-    img: 'img/cars/jetour.webp', credit: { author: 'Quzhouliulian', license: 'CC BY-SA 4.0', url: 'https://creativecommons.org/licenses/by-sa/4.0' },
+    asset: CAR_ASSETS.iceCream,
     obd: 'Proprietary protocol · no public PIDs' },
 ]
 
@@ -65,7 +66,7 @@ export function BydFocus() {
           {/* keyed remount + CSS entrance when the model changes */}
           <div key={car.id} className="animate-rise relative z-10 h-[240px] md:h-[320px]">
             {/* absolute + object-contain: an auto grid row would grow to the photo's intrinsic height */}
-            <img src={car.img} alt={`${car.brand} ${car.model}`} loading="lazy" data-parallax="-3"
+            <img src={car.asset.src} width={car.asset.w} height={car.asset.h} alt={car.asset.alt} loading="lazy" data-parallax="-3"
               className="absolute inset-0 size-full object-contain drop-shadow-[0_28px_36px_rgba(0,0,0,0.28)]" />
           </div>
           {car.markers?.map(({ x, y }, i) => (
@@ -87,8 +88,8 @@ export function BydFocus() {
           </ol>
         </div>
         <figcaption className="mt-3 text-xs text-muted-foreground">
-          {car.brand} {car.model}. Photo: {car.credit.author},{' '}
-          <a className="underline underline-offset-2 hover:text-brand" href={car.credit.url} target="_blank" rel="noopener noreferrer">{car.credit.license}</a>, via Wikimedia Commons; background removed.
+          {car.brand} {car.model}. Photo: {car.asset.credit.author},{' '}
+          <a className="underline underline-offset-2 hover:text-brand" href={car.asset.credit.url} target="_blank" rel="noopener noreferrer">{car.asset.credit.license}</a>, via Wikimedia Commons; background removed.
         </figcaption>
       </figure>
 

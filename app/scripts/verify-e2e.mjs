@@ -48,17 +48,24 @@ const ev = async (expr) => (await send('Runtime.evaluate', { expression: expr, r
 const wheel = async (dy) => { await send('Input.dispatchMouseEvent', { type: 'mouseWheel', x: 720, y: 450, deltaX: 0, deltaY: dy }); await sleep(60) }
 /** Polls an expression until it is truthy — fixed sleeps are where these scripts get flaky. */
 /** A genuine pointer press at a fraction of a slider's track — what a finger or mouse does.
- *  Waits for the track to stop moving (Lenis may still be gliding) and to be under the pointer. */
+ *  Waits for the track to stop moving (Lenis may still be gliding) and to be under the pointer, then
+ *  brings it on screen, and confirms the thumb actually landed near the aimed fraction, retrying a missed press. */
 const pressSlider = async (label, f) => {
-  const probe = `(()=>{const t=document.querySelector('[role=slider][aria-label="${label}"]').closest('[data-slot=slider]');const r=t.getBoundingClientRect();return {x:r.left,y:r.top+r.height/2,w:r.width}})()`
-  let r = await ev(probe), still = 0
-  for (let i = 0; i < 60 && still < 3; i++) { await sleep(120); const n = await ev(probe); still = n.x === r.x && n.y === r.y ? still + 1 : 0; r = n }
-  const x = r.x + Math.max(2, Math.min(r.w - 2, r.w * f))
-  await ev(`document.elementFromPoint(${x}, ${r.y})?.closest('[data-slot=slider]') ? true : false`)
-  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y: r.y })
-  await send('Input.dispatchMouseEvent', { type: 'mousePressed', x, y: r.y, button: 'left', clickCount: 1 })
-  await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y: r.y, button: 'left', clickCount: 1 })
-  await sleep(150)
+  const sel = `[role=slider][aria-label="${label}"]`
+  const probe = `(()=>{const t=document.querySelector('${sel}').closest('[data-slot=slider]');const r=t.getBoundingClientRect();return {x:r.left,y:r.top+r.height/2,w:r.width}})()`
+  const landed = `(()=>{const t=document.querySelector('${sel}');const lo=+t.getAttribute('aria-valuemin'),hi=+t.getAttribute('aria-valuemax');return (+t.getAttribute('aria-valuenow')-lo)/(hi-lo)})()`
+  for (let attempt = 0; attempt < 4; attempt++) {
+    await scrollUntil(sel, MID) // a press outside the viewport hits nothing: bring the slider on screen first
+    let r = await ev(probe), still = 0
+    for (let i = 0; i < 60 && still < 3; i++) { await sleep(120); const n = await ev(probe); still = n.x === r.x && n.y === r.y ? still + 1 : 0; r = n }
+    const x = r.x + Math.max(2, Math.min(r.w - 2, r.w * f))
+    await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y: r.y })
+    await send('Input.dispatchMouseEvent', { type: 'mousePressed', x, y: r.y, button: 'left', clickCount: 1 })
+    await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y: r.y, button: 'left', clickCount: 1 })
+    await sleep(200)
+    if (Math.abs((await ev(landed)) - f) < 0.08) return
+  }
+  check(`pointer press landed on the "${label}" slider`, false, `wanted ${f}, got ${await ev(landed)}`)
 }
 /** Scrolls with real wheel input until `delta` (an expression over `el`) is ~0. Lenis ignores native
  *  scrollTo while it is still gliding from earlier wheel input, so a user-faithful scroll is the only
@@ -152,6 +159,27 @@ try {
   await scrollUntil('[data-rig=wave]', 'el.getBoundingClientRect().bottom - innerHeight * 0.2')
   check('signal trace draws itself with scroll', typeof off0 === 'number' && off0 > 20 && await until(`(${SCRUB}) < 2`, 10_000), `offset ${off0?.toFixed?.(0)} → ${await ev(SCRUB)}`)
 
+  // ---- touch targets
+  check('every slider is at least 44 px tall (touch target)', await ev(`[...document.querySelectorAll('[data-slot=slider]')].length >= 4 && [...document.querySelectorAll('[data-slot=slider]')].every(s => s.getBoundingClientRect().height >= 44)`))
+
+  // ---- compatibility tool: real photographs, with credits
+  await centre('#compat-q')
+  const setQ = (v) => ev(`(()=>{const i=document.querySelector('#compat-q');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(i,${JSON.stringify(v)});i.dispatchEvent(new Event('input',{bubbles:true}))})()`)
+  await setQ('E07')
+  check('compat search: the Deepal E07 shows its own photo, decoded at full resolution', await until(`(()=>{const f=document.querySelector('[data-car=deepalE07]');const i=f&&f.querySelector('img');return !!i&&i.complete&&i.naturalWidth>=1200})()`, 15_000))
+  check('…with its licence credit', (await ev(`document.querySelector('[data-car=deepalE07]').parentElement.querySelector('figcaption')?.textContent`))?.includes('CC0'))
+  await setQ('Dolphin')
+  check('compat search: the Dolphin shows its photo', await until(`(()=>{const i=document.querySelector('[data-car=dolphin] img');return !!i&&i.complete&&i.naturalWidth>=1200})()`, 15_000))
+  await setQ('Seal')
+  check('a model without a licensed photo gets an honest placeholder, not another car', await until(`document.querySelector('[data-car=none]')?.textContent.includes('No licensed photo')`, 8_000))
+
+  // ---- simulator: the test-vehicle picker
+  await centre('[data-rig=vehicle]')
+  await until(`${BOARD}.dataset.phase === 'live'`, 25_000)
+  await ev(`[...document.querySelectorAll('[role=radio]')].find(r => r.textContent.includes('Deepal E07')).click()`)
+  check('simulator: choosing a vehicle swaps its photo and labels the port diagram', await until(`document.querySelector('[data-rig=vehicle]').dataset.vehicle === 'Changan Deepal E07' && !!document.querySelector('[data-rig=vehicle] [data-car=deepalE07] img') && ${BOARD}.textContent.includes('CHANGAN DEEPAL E07')`, 8_000))
+  check('…and the plug re-seats for the new car', await until(`${BOARD}.dataset.phase === 'live' && Math.abs((${RATIO}) - 0.8703) < 0.012`, 25_000))
+
   // ---- OBD mode
   await centre('[data-rig=board]')
   await ev(`[...document.querySelectorAll('[role=tab]')].find(t => t.textContent.includes('Standard OBD diagnostics')).click()`)
@@ -160,6 +188,18 @@ try {
   let lo = 1, hi = 0
   for (let i = 0; i < 24; i++) { const v = await ev(`(()=>{const r=document.querySelector('[data-rig=probe]').getBoundingClientRect(),q=${BOARD}.getBoundingClientRect();return (r.right-q.left)/q.width})()`); lo = Math.min(lo, v); hi = Math.max(hi, v); await sleep(250) }
   check('probe approaches the port but is refused short of its face', hi < 0.643 && hi - lo > 0.05, `probe tip ${lo.toFixed(3)}–${hi.toFixed(3)} of board (face at 0.643)`)
+
+  console.log('\nTools calculator')
+  await send('Page.navigate', { url: `http://localhost:${PORT}/tools` })
+  check('Tools: the calculator renders the radial gauge', await until(`!!document.querySelector('[role=meter]')`, 20_000))
+  await centre('[role=meter]')
+  check('Tools: all five sliders are at least 44 px tall', await ev(`[...document.querySelectorAll('[data-slot=slider]')].length === 5 && [...document.querySelectorAll('[data-slot=slider]')].every(s => s.getBoundingClientRect().height >= 44)`))
+  await sleep(1500)
+  const t0 = await ev(`+document.querySelector('[role=meter]').getAttribute('aria-valuenow')`)
+  for (const l of ['Age', 'Charge cycles', 'Fast charging', 'Daily temperature']) await pressSlider(l, 1)
+  check('Tools: pushing the sliders drops the reading and turns the gauge critical red', await until(`(()=>{const m=document.querySelector('[role=meter]');return +m.getAttribute('aria-valuenow') < 55 && m.style.color === 'rgb(239, 68, 68)'})()`, 15_000), `${t0}% → ${await ev(`document.querySelector('[role=meter]').getAttribute('aria-valuetext')`)}`)
+  check('Tools: the needle settles on the reading', await until(`(()=>{const m=document.querySelector('[role=meter]');const a=+/rotate\\(([-\\d.]+)/.exec(m.querySelector('[data-gauge=needle]').getAttribute('transform'))[1];return Math.abs(a-(-135+2.7*+m.getAttribute('aria-valuenow')))<1})()`, 15_000))
+  check('Tools: financial figures are animated tabular numerals', await ev(`(()=>{const n=[...document.querySelectorAll('[aria-label="Calculator results"] [aria-hidden].tabular-nums')];return n.length >= 5 && n.every(e => getComputedStyle(e).fontVariantNumeric.includes('tabular-nums') && /\\d/.test(e.textContent))})()`))
 
   console.log('\nPhone 390×844, coarse pointer, reduced motion')
   await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true })
@@ -177,6 +217,21 @@ try {
   check('no WebGL canvas under reduced motion', !(await ev(`!!document.querySelector('canvas')`)))
   check('workflow is a plain stack (no pin)', !(await ev(`!!document.querySelector('.pin-spacer')`)) && (await ev(`document.querySelectorAll('section[aria-labelledby="wf-title"] article').length`)) === 4)
   check('nothing left invisible', (await ev(`[...document.querySelectorAll('.reveal, .reveal-item, section, article')].filter(e=>getComputedStyle(e).opacity==='0').length`)) === 0)
+
+  console.log('\nPinned workflow fallbacks')
+  const STACKED = `(()=>{const s=document.querySelector('section[aria-labelledby="wf-title"]');const r=[...s.querySelectorAll('article')].map(a=>a.getBoundingClientRect());return r.length===4&&!document.querySelector('.pin-spacer')&&r.every(x=>x.left>=0&&x.right<=innerWidth+1)&&r.every((x,i)=>i===0||x.top>=r[i-1].bottom-1)&&document.documentElement.scrollWidth===innerWidth})()`
+  await send('Emulation.setTouchEmulationEnabled', { enabled: true })
+  await send('Emulation.setEmulatedMedia', { features: [{ name: 'pointer', value: 'coarse' }, { name: 'hover', value: 'none' }, { name: 'prefers-reduced-motion', value: 'no-preference' }] })
+  await send('Emulation.setDeviceMetricsOverride', { width: 1180, height: 820, deviceScaleFactor: 1, mobile: true })
+  await send('Page.navigate', { url: `http://localhost:${PORT}/` })
+  await until(`!!document.querySelector('section[aria-labelledby="wf-title"] article')`)
+  check('touch tablet 1180×820 (landscape): workflow is a reachable vertical stack, no overflow', await until(STACKED, 8_000))
+  await send('Emulation.setTouchEmulationEnabled', { enabled: false })
+  await send('Emulation.setEmulatedMedia', { features: [{ name: 'pointer', value: 'fine' }, { name: 'hover', value: 'hover' }, { name: 'prefers-reduced-motion', value: 'reduce' }] })
+  await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false })
+  await send('Page.navigate', { url: `http://localhost:${PORT}/` })
+  await until(`!!document.querySelector('section[aria-labelledby="wf-title"] article')`)
+  check('desktop 1440 with reduced motion: all four steps reachable (stacked, not clipped off-screen)', await until(STACKED, 8_000))
 
   console.log('\nDesktop, WebGL unavailable')
   await send('Emulation.setEmulatedMedia', { features: [{ name: 'pointer', value: 'fine' }, { name: 'hover', value: 'hover' }, { name: 'prefers-reduced-motion', value: 'no-preference' }] })

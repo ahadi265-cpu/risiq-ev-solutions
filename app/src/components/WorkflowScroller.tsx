@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Plug, Gauge, Sigma, FileSignature, Check, MoveRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { PIN_QUERY } from '@/lib/pinned'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -23,8 +24,8 @@ const STEPS = [
 
 /**
  * Pinned horizontal sequence: on desktop the section pins for the height of
- * its track and vertical scroll scrubs the four panels sideways. On phones
- * and under reduced motion it is a plain vertical stack — nothing is hidden
+ * its track and vertical scroll scrubs the four panels sideways. On phones, touch
+ * tablets and under reduced motion it is a plain vertical stack — nothing is hidden
  * or repositioned by JS, so the copy is always reachable.
  *
  * Layered parallax, on top of the base scrub:
@@ -55,7 +56,7 @@ export function WorkflowScroller() {
 
   useEffect(() => {
     const mm = gsap.matchMedia()
-    mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+    mm.add(PIN_QUERY, () => {
       const sec = section.current!, tr = track.current!
       const dist = () => tr.scrollWidth - sec.clientWidth
 
@@ -107,9 +108,9 @@ export function WorkflowScroller() {
 
   return (
     <section ref={section} aria-labelledby="wf-title"
-      className="relative isolate overflow-hidden border-y bg-muted/60 lg:h-dvh lg:flex lg:flex-col lg:justify-center">
+      className="relative isolate overflow-hidden border-y bg-muted/60 pinned:h-dvh pinned:flex pinned:flex-col pinned:justify-center">
       <div ref={bgGrid} aria-hidden className="bg-grid absolute inset-0 -z-10 w-[160%] opacity-60 will-change-transform" />
-      <div className="mx-auto w-full max-w-[1440px] px-6 pt-16 lg:pt-0">
+      <div className="mx-auto w-full max-w-[1440px] px-6 pt-16 pinned:pt-0">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-[46rem]">
             <span className="flex items-center gap-2.5 font-mono text-xs tracking-[0.14em] text-amber uppercase">
@@ -117,7 +118,7 @@ export function WorkflowScroller() {
             </span>
             <h2 id="wf-title" className="text-fluid-h2 mt-4 font-semibold">From plug to certificate, in four steps.</h2>
           </div>
-          <div className="hidden items-center gap-3 font-mono text-xs text-muted-foreground lg:flex">
+          <div className="hidden items-center gap-3 font-mono text-xs text-muted-foreground pinned:flex">
             <span className="tabular">{STEPS[idx].n} / 04</span>
             <span className="relative h-1 w-40 overflow-hidden rounded-full bg-border">
               <span ref={bar} className="absolute inset-0 origin-left rounded-full bg-brand" style={{ transform: 'scaleX(0)' }} />
@@ -129,14 +130,14 @@ export function WorkflowScroller() {
       </div>
 
       {/* the track: a column on phones, a sideways row on desktop */}
-      <div ref={track} className="mt-10 flex w-max flex-col gap-6 px-6 pb-16 will-change-transform lg:mt-12 lg:flex-row lg:items-stretch lg:gap-8 lg:pr-[calc(50vw-22rem)] lg:pb-0 lg:pl-[max(1.5rem,calc((100vw-1440px)/2+1.5rem))]">
+      <div ref={track} className="mx-auto mt-10 flex w-max flex-col gap-6 px-6 pb-16 will-change-transform pinned:mx-0 pinned:mt-12 pinned:flex-row pinned:items-stretch pinned:gap-8 pinned:pr-[calc(50vw-22rem)] pinned:pb-0 pinned:pl-[max(1.5rem,calc((100vw-1440px)/2+1.5rem))]">
         {STEPS.map((s, i) => {
           const Icon = s.icon
           const on = i === idx
           return (
             <article key={s.n} ref={(el) => { cardRefs.current[i] = el }}
-              className={cn('glass relative grid w-[calc(100vw-3rem)] max-w-[44rem] shrink-0 gap-6 overflow-hidden rounded-3xl border p-7 transition-colors duration-500 md:p-9 lg:w-[min(64vw,52rem)] lg:grid-cols-[1fr_auto]',
-              on && 'lg:border-brand/40 lg:shadow-[0_24px_70px_-30px_color-mix(in_oklch,var(--brand)_60%,transparent)]')}>
+              className={cn('glass relative grid w-[calc(100vw-3rem)] max-w-[44rem] shrink-0 gap-6 overflow-hidden rounded-3xl border p-7 transition-colors duration-500 md:p-9 pinned:w-[min(64vw,52rem)] pinned:grid-cols-[1fr_auto]',
+              on && 'pinned:border-brand/40 pinned:shadow-[0_24px_70px_-30px_color-mix(in_oklch,var(--brand)_60%,transparent)]')}>
               <div>
                 <span className="font-mono text-[0.68rem] tracking-[0.16em] text-brand uppercase">Step {s.n} · {s.at}</span>
                 <h3 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">{s.t}</h3>
@@ -151,7 +152,7 @@ export function WorkflowScroller() {
                 </ul>
               </div>
               <div ref={(el) => { chipRefs.current[i] = el }}
-                className="grid content-center justify-items-center gap-4 will-change-transform lg:w-52">
+                className="grid content-center justify-items-center gap-4 will-change-transform pinned:w-52">
                 <span className={cn('grid size-28 place-items-center rounded-3xl border transition-all duration-500',
                   on ? 'border-brand/40 bg-brand text-white shadow-[0_0_60px_-10px_color-mix(in_oklch,var(--brand)_70%,transparent)]' : 'bg-card text-brand')}>
                   <Icon className="size-12" strokeWidth={1.6} />
