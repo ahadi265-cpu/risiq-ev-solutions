@@ -128,8 +128,32 @@ export function mulberry32(seed: number) {
    is what a plain reader gets from the diagnostic port; socket measurement
    works on all of them, and any BMS reading is cross-checked regardless. */
 export type ObdStatus = 'locked' | 'partial' | 'readable'
-export type Compat = { make: string; model: string; seg: string; kwh: string; obd: ObdStatus; common: boolean }
+/** Addis Ababa field programme. `certified` = measured on the car in Addis; `validating` = on the
+ *  programme, certification profile not yet complete. Institutional facts only — never method detail. */
+export type FieldStatus = 'certified' | 'validating'
+export type FieldProfile = {
+  status: FieldStatus; tests: string; architecture: string; platform: string; confidence: string; note: string
+}
+export type Compat = {
+  make: string; model: string; seg: string; kwh: string; obd: ObdStatus; common: boolean; field?: FieldProfile
+}
+export const FIELD_BADGE = 'Field-Tested in Addis Ababa — 100% Rapid Certified'
+const FIELD_TESTS = 'Rapid Check (15 min) · Reference Test'
+const FIELD_CONF = '±3% Reference · ±6% Rapid'
 export const COMPAT: Compat[] = [
+  /* Field-tested in Addis Ababa, October 2026 — listed first so they lead the default view. */
+  { make: 'BYD', model: 'Seagull', seg: 'City hatchback', kwh: '30 / 38.88 kWh', obd: 'partial', common: true,
+    field: { status: 'certified', tests: FIELD_TESTS, architecture: 'LFP Blade', platform: '288 V', confidence: FIELD_CONF,
+      note: 'Full-window Reference Test completed on a 38.88 kWh Blade pack in Addis Ababa, October 2026.' } },
+  { make: 'BYD', model: 'Yuan UP (Atto 2)', seg: 'Compact SUV', kwh: '32 / 45.12 kWh', obd: 'partial', common: true,
+    field: { status: 'certified', tests: FIELD_TESTS, architecture: 'LFP Blade', platform: '300 V', confidence: FIELD_CONF,
+      note: 'Verified on a 45.12 kWh Blade pack in Addis Ababa; the 94-cell array profiled cell by cell.' } },
+  { make: 'BYD', model: 'Leopard (Fangchengbao)', seg: 'Off-road SUV · plug-in hybrid', kwh: '≈ 36 kWh traction pack', obd: 'partial', common: true,
+    field: { status: 'certified', tests: FIELD_TESTS, architecture: 'LFP Blade', platform: '454 V high-voltage', confidence: FIELD_CONF,
+      note: 'Verified on the 142-cell high-voltage platform in Addis Ababa; calibrated for dual-motor architectures.' } },
+  { make: 'BYD', model: 'Sealion', seg: 'Mid-size SUV', kwh: '82.5 kWh (Sealion 7)', obd: 'locked', common: true,
+    field: { status: 'validating', tests: FIELD_TESTS, architecture: 'LFP Blade', platform: 'Confirmed on test', confidence: FIELD_CONF,
+      note: 'On the Addis Ababa field programme — the certification profile is being validated.' } },
   { make: 'BYD', model: 'Atto 3', seg: 'Compact SUV', kwh: '49.9 / 60.5 kWh', obd: 'locked', common: true },
   { make: 'BYD', model: 'Dolphin', seg: 'Hatchback', kwh: '44.9 / 60.5 kWh', obd: 'locked', common: true },
   { make: 'BYD', model: 'Seal', seg: 'Saloon', kwh: '61.4 / 82.5 kWh', obd: 'locked', common: false },
@@ -149,11 +173,55 @@ export const COMPAT: Compat[] = [
 
 /** Real-time compatibility search. No query shows the models most common in
  *  Addis; a query matches make, model or segment, case-insensitively. */
-export function filterCompat(query: string, limit = 8): Compat[] {
+export const COMPAT_LIMIT = 12
+export function filterCompat(query: string, limit = COMPAT_LIMIT): Compat[] {
   const s = query.trim().toLowerCase()
   const list = s
     ? COMPAT.filter((c) => `${c.make} ${c.model} ${c.seg}`.toLowerCase().includes(s))
     : COMPAT.filter((c) => c.common)
   return list.slice(0, limit)
 }
+
+/* Real-world evidence from the Addis Ababa field programme, October 2026. Anonymised,
+   institution-facing highlights only: what was measured, never how it was obtained. */
+export type EvidenceStat = { n: number; unit: string; label: string; decimals?: number }
+export type Evidence = {
+  id: string; make: string; model: string; profile: string; method: string
+  headline: string; body: string; stats: EvidenceStat[]; footnote: string
+}
+export const EVIDENCE: Evidence[] = [
+  { id: 'seagull', make: 'BYD', model: 'Seagull', profile: 'Real-World Fleet Cycle',
+    method: 'Measured · full-window Reference Test',
+    headline: 'A working city car with 32,695 km behind it — and a battery still at 97% of new.',
+    body: 'A high-mileage Seagull from the Addis fleet: 290 charge sessions tracked across 32,695 km, then put through a full-window reference charge at the socket. The measured State of Health landed at 97.2%, and the pack settled to a 51 mV resting balance after the charge — a healthy, evenly aged pack.',
+    stats: [
+      { n: 32695, unit: 'km', label: 'tracked on the odometer' },
+      { n: 290, unit: 'sessions', label: 'charge sessions analysed' },
+      { n: 97.2, unit: '%', label: 'measured State of Health', decimals: 1 },
+      { n: 51, unit: 'mV', label: 'resting pack balance' },
+    ],
+    footnote: '38.88 kWh LFP Blade pack · about 148 equivalent full cycles · Reference Test, Addis Ababa, 27 October 2026.' },
+  { id: 'yuan-up', make: 'BYD', model: 'Yuan UP', profile: 'Urban Commute Profile',
+    method: 'Health index · calibrated pack record',
+    headline: 'A commuter’s Atto 2, 79 full cycles in: a 98.4% health index and cells within 5 mV of each other.',
+    body: 'An everyday Addis commuter on the 45.12 kWh Blade pack. RISIQ’s calibrated pack record puts the health index at 98.4%, with an industry-leading 5 mV delta across the 94-cell array — the signature of a pack that has only ever been charged gently.',
+    stats: [
+      { n: 45.12, unit: 'kWh', label: 'nominal pack capacity', decimals: 2 },
+      { n: 98.4, unit: '%', label: 'health index', decimals: 1 },
+      { n: 5, unit: 'mV', label: 'cell delta across the pack' },
+      { n: 94, unit: 'cells', label: 'in the series array' },
+    ],
+    footnote: 'Health index from the calibrated pack record, cross-checked against lifetime energy counters (99.7% agreement); full-window Reference Test scheduled.' },
+  { id: 'leopard', make: 'BYD', model: 'Leopard', profile: 'Next-Gen High-Voltage',
+    method: 'Health index · near-new baseline',
+    headline: 'The first high-voltage BYD platform certified in Ethiopia: 142 cells in series, 454 V, profiled from new.',
+    body: 'A Fangchengbao Leopard on BYD’s 454 V architecture, calibrated for high-performance dual-motor drivetrains. Profiled almost new — 1.5 full cycles — it gives RISIQ a factory-fresh baseline for the high-voltage packs now arriving in Addis, with an 8 mV cell balance and a 99.2% health index.',
+    stats: [
+      { n: 142, unit: 'cells', label: 'in the series system' },
+      { n: 454, unit: 'V', label: 'high-voltage platform' },
+      { n: 8, unit: 'mV', label: 'cell balance' },
+      { n: 99.2, unit: '%', label: 'health index (near-new)', decimals: 1 },
+    ],
+    footnote: '≈ 36 kWh LFP Blade traction pack · plug-in hybrid platform · profiled in Addis Ababa, 20 October 2026.' },
+]
 

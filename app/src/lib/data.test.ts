@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  modelSoH, decayCurve, gradeOf, bookFactor, batteryFactor, hashStr, mulberry32, filterCompat, COMPAT, GRADES,
+  modelSoH, decayCurve, gradeOf, bookFactor, batteryFactor, hashStr, mulberry32, filterCompat, COMPAT, COMPAT_LIMIT, GRADES, EVIDENCE,
 } from '@/lib/data'
 
 describe('battery model', () => {
@@ -81,11 +81,17 @@ describe('seeded randomness', () => {
 })
 
 describe('compatibility search', () => {
-  it('shows only the common models when the query is empty, capped at 8', () => {
+  it('shows only the common models when the query is empty, capped at the list limit', () => {
     const hits = filterCompat('')
     expect(hits.length).toBeGreaterThan(0)
-    expect(hits.length).toBeLessThanOrEqual(8)
+    expect(hits.length).toBeLessThanOrEqual(COMPAT_LIMIT)
     expect(hits.every((c) => c.common)).toBe(true)
+  })
+
+  it('leads the default view with the field-tested Addis models', () => {
+    const first = filterCompat('').slice(0, 3)
+    expect(first.every((c) => c.field?.status === 'certified')).toBe(true)
+    expect(first.map((c) => c.model)).toContain('Seagull')
   })
 
   it('matches make, model and segment, ignoring case and whitespace', () => {
@@ -102,5 +108,45 @@ describe('compatibility search', () => {
   it('reports locked OBD on the Chinese imports and readable on the Leaf', () => {
     expect(filterCompat('Atto 3')[0].obd).toBe('locked')
     expect(filterCompat('Leaf')[0].obd).toBe('readable')
+  })
+})
+
+describe('Addis Ababa field programme', () => {
+  it('certifies the three models with completed field sessions and keeps the Sealion in validation', () => {
+    const status = (m: string) => COMPAT.find((c) => c.model.startsWith(m))?.field?.status
+    expect(status('Seagull')).toBe('certified')
+    expect(status('Yuan UP')).toBe('certified')
+    expect(status('Leopard')).toBe('certified')
+    expect(status('Sealion')).toBe('validating')
+    expect(status('Atto 3')).toBeUndefined()
+  })
+
+  it('every field profile states the test types, pack architecture and confidence band', () => {
+    for (const c of COMPAT.filter((c) => c.field)) {
+      expect(c.field!.tests).toMatch(/Rapid/)
+      expect(c.field!.tests).toMatch(/Reference/)
+      expect(c.field!.architecture).toMatch(/LFP Blade/)
+      expect(c.field!.confidence).toMatch(/±3%/)
+    }
+  })
+
+  it('publishes three case studies whose headline figures match the field reports', () => {
+    expect(EVIDENCE.map((e) => e.model)).toEqual(['Seagull', 'Yuan UP', 'Leopard'])
+    const stat = (id: string, unit: string) => EVIDENCE.find((e) => e.id === id)!.stats.find((s) => s.unit === unit)!.n
+    expect(stat('seagull', 'km')).toBe(32695)
+    expect(stat('seagull', 'sessions')).toBe(290)
+    expect(stat('seagull', '%')).toBe(97.2)
+    expect(stat('seagull', 'mV')).toBe(51)
+    expect(stat('yuan-up', 'kWh')).toBe(45.12)
+    expect(stat('yuan-up', '%')).toBe(98.4)
+    expect(stat('yuan-up', 'mV')).toBe(5)
+    expect(stat('yuan-up', 'cells')).toBe(94)
+    expect(stat('leopard', 'cells')).toBe(142)
+    expect(stat('leopard', 'V')).toBe(454)
+  })
+
+  it('labels only the Seagull as measured — the other two carry a health index, not a measured SoH', () => {
+    expect(EVIDENCE.find((e) => e.id === 'seagull')!.method).toMatch(/^Measured/)
+    for (const id of ['yuan-up', 'leopard']) expect(EVIDENCE.find((e) => e.id === id)!.method).toMatch(/^Health index/)
   })
 })

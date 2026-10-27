@@ -509,7 +509,12 @@ html { scroll-behavior: smooth; }
     50%      { box-shadow: 0 0 0 3px transparent, 0 0 12px 2px var(--cell-glow); }
   }
 
+/* ---------- field evidence: dwell bar on the active case-study tab ------ */
+  .ev-progress { transform-origin: left; animation: ev-progress 7s linear both; }
+  @keyframes ev-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
   @media (prefers-reduced-motion: reduce) {
+    .ev-progress { animation: none; transform: none; }
     .hero-aurora, .hero-grid, .hero-scan, .glow-metric::before, .node-pulse, .deny-flash, .cell-pulse { animation: none; }
     .rig-probe { animation: none; transform: translateX(var(--travel)); }
     .rig-shield { animation: none; opacity: 1; }

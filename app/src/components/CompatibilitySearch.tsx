@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
-import { Search, Lock, LockOpen, Unlock, Check, Timer, PlugZap, CarFront } from 'lucide-react'
+import { Search, Lock, LockOpen, Unlock, Check, Timer, PlugZap, CarFront, BadgeCheck, FlaskConical } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Stage, GLASS, GLASS_HOVER } from '@/components/Stage'
-import { COMPAT, filterCompat, type ObdStatus } from '@/lib/data'
+import { COMPAT, FIELD_BADGE, filterCompat, type ObdStatus } from '@/lib/data'
 import { carAssetFor } from '@/lib/cars'
 import { CarPhoto } from '@/components/CarPhoto'
 import { cn } from '@/lib/utils'
@@ -52,8 +52,17 @@ export function CompatibilitySearch() {
                         ? <img src={asset.src} width={asset.w} height={asset.h} alt="" loading="lazy" decoding="async" className="max-h-8 w-auto max-w-full object-contain" />
                         : <CarFront className="size-5 text-muted-foreground/60" strokeWidth={1.5} />}
                     </span>
-                    <span className="min-w-0 flex-1"><span className="font-mono text-[0.66rem] tracking-wider text-muted-foreground uppercase">{c.make}</span> <b>{c.model}</b></span>
-                    <span className="font-mono text-xs text-muted-foreground">{c.seg}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="font-mono text-[0.66rem] tracking-wider text-muted-foreground uppercase">{c.make}</span> <b>{c.model}</b>
+                      {c.field && (
+                        <span className={cn('ml-1.5 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 align-middle font-mono text-[0.58rem] font-semibold tracking-wider uppercase',
+                          c.field.status === 'certified' ? 'bg-grade-a/15 text-grade-a' : 'bg-amber/15 text-amber')}>
+                          {c.field.status === 'certified' ? <BadgeCheck className="size-3" /> : <FlaskConical className="size-3" />}
+                          {c.field.status === 'certified' ? 'Field-tested' : 'Validating'}
+                        </span>
+                      )}
+                    </span>
+                    <span className="hidden font-mono text-xs text-muted-foreground sm:block">{c.seg}</span>
                   </button>
                 </li>
               )
@@ -83,6 +92,26 @@ export function CompatibilitySearch() {
                 <Timer className="size-4 shrink-0 text-teal" />Est. Rapid Test: 15 min · Reference Test ≈ 4 h
               </li>
             </ul>
+            {sel.field && (() => {
+              const f = sel.field, ok = f.status === 'certified'
+              return (
+                <div className={cn('rounded-xl border p-4', ok ? 'border-grade-a/40 bg-grade-a/10' : 'border-amber/40 bg-amber/10')}>
+                  <span className={cn('inline-flex items-center gap-1.5 font-mono text-[0.66rem] font-semibold tracking-wider uppercase', ok ? 'text-grade-a' : 'text-amber')}>
+                    {ok ? <BadgeCheck className="size-3.5 shrink-0" /> : <FlaskConical className="size-3.5 shrink-0" />}
+                    {ok ? FIELD_BADGE : 'Validation in progress — Addis Ababa field programme'}
+                  </span>
+                  <dl className="mt-3 grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
+                    {([['Supported test type', f.tests], ['Pack architecture', f.architecture], ['Voltage platform', f.platform], ['Certification confidence', f.confidence]] as const).map(([k, v]) => (
+                      <div key={k}>
+                        <dt className="font-mono text-[0.62rem] tracking-[0.14em] text-muted-foreground uppercase">{k}</dt>
+                        <dd className="mt-0.5 text-sm font-medium tabular">{v}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <p className="mt-3 text-xs text-muted-foreground">{f.note}</p>
+                </div>
+              )
+            })()}
             <p className="flex items-start gap-2 text-xs text-muted-foreground">
               <Check className="mt-0.5 size-3.5 shrink-0 text-teal" strokeWidth={3} />
               Whatever the port allows, every BMS reading is cross-checked against RISIQ’s calibrated database; the certificate carries the calibrated result.

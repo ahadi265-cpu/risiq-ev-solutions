@@ -23,6 +23,7 @@ import { ServiceTabs } from '@/components/ServiceTabs'
 import { CalibrationFlow } from '@/components/CalibrationFlow'
 import { BydFocus, GradeLegend } from '@/components/BydFocus'
 import { CompatibilitySearch } from '@/components/CompatibilitySearch'
+import { FieldEvidence } from '@/components/FieldEvidence'
 import { MagneticButton } from '@/components/MagneticButton'
 import { WorkflowScroller } from '@/components/WorkflowScroller'
 import { scrollToEl } from '@/lib/useLenis'
@@ -149,7 +150,7 @@ export default function Home() {
               )}
             </p>
             <ul className="mt-7 flex flex-wrap gap-2" aria-label="Why RISIQ">
-              {['Independent — no OEM tool needed', 'Built for BYD & Chinese imports', 'QR-verified in under 2 s', 'Made in Addis Ababa'].map((t) => (
+              {['Independent — no OEM tool needed', 'Built for BYD & Chinese imports', 'QR-verified in under 2 s', 'Field-tested in Addis Ababa'].map((t) => (
                 <li key={t} className="flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90">
                   <BadgeCheck className="size-3.5" />{t}
                 </li>
@@ -248,6 +249,14 @@ export default function Home() {
         </SectionHead>
         <Reveal><BydFocus /></Reveal>
         <Reveal className="mt-10"><CompatibilitySearch /></Reveal>
+      </Section>
+
+      {/* ------------------------------------ real-world evidence: Addis field programme */}
+      <Section id="evidence">
+        <SectionHead eyebrow="Real-World Evidence" title="Addis Ababa fleet benchmarks.">
+          Measured on the BYD models actually being imported — on Addis Ababa roads in October 2026, not on a European test bench. Three anonymised case studies from the field programme.
+        </SectionHead>
+        <Reveal><FieldEvidence /></Reveal>
       </Section>
 
       {/* ----------------------------------------------------- what we offer */}
